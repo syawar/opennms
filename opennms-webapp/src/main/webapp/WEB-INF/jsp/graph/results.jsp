@@ -197,8 +197,8 @@
                     <c:param name="report" value="${resultSet.graphs[0].name}"/>
                     <c:param name="start" value="${results.start.time}"/>
                     <c:param name="end" value="${results.end.time}"/>
-                    <c:param name="width" value="${resultSet.graphs[0].graphWidth}"/>
-                    <c:param name="height" value="${resultSet.graphs[0].graphHeight}"/>
+                    <c:param name="width" value="800"/>
+                    <c:param name="height" value="150"/>
                 </c:url>
                 
                 <c:url var="graphUrl2" value="graph/graph.png">
@@ -206,8 +206,8 @@
                     <c:param name="report" value="${resultSet.graphs[0].name}"/>
                     <c:param name="start" value="${results.end.time - (results.end.time - results.start.time) * 7}"/>
                     <c:param name="end" value="${results.end.time}"/>
-                    <c:param name="width" value="${resultSet.graphs[0].graphWidth}"/>
-                    <c:param name="height" value="${resultSet.graphs[0].graphHeight}"/>
+                    <c:param name="width" value="800"/>
+                    <c:param name="height" value="150"/>
                 </c:url>
                 
                 <c:url var="graphUrl3" value="graph/graph.png">
@@ -215,8 +215,8 @@
                     <c:param name="report" value="${resultSet.graphs[0].name}"/>
                     <c:param name="start" value="${results.end.time - (results.end.time - results.start.time) * 30}"/>
                     <c:param name="end" value="${results.end.time}"/>
-                    <c:param name="width" value="${resultSet.graphs[0].graphWidth}"/>
-                    <c:param name="height" value="${resultSet.graphs[0].graphHeight}"/>
+                    <c:param name="width" value="800"/>
+                    <c:param name="height" value="150"/>
                 </c:url>
 
                 <script type="text/javascript">
