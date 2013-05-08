@@ -29,10 +29,8 @@
 package org.opennms.web.controller;
 
 import java.io.InputStream;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.jrobin.core.RrdException;
 import org.jrobin.core.timespec.TimeParser;
 import org.jrobin.core.timespec.TimeSpec;
@@ -127,8 +125,17 @@ public class RrdGraphController extends AbstractController {
                 throw new MissingParameterException("report");
             }
             
+            String width = request.getParameter("width");
+            String height = request.getParameter("height");
+            
             tempIn = m_rrdGraphService.getPrefabGraph(resourceId,
-                                                      report, startTime, endTime);
+                                                      report, startTime, endTime,
+                                                      width != null && !width.isEmpty()
+                                                        ? Integer.valueOf(width)
+                                                        : null,
+                                                      height != null && !height.isEmpty()
+                                                        ? Integer.valueOf(height)
+                                                        : null);
         }
 
         response.setContentType("image/png");

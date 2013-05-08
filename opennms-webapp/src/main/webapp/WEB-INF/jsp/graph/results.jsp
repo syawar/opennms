@@ -192,13 +192,31 @@
 
         <c:choose>
             <c:when test="${param.zoom == 'true'}">
-                <c:url var="graphUrl" value="graph/graph.png">
+                <c:url var="graphUrl1" value="graph/graph.png">
                     <c:param name="resourceId" value="${resultSet.resource.id}"/>
                     <c:param name="report" value="${resultSet.graphs[0].name}"/>
                     <c:param name="start" value="${results.start.time}"/>
                     <c:param name="end" value="${results.end.time}"/>
-                    <c:param name="graph_width" value="${resultSet.graphs[0].graphWidth}"/>
-                    <c:param name="graph_height" value="${resultSet.graphs[0].graphHeight}"/>
+                    <c:param name="width" value="${resultSet.graphs[0].graphWidth}"/>
+                    <c:param name="height" value="${resultSet.graphs[0].graphHeight}"/>
+                </c:url>
+                
+                <c:url var="graphUrl2" value="graph/graph.png">
+                    <c:param name="resourceId" value="${resultSet.resource.id}"/>
+                    <c:param name="report" value="${resultSet.graphs[0].name}"/>
+                    <c:param name="start" value="${results.end.time - (results.end.time - results.start.time) * 7}"/>
+                    <c:param name="end" value="${results.end.time}"/>
+                    <c:param name="width" value="${resultSet.graphs[0].graphWidth}"/>
+                    <c:param name="height" value="${resultSet.graphs[0].graphHeight}"/>
+                </c:url>
+                
+                <c:url var="graphUrl3" value="graph/graph.png">
+                    <c:param name="resourceId" value="${resultSet.resource.id}"/>
+                    <c:param name="report" value="${resultSet.graphs[0].name}"/>
+                    <c:param name="start" value="${results.end.time - (results.end.time - results.start.time) * 30}"/>
+                    <c:param name="end" value="${results.end.time}"/>
+                    <c:param name="width" value="${resultSet.graphs[0].graphWidth}"/>
+                    <c:param name="height" value="${resultSet.graphs[0].graphHeight}"/>
                 </c:url>
 
                 <script type="text/javascript">
@@ -214,8 +232,10 @@
                     <c:if test="${fn:contains(resultSet.resource.resourceType.label, 'SNMP') || fn:contains(resultSet.resource.resourceType.label, 'TCA') }">
                         <c:if test="${fn:contains(resultSet.resource.label,'(*)') != true}">
                             <a href="javascript:nrtgPopUp('${resultSet.resource.id}','${resultSet.graphs[0].name}')"><font size="-1"> Start NRT-Graphing for ${resultSet.graphs[0].title} </font></a><br>
-                            </c:if>
                         </c:if>
+                    </c:if>
+                    <opennms-addKscReport id="${resultSet.resource.id}.${resultSet.graphs[0].name}" reportName="${resultSet.graphs[0].name}" resourceId="${resultSet.resource.id}" graphTitle="${resultSet.graphs[0].title}" timespan="${results.relativeTime}"></opennms-addKscReport>
+                    <br />
                     <!--
                                         <form action="nrt/starter" onsubmit="return nrtgPopup();" id="nrtgForm" >
                                             <input type="hidden" name="resourceId" value="${resultSet.resource.id}"/>
@@ -223,8 +243,18 @@
                                             <input type="submit" name="nrt" value="NRT Graph"/>
                                         </form>
                     -->
-                    <img id="zoomImage" src="${graphUrl}" alt="Resource graph: ${resultSet.graphs[0].title} (drag to zoom)" />
-                    <opennms-addKscReport id="${resultSet.resource.id}.${resultSet.graphs[0].name}" reportName="${resultSet.graphs[0].name}" resourceId="${resultSet.resource.id}" graphTitle="${resultSet.graphs[0].title}" timespan="${results.relativeTime}"></opennms-addKscReport>
+                    
+                    <p>
+                    <img src="${graphUrl1}" id="zoomImage" alt="Resource graph: ${resultSet.graphs[0].title} (drag to zoom)" />
+                    </p>
+                    
+                    <p>
+                    <img src="${graphUrl2}" alt="Resource graph: ${resultSet.graphs[0].title}" />
+                    </p>
+                    
+                    <p>
+                    <img src="${graphUrl3}" alt="Resource graph: ${resultSet.graphs[0].title}" />
+                    </p>
                 </div>
             </c:when>
 
@@ -244,6 +274,8 @@
                         <c:param name="report" value="${graph.name}"/>
                         <c:param name="start" value="${results.start.time}"/>
                         <c:param name="end" value="${results.end.time}"/>
+                        <c:param name="width" value="${resultSet.graphs[0].graphWidth}"/>
+                        <c:param name="height" value="${resultSet.graphs[0].graphHeight}"/>
                     </c:url>
 
                     <c:if test="${fn:contains(resultSet.resource.resourceType.label, 'SNMP') || fn:contains(resultSet.resource.resourceType.label, 'TCA') }">

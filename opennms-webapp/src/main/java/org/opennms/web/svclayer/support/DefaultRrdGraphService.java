@@ -32,13 +32,14 @@ package org.opennms.web.svclayer.support;
 import java.io.File;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.text.SimpleDateFormat;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.regexp.RE;
 import org.apache.regexp.RESyntaxException;
 import org.opennms.core.utils.LogUtils;
@@ -144,7 +145,7 @@ public class DefaultRrdGraphService implements RrdGraphService, InitializingBean
 
     /** {@inheritDoc} */
     @Override
-    public InputStream getPrefabGraph(String resourceId, String report, long start, long end) {
+    public InputStream getPrefabGraph(String resourceId, String report, long start, long end, Integer width, Integer height) {
         Assert.notNull(resourceId, "resourceId argument cannot be null");
         Assert.notNull(report, "report argument cannot be null");
         Assert.isTrue(end > start, "end time " + end + " must be after start time" + start);
@@ -165,7 +166,9 @@ public class DefaultRrdGraphService implements RrdGraphService, InitializingBean
         String command = createPrefabCommand(graph,
                                              t.getCommandPrefix(),
                                              m_resourceDao.getRrdDirectory(true),
-                                             report);
+                                             report,
+                                             width,
+                                             height);
         
         return getInputStreamForCommand(command);
     }
@@ -298,9 +301,11 @@ public class DefaultRrdGraphService implements RrdGraphService, InitializingBean
      * @param reportName a {@link java.lang.String} object.
      * @return a {@link java.lang.String} object.
      */
+
     protected String createPrefabCommand(Graph graph,
             String commandPrefix,
-            File workDir, String reportName) {
+            File workDir, String reportName,
+            Integer width, Integer height) {
         PrefabGraph prefabGraph = graph.getPrefabGraph();
 
         String[] rrds = getRrdNames(graph.getResource(), graph.getPrefabGraph().getColumns());
@@ -395,6 +400,29 @@ public class DefaultRrdGraphService implements RrdGraphService, InitializingBean
             throw new IllegalArgumentException("Invalid regular expression "
                                                + "syntax, check "
                                                + "rrd-properties file", e);
+        }
+        
+        
+        if (width != null) {
+            final Pattern re = Pattern.compile("(--width|-w)(\\w+|=)(\\d+)");
+        
+            final Matcher matcher = re.matcher(command);
+            if (matcher.matches()) {
+                matcher.replaceFirst("--width " + width);
+            } else {
+                command = command + " --width " + width;
+            }
+        }
+        
+        if (height != null) {
+            final Pattern re = Pattern.compile("(--height|-h)(\\w+|=)(\\d+)");
+            
+            final Matcher matcher = re.matcher(command);
+            if (matcher.matches()) {
+                matcher.replaceFirst("--height=" + height);
+            } else {
+                command = command + " --height=" + height;
+            }
         }
         
         return command;
