@@ -197,28 +197,9 @@
                     <c:param name="report" value="${resultSet.graphs[0].name}"/>
                     <c:param name="start" value="${results.start.time}"/>
                     <c:param name="end" value="${results.end.time}"/>
-                    <c:param name="width" value="800"/>
-                    <c:param name="height" value="150"/>
+                    <c:param name="width" value="700"/>
+                    <c:param name="height" value="200"/>
                 </c:url>
-                
-                <c:url var="graphUrl2" value="graph/graph.png">
-                    <c:param name="resourceId" value="${resultSet.resource.id}"/>
-                    <c:param name="report" value="${resultSet.graphs[0].name}"/>
-                    <c:param name="start" value="${results.end.time - (results.end.time - results.start.time) * 7}"/>
-                    <c:param name="end" value="${results.end.time}"/>
-                    <c:param name="width" value="800"/>
-                    <c:param name="height" value="150"/>
-                </c:url>
-                
-                <c:url var="graphUrl3" value="graph/graph.png">
-                    <c:param name="resourceId" value="${resultSet.resource.id}"/>
-                    <c:param name="report" value="${resultSet.graphs[0].name}"/>
-                    <c:param name="start" value="${results.end.time - (results.end.time - results.start.time) * 30}"/>
-                    <c:param name="end" value="${results.end.time}"/>
-                    <c:param name="width" value="800"/>
-                    <c:param name="height" value="150"/>
-                </c:url>
-
                 <script type="text/javascript">
                     var zoomGraphLeftOffset  = ${results.graphLeftOffset};
                     var zoomGraphRightOffset = ${results.graphRightOffset};
@@ -274,8 +255,8 @@
                         <c:param name="report" value="${graph.name}"/>
                         <c:param name="start" value="${results.start.time}"/>
                         <c:param name="end" value="${results.end.time}"/>
-                        <c:param name="width" value="${resultSet.graphs[0].graphWidth}"/>
-                        <c:param name="height" value="${resultSet.graphs[0].graphHeight}"/>
+                        <c:param name="width" value="700"/>
+                        <c:param name="height" value="200"/>
                     </c:url>
 
                     <c:if test="${fn:contains(resultSet.resource.resourceType.label, 'SNMP') || fn:contains(resultSet.resource.resourceType.label, 'TCA') }">
