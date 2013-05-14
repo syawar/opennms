@@ -39,14 +39,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.opennms.features.topology.api.BoundingBox;
 import org.opennms.features.topology.api.Graph;
 import org.opennms.features.topology.api.GraphContainer;
+import org.opennms.features.topology.api.GraphContainer.ChangeListener;
 import org.opennms.features.topology.api.GraphVisitor;
 import org.opennms.features.topology.api.MapViewManager;
 import org.opennms.features.topology.api.MapViewManagerListener;
 import org.opennms.features.topology.api.Point;
 import org.opennms.features.topology.api.SelectionContext;
 import org.opennms.features.topology.api.SelectionListener;
-import org.opennms.features.topology.api.SelectionManager;
-import org.opennms.features.topology.api.GraphContainer.ChangeListener;
 import org.opennms.features.topology.api.topo.Edge;
 import org.opennms.features.topology.api.topo.Vertex;
 import org.opennms.features.topology.api.topo.VertexRef;
@@ -334,6 +333,7 @@ public class TopologyComponent extends AbstractComponent implements ChangeListen
 	    }
 	}
 
+    @Override
 	public void graphChanged(GraphContainer container) {
 		Graph graph = container.getGraph();
         setGraph(graph);
@@ -345,6 +345,7 @@ public class TopologyComponent extends AbstractComponent implements ChangeListen
 	/**
 	 * ValueChange listener for the scale property
 	 */
+    @Override
     public void valueChange(ValueChangeEvent event) {
         
         double scale = (Double) event.getProperty().getValue();

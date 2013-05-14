@@ -28,25 +28,21 @@
 
 package org.opennms.features.topology.plugins.browsers;
 
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.opennms.features.topology.api.DefaultSelectionContext;
 import org.opennms.features.topology.api.HasExtraComponents;
-import org.opennms.features.topology.api.SelectionContext;
-import org.opennms.features.topology.api.topo.AbstractVertexRef;
 import org.opennms.netmgt.dao.AlarmRepository;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Container.ItemSetChangeEvent;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.NativeSelect;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.BaseTheme;
 
 @SuppressWarnings("serial")
@@ -68,6 +64,7 @@ public class AlarmTable extends SelectionAwareTable implements HasExtraComponent
 
 		public CheckboxButton(String string) {
 			super(string);
+			setColumnCollapsingAllowed(false);
 			addListener(new ClickListener() {
 
 				private static final long serialVersionUID = 4351558084135658129L;
@@ -172,14 +169,15 @@ public class AlarmTable extends SelectionAwareTable implements HasExtraComponent
 	private final SelectAllButton m_selectAllButton = new SelectAllButton("Select All");
 	private final ResetSelectionButton m_resetButton = new ResetSelectionButton("Clear");
 	private final AlarmRepository m_alarmRepo;
+	private Set<ItemSetChangeListener> m_itemSetChangeListeners = new HashSet<ItemSetChangeListener>();
 
 	/**
 	 *  Leave OnmsDaoContainer without generics; the Aries blueprint code cannot match up
 	 *  the arguments if you put the generic types in.
 	 */
-	@SuppressWarnings("unchecked")
 	public AlarmTable(final String caption, final OnmsDaoContainer container, final AlarmRepository alarmRepo) {
 		super(caption, container);
+
 		m_alarmRepo = alarmRepo;
 
 		m_ackCombo = new NativeSelect();
@@ -197,9 +195,18 @@ public class AlarmTable extends SelectionAwareTable implements HasExtraComponent
 	}
 
 	@Override
+	public void containerItemSetChange(Container.ItemSetChangeEvent event) {
+		for (ItemSetChangeListener listener : m_itemSetChangeListeners ) {
+			listener.containerItemSetChange(event);
+		}
+		super.containerItemSetChange(event);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked") // Because Aries Blueprint cannot handle generics
 	public void setColumnGenerators(final Map generators) {
+		super.setColumnGenerators(generators);
 		for (final Object key : generators.keySet()) {
-			super.addGeneratedColumn(key, (ColumnGenerator)generators.get(key));
 			// If any of the column generators are {@link CheckboxGenerator} instances,
 			// then connect it to the buttons.
 			try {
@@ -207,16 +214,10 @@ public class AlarmTable extends SelectionAwareTable implements HasExtraComponent
 				m_submitButton.setCheckboxGenerator(generator);
 				m_selectAllButton.setCheckboxGenerator(generator);
 				m_resetButton.setCheckboxGenerator(generator);
+
+				m_itemSetChangeListeners.add(generator);
 			} catch (final ClassCastException e) {}
 		}
-	}
-
-	@Override
-	public void setCellStyleGenerator(final CellStyleGenerator generator) {
-		try {
-			((TableAware)generator).setTable(this);
-		} catch (final ClassCastException e) {}
-		super.setCellStyleGenerator(generator);
 	}
 
 	@Override

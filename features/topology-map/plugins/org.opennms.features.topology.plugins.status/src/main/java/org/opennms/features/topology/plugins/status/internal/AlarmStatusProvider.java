@@ -117,23 +117,35 @@ public class AlarmStatusProvider implements StatusProvider {
     }
 
     private Status getStatusForGroup(VertexRef groupRef) {
-        List<Vertex> vertices = getVertexProvider().getChildren(groupRef);
+        
+        
         Collection<Integer> nodeIds = new ArrayList<Integer>();
         
+        getChildrenRecursively(groupRef, nodeIds);
+        
+        if(nodeIds.size() >= 1) {
+            CriteriaBuilder builder = new CriteriaBuilder(OnmsAlarm.class);
+            builder.alias("node", "node");
+            builder.in("node.id", nodeIds);
+            builder.ge("severity", OnmsSeverity.WARNING);
+            builder.orderBy("node.id").asc();
+            builder.orderBy("severity").desc();
+            
+            return getStatusForCriteria(builder);
+        }else {
+            return createIndeterminateStatus();
+        }
+    }
+
+    private void getChildrenRecursively(VertexRef groupRef, Collection<Integer> nodeIds) {
+        List<Vertex> vertices = getVertexProvider().getChildren(groupRef);
         for(Vertex vertex : vertices) {
             if(!vertex.isGroup()) {
                nodeIds.add(vertex.getNodeID());
+            } else {
+                getChildrenRecursively(vertex, nodeIds);
             }
         }
-        
-        CriteriaBuilder builder = new CriteriaBuilder(OnmsAlarm.class);
-        builder.alias("node", "node");
-        builder.in("node.id", nodeIds);
-        builder.ge("severity", OnmsSeverity.WARNING);
-        builder.orderBy("node.id").asc();
-        builder.orderBy("severity").desc();
-        
-        return getStatusForCriteria(builder);
     }
 
     private boolean isGroup(VertexRef vertexRef) {
