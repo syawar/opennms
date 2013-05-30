@@ -28,12 +28,13 @@
 
 package org.opennms.netmgt.model;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.LinkedList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * <p>OnmsMapList class.</p>
@@ -80,6 +81,7 @@ public class DataLinkInterfaceList extends LinkedList<DataLinkInterface> {
      * @param maps a {@link java.util.List} object.
      */
     public void setLinks(List<DataLinkInterface> links) {
+        if (links == this) return;
         clear();
         addAll(links);
     }

@@ -45,7 +45,7 @@
     <dependency>
       <groupId>org.opennms.dependencies</groupId>
       <artifactId>jasper-dependencies</artifactId>
-      <version>1.8.17-SNAPSHOT</version>
+      <version>1.10.10-SNAPSHOT</version>
       <type>pom</type>
     </dependency>
     <dependency>
@@ -58,6 +58,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.8.2</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <repositories>

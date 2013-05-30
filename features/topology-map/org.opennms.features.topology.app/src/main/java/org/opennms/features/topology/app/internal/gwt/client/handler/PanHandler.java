@@ -28,24 +28,29 @@
 
 package org.opennms.features.topology.app.internal.gwt.client.handler;
 
-import org.opennms.features.topology.app.internal.gwt.client.map.SVGTopologyMap;
+import org.opennms.features.topology.app.internal.gwt.client.VTopologyComponent;
+import org.opennms.features.topology.app.internal.gwt.client.VTopologyComponent.TopologyViewRenderer;
+import org.opennms.features.topology.app.internal.gwt.client.service.ServiceRegistry;
+import org.opennms.features.topology.app.internal.gwt.client.view.TopologyView;
 
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.user.client.ui.ToggleButton;
 
 public class PanHandler implements DragBehaviorHandler{
     public static String DRAG_BEHAVIOR_KEY = "panHandler";
-    private ToggleButton m_toggle;
     protected PanObject m_panObject;
-    SVGTopologyMap m_svgTopologyMap;
+    TopologyView<TopologyViewRenderer> m_topologyView;
+    ServiceRegistry m_serviceRegistry;
+    VTopologyComponent m_topologyComponent;
     
-    public PanHandler(SVGTopologyMap topologyMap) {
-        m_svgTopologyMap = topologyMap;
+    public PanHandler(VTopologyComponent vtopologyComp, ServiceRegistry serviceRegistry) {
+        m_topologyComponent = vtopologyComp;
+        m_topologyView = vtopologyComp.getTopologyView();
+        m_serviceRegistry = serviceRegistry;
     }
     
     @Override
     public void onDragStart(Element elem) {
-        m_panObject = new PanObject(m_svgTopologyMap, m_svgTopologyMap.getSVGViewPort(), m_svgTopologyMap.getSVGElement());
+        m_panObject = new PanObject(m_topologyView);
     }
 
     @Override
@@ -56,6 +61,7 @@ public class PanHandler implements DragBehaviorHandler{
     @Override
     public void onDragEnd(Element elem) {
         m_panObject = null;
+        m_topologyComponent.updateMapPosition();
     }
 
     

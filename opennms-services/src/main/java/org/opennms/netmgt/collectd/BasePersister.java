@@ -102,16 +102,19 @@ public class BasePersister extends AbstractCollectionSetVisitor implements Persi
     }
 
     /** {@inheritDoc} */
+    @Override
     public void completeAttribute(CollectionAttribute attribute) {
         popShouldPersist();
     }
 
     /** {@inheritDoc} */
+    @Override
     public void completeGroup(AttributeGroup group) {
         popShouldPersist();
     }
 
     /** {@inheritDoc} */
+    @Override
     public void completeResource(CollectionResource resource) {
         popShouldPersist();
     }
@@ -174,13 +177,16 @@ public class BasePersister extends AbstractCollectionSetVisitor implements Persi
     }
 
     /** {@inheritDoc} */
+    @Override
     public void persistNumericAttribute(CollectionAttribute attribute) {
     	log().debug("Persisting "+attribute + (isIgnorePersist() ? ". Ignoring value because of sysUpTime changed" : ""));
     	String value = isIgnorePersist() ? "U" : attribute.getNumericValue();
         m_builder.setAttributeValue(attribute.getAttributeType(), value);
+        m_builder.setAttributeMetadata(attribute.getMetricIdentifier(), attribute.getName());
     }
 
     /** {@inheritDoc} */
+    @Override
     public void persistStringAttribute(CollectionAttribute attribute) {
             log().debug("Persisting "+attribute);
             CollectionResource resource = attribute.getResource();
@@ -278,17 +284,20 @@ public class BasePersister extends AbstractCollectionSetVisitor implements Persi
     }
 
     /** {@inheritDoc} */
+    @Override
     public void visitAttribute(CollectionAttribute attribute) {
         pushShouldPersist(attribute);
         storeAttribute(attribute);
     }
 
     /** {@inheritDoc} */
+    @Override
     public void visitGroup(AttributeGroup group) {
         pushShouldPersist(group);
     }
 
     /** {@inheritDoc} */
+    @Override
     public void visitResource(CollectionResource resource) {
         log().info("Persisting data for resource "+resource);
         pushShouldPersist(resource);

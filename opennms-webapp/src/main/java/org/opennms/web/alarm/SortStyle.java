@@ -50,6 +50,7 @@ public enum SortStyle {
     POLLER("poller"),
     ID("id"),
     COUNT("count"),
+    ACKUSER("ackuser"),
     REVERSE_SEVERITY("rev_severity"),
     REVERSE_LASTEVENTTIME("rev_lasteventtime"),
     REVERSE_FIRSTEVENTTIME("rev_firsteventtime"),
@@ -58,7 +59,8 @@ public enum SortStyle {
     REVERSE_SERVICE("rev_service"),
     REVERSE_POLLER("rev_poller"),
     REVERSE_ID("rev_id"),
-    REVERSE_COUNT("rev_count");
+    REVERSE_COUNT("rev_count"),
+    REVERSE_ACKUSER("rev_ackuser");
 
     /** Constant <code>m_sortStylesString</code> */
     private static final Map<String, SortStyle> m_sortStylesString;
@@ -82,6 +84,7 @@ public enum SortStyle {
      *
      * @return a {@link java.lang.String} object.
      */
+    @Override
     public String toString() {
         return ("SortStyle." + getName());
     }
@@ -198,6 +201,14 @@ public enum SortStyle {
             clause = " ORDER BY COUNTER ASC";
             break;
     
+        case ACKUSER:
+            clause = " ORDER BY ALARMACKUSER ASC";
+            break;
+    
+        case REVERSE_ACKUSER:
+            clause = " ORDER BY ALARMACKUSER DESC";
+            break;
+        
         default:
             throw new IllegalArgumentException("Unknown SortStyle: " + this);
         }

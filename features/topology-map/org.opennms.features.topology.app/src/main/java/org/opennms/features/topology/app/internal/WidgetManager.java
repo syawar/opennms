@@ -29,49 +29,71 @@
 package org.opennms.features.topology.app.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.opennms.features.topology.api.IViewContribution;
+import org.slf4j.LoggerFactory;
 
-import com.vaadin.ui.TabSheet;
-
+/**
+ * This class listens for {@link IViewContribution} service registrations.
+ */
 public class WidgetManager {
 
-    private List<IViewContribution> m_viewContributors = new ArrayList<IViewContribution>();
-    private List<WidgetUpdateListener> m_listeners = new ArrayList<WidgetUpdateListener>();
+    private List<IViewContribution> m_viewContributors = new CopyOnWriteArrayList<IViewContribution>();
+    private List<WidgetUpdateListener> m_listeners = new CopyOnWriteArrayList<WidgetUpdateListener>();
     
-    public WidgetManager() {
-        
-    }
+    public WidgetManager() {}
     
     public void addUpdateListener(WidgetUpdateListener listener) {
-        m_listeners.add(listener);
-        updateWidgetListeners();
+        LoggerFactory.getLogger(this.getClass()).info("Adding WidgetUpdateListener {} to WidgetManager {}", listener, this);
+        synchronized (m_listeners) {
+            m_listeners.add(listener);
+            updateWidgetListeners();
+        }
     }
-    
+
+    public void removeUpdateListener(WidgetUpdateListener listener) {
+        LoggerFactory.getLogger(this.getClass()).info("Removing WidgetUpdateListener {} from WidgetManager {}", listener, this);
+        synchronized (m_listeners) {
+            m_listeners.remove(listener);
+        }
+    }
+
     public int widgetCount() {
         return m_viewContributors.size();
     }
     
-    public TabSheet getTabSheet() {
-        TabSheet tabSheet = new TabSheet();
-        
-        for(IViewContribution viewContrib : m_viewContributors) {
-            
-            if(viewContrib.getIcon() != null) {
-                tabSheet.addTab(viewContrib.getView(), viewContrib.getTitle(), viewContrib.getIcon());
-            } else {
-                tabSheet.addTab(viewContrib.getView(), viewContrib.getTitle());
+    /**
+     * Gets the list of Widgets as IViewContributions
+     * 
+     * @return List<IViewContribution>
+     */
+    public List<IViewContribution> getWidgets(){
+        List<IViewContribution> widgets = new ArrayList<IViewContribution>();
+        widgets.addAll(m_viewContributors);
+        // Sort the widgets by their title
+        Collections.sort(widgets, new Comparator<IViewContribution>() {
+            @Override
+            public int compare(IViewContribution o1, IViewContribution o2) {
+                return o1.getTitle().compareTo(o2.getTitle());
             }
-            
-        }
-        
-        return tabSheet;
+        });
+        return Collections.unmodifiableList(widgets);
     }
     
-    public void onBind(IViewContribution viewContribution) {
-        m_viewContributors.add(viewContribution);
-        updateWidgetListeners();
+    public synchronized void onBind(IViewContribution viewContribution) {
+        LoggerFactory.getLogger(this.getClass()).info("Binding IViewContribution {} to WidgetManager {}", viewContribution, this);
+        synchronized (m_viewContributors) {
+            try {
+                m_viewContributors.add(viewContribution);
+                updateWidgetListeners();
+            } catch (Throwable e) {
+                LoggerFactory.getLogger(this.getClass()).warn("Exception during onBind()", e);
+            }
+        }
     }
 
     private void updateWidgetListeners() {
@@ -80,12 +102,15 @@ public class WidgetManager {
         }
     }
     
-    public void onUnbind(IViewContribution viewContribution) {
-        m_viewContributors.remove(viewContribution);
-        updateWidgetListeners();
-    }
-
-    public void removeUpdateListener(WidgetUpdateListener listener) {
-        m_listeners.remove(listener);
+    public synchronized void onUnbind(IViewContribution viewContribution) {
+        LoggerFactory.getLogger(this.getClass()).info("Unbinding IViewContribution {} from WidgetManager {}", viewContribution, this);
+        synchronized (m_viewContributors) {
+            try {
+                m_viewContributors.remove(viewContribution);
+                updateWidgetListeners();
+            } catch (Throwable e) {
+                LoggerFactory.getLogger(this.getClass()).warn("Exception during onUnbind()", e);
+            }
+        }
     }
 }

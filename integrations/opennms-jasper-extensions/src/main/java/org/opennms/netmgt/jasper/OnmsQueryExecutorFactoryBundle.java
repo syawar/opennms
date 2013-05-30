@@ -28,32 +28,51 @@
 
 package org.opennms.netmgt.jasper;
 
-import org.opennms.netmgt.jasper.jrobin.JRobinQueryExecutorFactory;
-import org.opennms.netmgt.jasper.rrdtool.RrdtoolQueryExecutorFactory;
-
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.query.JRQueryExecuterFactory;
 import net.sf.jasperreports.engine.query.QueryExecuterFactoryBundle;
+
 import org.opennms.netmgt.jasper.jrobin.JRobinQueryExecutorFactory;
 import org.opennms.netmgt.jasper.resource.ResourceQueryExecuterFactory;
 import org.opennms.netmgt.jasper.rrdtool.RrdtoolQueryExecutorFactory;
 
 public class OnmsQueryExecutorFactoryBundle implements QueryExecuterFactoryBundle {
     
+    @Override
     public String[] getLanguages() {
         return new String[] {"jrobin","rrdtool","resourceQuery"};
     }
 
+    @Override
     public JRQueryExecuterFactory getQueryExecuterFactory(String language) throws JRException {
-        if("jrobin".equals(language)) {
+        String reportLanguage = checkReportLanguage(language);
+        
+        if("jrobin".equals(reportLanguage)) {
             return new JRobinQueryExecutorFactory();
-        } else if("rrdtool".equals(language)) {
+        } else if("rrdtool".equals(reportLanguage)) {
             return new RrdtoolQueryExecutorFactory();
-        } else if("resourceQuery".equals(language)) {
+        } else if("resourceQuery".equals(reportLanguage)) {
             return new ResourceQueryExecuterFactory();
         } else {
             return null;
         }
+    }
+
+    private String checkReportLanguage(String language) {
+        if(language.equals("resourceQuery")) return language;
+        
+        String strategy = System.getProperty("org.opennms.rrd.strategyClass");
+        
+        if(strategy == null) return language;
+        
+        String[] strategySplit = strategy.split("\\.");
+        String rrdStrategy = strategySplit[strategySplit.length - 1];
+        if(rrdStrategy.equals("JniRrdStrategy")) {
+            return "rrdtool";
+        } else if(rrdStrategy.equals("JRobinRrdStrategy")) {
+            return "jrobin";
+        }
+        return "";
     }
 
 }

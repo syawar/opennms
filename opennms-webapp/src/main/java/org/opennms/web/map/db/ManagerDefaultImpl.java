@@ -243,6 +243,7 @@ public class ManagerDefaultImpl implements Manager {
      * @return a {@link org.opennms.web.map.view.VMap} object.
      * @throws org.opennms.web.map.MapNotFoundException if any.
      */
+    @Override
     public VMap openMap() throws MapNotFoundException {
         if (sessionMap != null) {
             return sessionMap;
@@ -256,6 +257,7 @@ public class ManagerDefaultImpl implements Manager {
      * @throws org.opennms.web.map.MapNotFoundException if any.
      * @throws org.opennms.web.map.MapsException if any.
      */
+    @Override
     public void clearMap() throws MapNotFoundException, MapsException {
         if (sessionMap == null) {
             throw new MapNotFoundException();
@@ -270,6 +272,7 @@ public class ManagerDefaultImpl implements Manager {
      * @throws org.opennms.web.map.MapNotFoundException if any.
      * @throws org.opennms.web.map.MapsException if any.
      */
+    @Override
     public void deleteMap() throws MapNotFoundException, MapsException {
         deleteMap(sessionMap.getId());
         
@@ -278,11 +281,13 @@ public class ManagerDefaultImpl implements Manager {
     /**
      * <p>closeMap</p>
      */
+    @Override
     public void closeMap() {
         sessionMap = null;
     }
 
     /** {@inheritDoc} */
+    @Override
     public VMap openMap(int id, String user, boolean refreshElems)
             throws MapsManagementException, MapNotFoundException,
             MapsException {
@@ -310,6 +315,7 @@ public class ManagerDefaultImpl implements Manager {
      *
      * Create a new VMap and return it
      */
+    @Override
     public VMap newMap(String owner,
             String userModifies, int width, int height) {
         VMap m = new VMap(MapsConstants.NEW_MAP_NAME);
@@ -532,6 +538,7 @@ public class ManagerDefaultImpl implements Manager {
     }
 
     /** {@inheritDoc} */
+    @Override
     public VMapInfo getDefaultMapsMenu(String user) throws MapsException {
 
         Iterator<Group> ite = getGroupDao().findGroupsForUser(user).iterator();
@@ -596,6 +603,7 @@ public class ManagerDefaultImpl implements Manager {
      *
      * gets all visible maps for user and userRole in input
      */
+    @Override
     public List<VMapInfo> getVisibleMapsMenu(String user)
             throws MapsException {
         return getMapsMenuByuser(user);
@@ -671,7 +679,7 @@ public class ManagerDefaultImpl implements Manager {
                 java.util.Map<Integer, Set<Integer>> parent_child = dbManager.getMapsStructure();
                 List<Integer> childList = new ArrayList<Integer>();
 
-                preorderVisit(new Integer(element.getId()), childList,
+                preorderVisit(Integer.valueOf(element.getId()), childList,
                               parent_child);
 
                 for (int i = 0; i < childList.size(); i++) {
@@ -751,6 +759,7 @@ public class ManagerDefaultImpl implements Manager {
      * Create a new element child of the map with mapId (this map must be the
      * sessionMap)
      */
+    @Override
     public VElement newElement(int mapId, int elementId, String type)
             throws MapsException {
         VElement velem = new VElement(dbManager.newElement(elementId, mapId, type));
@@ -796,6 +805,7 @@ public class ManagerDefaultImpl implements Manager {
      * Create a new element child of the map with mapId (this map must be the
      * sessionMap).
      */
+    @Override
     public VElement newElement(int mapId, int elementId, String type,
             String iconname, int x, int y) throws MapsException {
         VElement velem = newElement(mapId, elementId, type);
@@ -908,6 +918,7 @@ public class ManagerDefaultImpl implements Manager {
      *
      * save the map in input
      */
+    @Override
     synchronized public int save(VMap map) throws MapsException {
         Collection<DbElement> dbe = new ArrayList<DbElement>();
         for (VElement velem : map.getElements().values()) {
@@ -940,6 +951,7 @@ public class ManagerDefaultImpl implements Manager {
      *
      * Reloads elements of map and theirs avail,severity and status
      */
+    @Override
     public VMap reloadMap(VMap map) throws MapsException {
 
         DbElement[] elems = dbManager.getElementsOfMap(map.getId());
@@ -956,6 +968,7 @@ public class ManagerDefaultImpl implements Manager {
     }
 
     /** {@inheritDoc} */
+    @Override
     public VMap refreshMap(VMap map) throws MapsException {
         
         if (map == null) {
@@ -975,6 +988,7 @@ public class ManagerDefaultImpl implements Manager {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean foundLoopOnMaps(VMap parentMap, int mapId)
             throws MapsException {
 
@@ -982,21 +996,21 @@ public class ManagerDefaultImpl implements Manager {
         Set<Integer> childSet = new TreeSet<Integer>();
         for (VElement elem : parentMap.getElements().values()) {
             if (elem.getType().equals(MapsConstants.MAP_TYPE)) {
-                childSet.add(new Integer(elem.getId()));
+                childSet.add(Integer.valueOf(elem.getId()));
             }
         }
 
         log.debug("List of sub-maps before preorder visit "
                 + childSet.toString());
 
-        maps.put(new Integer(parentMap.getId()), childSet);
+        maps.put(Integer.valueOf(parentMap.getId()), childSet);
 
         while (childSet.size() > 0) {
             childSet = preorderVisit(childSet, maps);
 
             log.debug("List of sub-maps  " + childSet.toString());
 
-            if (childSet.contains(new Integer(mapId))) {
+            if (childSet.contains(Integer.valueOf(mapId))) {
                 return true;
             }
         }
@@ -1037,6 +1051,7 @@ public class ManagerDefaultImpl implements Manager {
      * @return a {@link java.util.List} object.
      * @throws org.opennms.web.map.MapsException if any.
      */
+    @Override
     public List<VElementInfo> getElementInfo() throws MapsException {
         elemInfo=  dbManager.getAllElementInfo();
         return elemInfo;
@@ -1082,7 +1097,7 @@ public class ManagerDefaultImpl implements Manager {
             java.util.Map<Integer, Double> avails) throws MapsException {
     
 
-        if (deletedNodeids.contains(new Integer(ve.getId())) ) {
+        if (deletedNodeids.contains(Integer.valueOf(ve.getId())) ) {
             ve.setAvail(mapsPropertiesFactory.getUndefinedAvail().getMin());
             ve.setStatus(mapsPropertiesFactory.getUnknownStatus().getId());
             ve.setSeverity(mapsPropertiesFactory.getIndeterminateSeverity().getId());
@@ -1095,8 +1110,8 @@ public class ManagerDefaultImpl implements Manager {
         ve.setStatus(mapsPropertiesFactory.getDefaultStatus().getId());
         ve.setSeverity(mapsPropertiesFactory.getDefaultSeverity().getId());
 
-        if (nodesBySource.contains(new Integer(ve.getId()))) {
-            Object id = new Integer(ve.getId());
+        if (nodesBySource.contains(Integer.valueOf(ve.getId()))) {
+            Object id = Integer.valueOf(ve.getId());
             log.debug("refresh: getting status from alternative source "
                             + dataSource.getClass().getName());
             int status = mapsPropertiesFactory.getStatus(dataSource.getStatus(id));
@@ -1123,15 +1138,15 @@ public class ManagerDefaultImpl implements Manager {
             return ve;
         } 
        
-        AlarmInfo oi = outagedNodes.get(new Integer(ve.getId()));
+        AlarmInfo oi = outagedNodes.get(Integer.valueOf(ve.getId()));
         if (oi != null) {
             ve.setStatus(oi.getStatus());
             ve.setSeverity(oi.getSeverity());
         }
         if (mapsPropertiesFactory.isAvailEnabled()
-                && (new Integer(ve.getId()) != null)
-                && (avails.get(new Integer(ve.getId())) != null)) {
-            ve.setAvail(avails.get(new Integer(ve.getId())).doubleValue());
+                && (Integer.valueOf(ve.getId()) != null)
+                && (avails.get(Integer.valueOf(ve.getId())) != null)) {
+            ve.setAvail(avails.get(Integer.valueOf(ve.getId())).doubleValue());
         }
         return ve;
     } 
@@ -1285,7 +1300,7 @@ public class ManagerDefaultImpl implements Manager {
                         + "/" + alarmSeverity);
             }
 
-            AlarmInfo alarminfo = alarmedNodes.get(new Integer(
+            AlarmInfo alarminfo = alarmedNodes.get(Integer.valueOf(
                                                                veleminfo.getId()));
 
             if (alarminfo != null) {
@@ -1298,7 +1313,7 @@ public class ManagerDefaultImpl implements Manager {
                 int curSeverity = alarmSeverity;
                 alarminfo = new AlarmInfo(curStatus, curSeverity);
             }
-            alarmedNodes.put(new Integer(veleminfo.getId()), alarminfo);
+            alarmedNodes.put(Integer.valueOf(veleminfo.getId()), alarminfo);
             if (log.isDebugEnabled()) {
                 log.debug("global element node status/severity "
                         + alarmStatus + "/" + alarmSeverity);
@@ -1536,6 +1551,7 @@ public class ManagerDefaultImpl implements Manager {
     }
 
     /** {@inheritDoc} */
+    @Override
     public VMap searchMap(String owner,String userModifies, int width, int height, List<VElement> elems) throws MapsException {
         VMap m = new VMap(MapsConstants.SEARCH_MAP_NAME);
         m.setOwner(owner);
@@ -1556,11 +1572,12 @@ public class ManagerDefaultImpl implements Manager {
     }
 
     /** {@inheritDoc} */
+    @Override
     public java.util.Map<String, Set<Integer>> getNodeLabelToMaps(String user)
             throws MapsException {
         Map<Integer,String> maps = new HashMap<Integer,String>();
         for (VMapInfo mapinfo :mapInfo) {
-            maps.put(new Integer(mapinfo.getId()),mapinfo.getName());
+            maps.put(Integer.valueOf(mapinfo.getId()),mapinfo.getName());
         }
         Map<Integer,String> elemInfoMap = new HashMap<Integer,String>();
         for (VElementInfo elem: elemInfo) {
@@ -1570,7 +1587,7 @@ public class ManagerDefaultImpl implements Manager {
         java.util.Map<String, Set<Integer>> nodelabelMap = new HashMap<String, Set<Integer>>();
         for (int i = 0; i < elems.length; i++) {
             DbElement elem = elems[i];
-            Integer mapId = new Integer(elem.getMapId());
+            Integer mapId = Integer.valueOf(elem.getMapId());
             if (!maps.containsKey(mapId))
                 continue;
 
@@ -1615,6 +1632,7 @@ public class ManagerDefaultImpl implements Manager {
     }
 
     /** {@inheritDoc} */
+    @Override
     public VProperties getProperties(boolean isUserAdmin)
             throws MapsException {
         VProperties inObj = new VProperties();
@@ -1648,6 +1666,7 @@ public class ManagerDefaultImpl implements Manager {
     }
 
     /** {@inheritDoc} */
+    @Override
     public VMap addElements(VMap map, List<VElement> velems) throws MapsException {
         map.removeAllLinks();
         for (VElement ve: velems) {
@@ -1674,6 +1693,7 @@ public class ManagerDefaultImpl implements Manager {
      *
      * @throws org.opennms.web.map.MapsException if any.
      */
+    @Override
     public void reloadConfig() throws MapsException {
         try {
             mapsPropertiesFactory.reload(true);
@@ -1684,20 +1704,24 @@ public class ManagerDefaultImpl implements Manager {
         }
     }
 
+    @Override
     public String execCommand(final Command command) {
         String key= UUID.randomUUID().toString();
         commandmap.put(key, command);
         return key;
     }
 
+    @Override
     public Command getCommand(String id) {
         return commandmap.get(id);
     }
 
+    @Override
     public void removeCommand(String id) {
         commandmap.remove(id);
     }
 
+    @Override
     public boolean checkCommandExecution() {
         List<String> keytoremove = new ArrayList<String>();
         for (String key: commandmap.keySet()) {

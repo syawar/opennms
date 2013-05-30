@@ -99,6 +99,7 @@ public class MenuBarBuilder extends MenuBuilder<MenuBar.Command, MenuItem> {
     }
 
 	@SuppressWarnings("unchecked")
+    @Override
 	protected void addMenuItems(MenuItem subMenu, Map<String, Object> value) {
 	    
 	    Set<Entry<String, Object>> sortedEntrySet = getSortedSubmenuGroup(subMenu.getText(), value);
@@ -108,7 +109,7 @@ public class MenuBarBuilder extends MenuBuilder<MenuBar.Command, MenuItem> {
 	            MenuBar.MenuItem subMenuItem = subMenu.addItem(commandKey, null);
 	            addMenuItems(subMenuItem, (Map<String, Object>) entry.getValue());
 	        }else {
-	            if(commandKey.equals("separator")) {
+	            if(commandKey.startsWith("separator")) {
 	                subMenu.addSeparator();
 	            }else {
 	                subMenu.addItem(removeLabelProperties(commandKey), (Command) entry.getValue());

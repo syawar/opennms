@@ -128,6 +128,7 @@ public final class LinkdConfigFactory extends LinkdConfigManager {
     }
 
     /** {@inheritDoc} */
+    @Override
     protected synchronized void saveXml(String xml) throws IOException {
         if (xml != null) {
             long timestamp = System.currentTimeMillis();
@@ -173,6 +174,7 @@ public final class LinkdConfigFactory extends LinkdConfigManager {
      * @throws org.exolab.castor.xml.MarshalException if any.
      * @throws org.exolab.castor.xml.ValidationException if any.
      */
+    @Override
     public void reload() throws IOException, MarshalException, ValidationException {
         getWriteLock().lock();
         try {
@@ -200,13 +202,12 @@ public final class LinkdConfigFactory extends LinkdConfigManager {
      * <p>update</p>
      *
      */
+    @Override
     public void update() {
         getWriteLock().lock();
         try {
             updateUrlIpMap();
             updatePackageIpListMap();
-            updateVlanClassNames();
-            updateIpRouteClassNames();
         } finally {
             getWriteLock().unlock();
         }
@@ -239,6 +240,7 @@ public final class LinkdConfigFactory extends LinkdConfigManager {
      * @throws java.io.IOException if any.
      * @throws org.exolab.castor.xml.ValidationException if any.
      */
+    @Override
     public void save() throws MarshalException, IOException, ValidationException {
         getWriteLock().lock();
         

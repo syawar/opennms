@@ -36,9 +36,8 @@ import java.util.StringTokenizer;
 /**
  * Convenience class for looking up string and integer values in a parameter
  * map.
- *
- * @author ranger
- * @version $Id: $
+ * 
+ * @deprecated This class *modifies* the maps that are passed in, we should really do it another way.
  */
 public abstract class ParameterMap {
 	
@@ -55,7 +54,7 @@ public abstract class ParameterMap {
 	 * @param key a {@link java.lang.String} object.
 	 * @param defValue a long.
 	 */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public static long getKeyedLong(final Map map, final String key, final long defValue) {
 	    
 	    if (map == null) return defValue;

@@ -30,41 +30,36 @@ package org.opennms.features.topology.plugins.topo.simple.internal.operations;
 
 import java.util.List;
 
-import org.opennms.features.topology.api.EditableTopologyProvider;
+import org.opennms.features.topology.api.Constants;
 import org.opennms.features.topology.api.Operation;
 import org.opennms.features.topology.api.OperationContext;
+import org.opennms.features.topology.api.topo.Vertex;
+import org.opennms.features.topology.api.topo.VertexRef;
 
-
-public class ResetOperation implements Constants, Operation{
+public class ResetOperation implements Constants, Operation {
     
-    EditableTopologyProvider m_topologyProvider;
-    
-    public ResetOperation(EditableTopologyProvider topologyProvider) {
-        m_topologyProvider = topologyProvider;
-    }
-
     @Override
-    public Undoer execute(List<Object> targets, OperationContext operationContext) {
+    public Undoer execute(List<VertexRef> targets, OperationContext operationContext) {
         
-        m_topologyProvider.resetContainer();
-        Object groupId = m_topologyProvider.addGroup(GROUP_ICON_KEY);
-        Object vertexId = m_topologyProvider.addVertex(50, 50);
-        m_topologyProvider.setParent(vertexId, groupId);
+        operationContext.getGraphContainer().getBaseTopology().resetContainer();
+        Vertex groupId = operationContext.getGraphContainer().getBaseTopology().addGroup("Group", GROUP_ICON_KEY);
+        Vertex vertexId = operationContext.getGraphContainer().getBaseTopology().addVertex(50, 50);
+        operationContext.getGraphContainer().getBaseTopology().setParent(vertexId, groupId);
         return null;
     }
 
     @Override
-    public boolean display(List<Object> targets, OperationContext operationContext) {
+    public boolean display(List<VertexRef> targets, OperationContext operationContext) {
         return true;
     }
 
     @Override
-    public boolean enabled(List<Object> targets, OperationContext operationContext) {
+    public boolean enabled(List<VertexRef> targets, OperationContext operationContext) {
         return true;
     }
 
     @Override
     public String getId() {
-        return null;
+        return "Reset";
     }
 }

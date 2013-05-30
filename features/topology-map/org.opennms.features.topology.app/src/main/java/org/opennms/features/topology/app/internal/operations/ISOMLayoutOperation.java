@@ -28,45 +28,26 @@
 
 package org.opennms.features.topology.app.internal.operations;
 
-import java.util.List;
-
-import org.opennms.features.topology.api.CheckedOperation;
-import org.opennms.features.topology.api.DisplayState;
-import org.opennms.features.topology.api.OperationContext;
+import org.opennms.features.topology.api.LayoutAlgorithm;
 import org.opennms.features.topology.app.internal.jung.ISOMLayoutAlgorithm;
 
+public class ISOMLayoutOperation extends LayoutOperation {
 
-public class ISOMLayoutOperation implements CheckedOperation {
+	public ISOMLayoutOperation() {
+		super(new LayoutFactory() {
+		    
+		    private final ISOMLayoutAlgorithm m_layoutAlgorithm = new ISOMLayoutAlgorithm();
+		    
+			@Override
+			public LayoutAlgorithm getLayoutAlgorithm() {
+				return m_layoutAlgorithm;
+			}
+		});
+	}
 
-    @Override
-    public Undoer execute(List<Object> targets,
-            OperationContext operationContext) {
-        DisplayState graphContainer = operationContext.getGraphContainer();
-        
-        graphContainer.setLayoutAlgorithm(new ISOMLayoutAlgorithm());
-        return null;
-    }
+	@Override
+	public String getId() {
+		return getClass().getSimpleName();
+	}
 
-    @Override
-    public boolean display(List<Object> targets, OperationContext operationContext) {
-        return true;
-    }
-
-    @Override
-    public boolean enabled(List<Object> targets, OperationContext operationContext) {
-        return true;
-    }
-
-    @Override
-    public String getId() {
-        return null;
-    }
-
-    @Override
-    public boolean isChecked(List<Object> targets, OperationContext operationContext) {
-        if(operationContext.getGraphContainer().getLayoutAlgorithm() instanceof ISOMLayoutAlgorithm) {
-            return true;
-        }
-        return false;
-    }
 }

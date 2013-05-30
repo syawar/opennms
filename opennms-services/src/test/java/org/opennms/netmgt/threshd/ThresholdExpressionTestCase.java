@@ -50,6 +50,7 @@ public class ThresholdExpressionTestCase extends TestCase {
     
     Expression expression;
     
+    @Override
     public void setUp() {
         expression=new Expression();
         expression.setType("high");
@@ -70,7 +71,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         Map<String, Double> values=new HashMap<String,Double>();
         values.put("dsname",1000.0);
         double result=wrapper.evaluate(values);
-        assertEquals("Threshold Expression result", new Double(result), new Double(100.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(100.0));
     }
     
     public void testEvaluateEvaluateSingleItemWithMultiply() throws Exception {
@@ -84,7 +85,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         Map<String, Double> values=new HashMap<String,Double>();
         values.put("dsname",100.0);
         double result=wrapper.evaluate(values);
-        assertEquals("Threshold Expression result", new Double(result), new Double(1000.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(1000.0));
     }
     
     public void testEvaluateEvaluateSingleItemWithSubtraction() throws Exception {
@@ -98,7 +99,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         Map<String, Double> values=new HashMap<String,Double>();
         values.put("dsname",100.0);
         double result=wrapper.evaluate(values);
-        assertEquals("Threshold Expression result", new Double(result), new Double(90.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(90.0));
     }
 
     public void testEvaluateEvaluateSingleItemWithAddition() throws Exception {
@@ -112,7 +113,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         Map<String, Double> values=new HashMap<String,Double>();
         values.put("dsname",100.0);
         double result=wrapper.evaluate(values);
-        assertEquals("Threshold Expression result", new Double(result), new Double(110.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(110.0));
     }
     
     public void testEvaluateEvaluateMultipleItemsDivided() throws Exception {
@@ -127,7 +128,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         values.put("dsname1",100.0);
         values.put("dsname2",5.0);
         double result=wrapper.evaluate(values);
-        assertEquals("Threshold Expression result", new Double(result), new Double(20.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(20.0));
     }
     
     public void testEvaluateEvaluateMultipleItemsMultiplied() throws Exception {
@@ -142,7 +143,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         values.put("dsname1",20.0);
         values.put("dsname2",5.0);
         double result=wrapper.evaluate(values);
-        assertEquals("Threshold Expression result", new Double(result), new Double(100.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(100.0));
     }
     
     public void testEvaluateEvaluateMultipleItemsAdded() throws Exception {
@@ -157,7 +158,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         values.put("dsname1",20.0);
         values.put("dsname2",5.0);
         double result=wrapper.evaluate(values);
-        assertEquals("Threshold Expression result", new Double(result), new Double(25.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(25.0));
     }
     
     public void testEvaluateEvaluateMultipleItemsSubtracted() throws Exception {
@@ -172,7 +173,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         values.put("dsname1",20.0);
         values.put("dsname2",5.0);
         double result=wrapper.evaluate(values);
-        assertEquals("Threshold Expression result", new Double(result), new Double(15.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(15.0));
     }
     
     /*
@@ -195,7 +196,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         double result=wrapper.evaluate(values);
         
         //1MB free, hopefully
-        assertEquals("Threshold Expression result", new Double(result), new Double(1024.0*1024.0));
+        assertEquals("Threshold Expression result", Double.valueOf(result), Double.valueOf(1024.0*1024.0));
     }
     
     public void testThresholdEntityRequiredDataSources() throws Exception {
@@ -241,7 +242,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         values.put("falseval",7.0);
         
         double result=wrapper.evaluate(values);
-        assertEquals("Conditional Expression result", new Double(result), new Double(7.0));
+        assertEquals("Conditional Expression result", Double.valueOf(result), Double.valueOf(7.0));
     }
     
     public void testEvaluateConditionalTrue() throws Exception {
@@ -265,7 +266,7 @@ public class ThresholdExpressionTestCase extends TestCase {
         values.put("falseval",7.0);
         
         double result=wrapper.evaluate(values);
-        assertEquals("Conditional Expression result", new Double(result), new Double(3.0));
+        assertEquals("Conditional Expression result", Double.valueOf(result), Double.valueOf(3.0));
     }
     
     public void testAbsoluteValues() throws Exception {
@@ -280,12 +281,12 @@ public class ThresholdExpressionTestCase extends TestCase {
         values.put("variable", -25.0);
         
         double result = wrapper.evaluate(values);
-        assertEquals("Conditional Expression result", new Double(20.0), result);
+        assertEquals("Conditional Expression result", Double.valueOf(20.0), result);
         
         values.clear();
         values.put("variable", 25.0);
         
         result = wrapper.evaluate(values);
-        assertEquals("Conditional Expression result", new Double(30.0), result);
+        assertEquals("Conditional Expression result", Double.valueOf(30.0), result);
     }
 }

@@ -59,7 +59,7 @@ import org.opennms.core.xml.bind.InetAddressXmlAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 //@ValidateUsing("event.xsd")
 public class Event implements Serializable {
-	private static final long serialVersionUID = 3928732070467015212L;
+    private static final long serialVersionUID = -7181966801138679257L;
 
 	// --------------------------/
 	// - Class/Member Variables -/
@@ -1817,6 +1817,7 @@ public class Event implements Serializable {
 		_uuid = uuid;
 	}
 
+    @Override
 	public String toString() {
 		return new ToStringBuilder(this)
 			.append("uuid", _uuid)

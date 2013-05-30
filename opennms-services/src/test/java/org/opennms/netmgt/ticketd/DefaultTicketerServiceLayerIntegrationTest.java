@@ -32,6 +32,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.HashMap;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -110,7 +112,7 @@ public class DefaultTicketerServiceLayerIntegrationTest implements InitializingB
 
 		final int alarmId = alarm.getId();
 
-		m_ticketerServiceLayer.createTicketForAlarm(alarmId);
+		m_ticketerServiceLayer.createTicketForAlarm(alarmId, new HashMap<String,String>());
 
 		m_alarmDao.flush();
 
@@ -138,12 +140,14 @@ public class DefaultTicketerServiceLayerIntegrationTest implements InitializingB
 
 	public static class TestTicketerPlugin implements Plugin {
 
+                @Override
 		public Ticket get(String ticketId) {
 			Ticket ticket = new Ticket();
 			ticket.setId(ticketId);
 			return ticket;
 		}
 
+                @Override
 		public void saveOrUpdate(Ticket ticket) {
 			ticket.setId("testId");
 		}

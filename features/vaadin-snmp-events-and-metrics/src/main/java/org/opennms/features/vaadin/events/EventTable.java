@@ -48,10 +48,10 @@ import com.vaadin.ui.themes.Runo;
 public abstract class EventTable extends Table {
 
     /** The Constant COLUMN_NAMES. */
-    public static final String[] COLUMN_NAMES = new String[] { "eventLabel" };
+    public static final String[] COLUMN_NAMES = new String[] { "eventLabel", "uei" };
 
     /** The Constant COLUMN_LABELS. */
-    public static final String[] COLUMN_LABELS = new String[] { "Generated Events" };
+    public static final String[] COLUMN_LABELS = new String[] { "Event Label", "Event UEI" };
 
     /** The Table Container for Events. */
     private final BeanContainer<String, org.opennms.netmgt.xml.eventconf.Event> container;
@@ -74,6 +74,7 @@ public abstract class EventTable extends Table {
         setWidth("100%");
         setHeight("250px");
         addListener(new Property.ValueChangeListener() {
+            @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (getValue() != null) {
                     updateExternalSource(getEvent(getValue()));

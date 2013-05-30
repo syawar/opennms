@@ -43,7 +43,7 @@ public final class Activator
     implements BundleActivator
 {
 	
-	ServiceRegistration m_registration;
+	ServiceRegistration<CommandProvider> m_registration;
 	RxtxCommands m_commands;
 	
     /**
@@ -51,6 +51,7 @@ public final class Activator
      *
      * Called whenever the OSGi framework starts our bundle
      */
+        @Override
     public void start( BundleContext bc )
         throws Exception
     {
@@ -58,7 +59,7 @@ public final class Activator
     	m_commands = new RxtxCommands();
     	
         // Register our example service implementation in the OSGi service registry
-        m_registration = bc.registerService( CommandProvider.class.getName(), m_commands, null );
+        m_registration = bc.registerService( CommandProvider.class, m_commands, null );
     }
 
     /**
@@ -66,6 +67,7 @@ public final class Activator
      *
      * Called whenever the OSGi framework stops our bundle
      */
+        @Override
     public void stop( BundleContext bc )
         throws Exception
     {

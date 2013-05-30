@@ -85,6 +85,7 @@ public class StorageStrategyField extends CustomField implements Button.ClickLis
         combo.setRequired(true);
         combo.setNewItemsAllowed(true);
         combo.setNewItemHandler(new NewItemHandler() {
+            @Override
             public void addNewItem(String newItemCaption) {
                 if (!combo.containsId(newItemCaption)) {
                     combo.addItem(newItemCaption);
@@ -175,6 +176,7 @@ public class StorageStrategyField extends CustomField implements Button.ClickLis
     /* (non-Javadoc)
      * @see com.vaadin.ui.Button.ClickListener#buttonClick(com.vaadin.ui.Button.ClickEvent)
      */
+    @Override
     public void buttonClick(Button.ClickEvent event) {
         final Button btn = event.getButton();
         if (btn == add) {
@@ -203,13 +205,14 @@ public class StorageStrategyField extends CustomField implements Button.ClickLis
             getApplication().getMainWindow().showNotification("Please select a Parameter from the table.");
         } else {
             MessageBox mb = new MessageBox(getApplication().getMainWindow(),
-                    "Are you sure?",
-                    MessageBox.Icon.QUESTION,
-                    "Do you really want to continue?",
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
+                                           "Are you sure?",
+                                           MessageBox.Icon.QUESTION,
+                                           "Do you really want to remove the selected Storage Strategy?<br/>This action cannot be undone.",
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
             mb.addStyleName(Runo.WINDOW_DIALOG);
             mb.show(new EventListener() {
+                @Override
                 public void buttonClicked(ButtonType buttonType) {
                     if (buttonType == MessageBox.ButtonType.YES) {
                         table.removeItem(itemId);

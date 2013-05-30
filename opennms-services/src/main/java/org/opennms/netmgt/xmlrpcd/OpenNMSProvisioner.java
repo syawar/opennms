@@ -183,6 +183,7 @@ public class OpenNMSProvisioner implements Provisioner {
 
 
     /** {@inheritDoc} */
+    @Override
     public boolean addServiceICMP(final String serviceId, final int retry, final int timeout, final int interval, final int downTimeInterval, final int downTimeDuration) {
         validateSchedule(retry, timeout, interval, downTimeInterval, downTimeDuration);
         return addService(serviceId, retry, timeout, interval, downTimeInterval, downTimeDuration, ICMP_MONITOR, ICMP_PLUGIN);
@@ -319,6 +320,7 @@ public class OpenNMSProvisioner implements Provisioner {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addServiceDNS(final String serviceId, final int retry, final int timeout, final int interval, final int downTimeInterval, final int downTimeDuration, final int port, final String lookup) {
         validateSchedule(retry, timeout, interval, downTimeInterval, downTimeDuration);
         checkPort(port);
@@ -333,6 +335,7 @@ public class OpenNMSProvisioner implements Provisioner {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addServiceTCP(final String serviceId, final int retry, final int timeout, final int interval, final int downTimeInterval, final int downTimeDuration, final int port, final String banner) {
         validateSchedule(retry, timeout, interval, downTimeInterval, downTimeDuration);
         checkPort(port);
@@ -347,6 +350,7 @@ public class OpenNMSProvisioner implements Provisioner {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addServiceHTTP(final String serviceId, final int retry, final int timeout, final int interval, final int downTimeInterval, final int downTimeDuration, final String hostName, final int port, final String response, final String responseText, final String url, final String user, final String passwd, final String agent) throws MalformedURLException {
         validateSchedule(retry, timeout, interval, downTimeInterval, downTimeDuration);
         checkHostname(hostName);
@@ -383,6 +387,7 @@ public class OpenNMSProvisioner implements Provisioner {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addServiceHTTPS(final String serviceId, final int retry, final int timeout, final int interval, final int downTimeInterval, final int downTimeDuration, final String hostName, final int port, final String response, final String responseText, final String url, final String user, final String passwd, final String agent) throws MalformedURLException {
         validateSchedule(retry, timeout, interval, downTimeInterval, downTimeDuration);
         checkHostname(hostName);
@@ -419,6 +424,7 @@ public class OpenNMSProvisioner implements Provisioner {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean addServiceDatabase(final String serviceId, final int retry, final int timeout, final int interval, final int downTimeInterval, final int downTimeDuration, final String user, final String password, final String driver, final String url)   {
         validateSchedule(retry, timeout, interval, downTimeInterval, downTimeDuration);
         checkUsername(user);
@@ -437,6 +443,7 @@ public class OpenNMSProvisioner implements Provisioner {
     }
     
     /** {@inheritDoc} */
+    @Override
     public Map<String, Object> getServiceConfiguration(final String pkgName, final String serviceId) {
         if (pkgName == null) {
             throw new NullPointerException("pkgName is null");
@@ -457,7 +464,7 @@ public class OpenNMSProvisioner implements Provisioner {
         
         final Map<String, Object> m = new HashMap<String, Object>();
         m.put("serviceid", serviceId);
-        m.put("interval", new Integer((int)svc.getInterval()));
+        m.put("interval", Integer.valueOf((int)svc.getInterval()));
         
         for(int i = 0; i < svc.getParameterCount(); i++) {
         	final Parameter param = svc.getParameter(i);
@@ -502,9 +509,9 @@ public class OpenNMSProvisioner implements Provisioner {
             final Downtime dt = pkg.getDowntime(i);
             final String suffix = (i == 0 ? "" : ""+i);
             if ((dt.hasEnd()) || (dt.getDelete() != null && !"false".equals(dt.getDelete()))) {
-                m.put("downtime_interval"+suffix, new Integer((int)dt.getInterval()));
+                m.put("downtime_interval"+suffix, Integer.valueOf((int)dt.getInterval()));
                 int duration = (!dt.hasEnd() ? Integer.MAX_VALUE : (int)(dt.getEnd() - dt.getBegin()));
-                m.put("downtime_duration"+suffix, new Integer(duration));
+                m.put("downtime_duration"+suffix, Integer.valueOf(duration));
             }   
         }
         

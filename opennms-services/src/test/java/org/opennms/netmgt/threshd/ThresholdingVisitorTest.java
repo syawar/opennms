@@ -124,6 +124,7 @@ public class ThresholdingVisitorTest {
     EventAnticipator m_anticipator;
     List<Event> m_anticipatedEvents;
     private static final Comparator<Parm> PARM_COMPARATOR = new Comparator<Parm>() {
+        @Override
         public int compare(Parm o1, Parm o2) {
             if (o1 == null && o2 == null) return 0;
             if (o1 == null && o2 != null) return 1;
@@ -152,6 +153,7 @@ public class ThresholdingVisitorTest {
             return (s1.compareTo(s2));
         }
 
+        @Override
         public int compare(Event e1, Event e2) {
             if (e1 == null && e2 == null) return 0;
             if (e1 == null && e2 != null) return 1;
@@ -829,7 +831,7 @@ public class ThresholdingVisitorTest {
      * - test-thresholds-bug3227.xml
      * 
      * There is no Frame Relay related thresholds definitions on test-thresholds-bug3227.xml.
-     * When visit resources, getEntityMap from ThresholdingSet must null.
+     * When visit resources, getEntityMap from ThresholdingSet must be null.
      * Updated to reflect the fact that counter are treated as rates.
      */
     @Test
@@ -853,9 +855,9 @@ public class ThresholdingVisitorTest {
          * Original code expects WARNs, but this message is now an INFO.
          */
         resource.visit(visitor);
-        LoggingEvent[] events = MockLogAppender.getEventsGreaterOrEqual(Level.INFO);
+        LoggingEvent[] events = MockLogAppender.getEventsGreaterOrEqual(Level.TRACE);
         int count = 0;
-        String expectedMsg = "getEntityMap: No thresholds configured for resource type frCircuitIfIndex in threshold group generic-snmp. Skipping this group.";
+        String expectedMsg = "getEntityMap: No thresholds configured for resource type 'frCircuitIfIndex' in threshold group generic-snmp. Skipping this group.";
         for (LoggingEvent e : events) {
             if (e.getMessage().equals(expectedMsg))
                 count++;
@@ -1344,6 +1346,17 @@ public class ThresholdingVisitorTest {
 
          // Verify Events
          verifyEvents(0);
+     }
+
+     @Test
+     public void testBug5764() throws Exception {
+         ThresholdingVisitor visitor = createVisitor();
+
+
+         initFactories("/threshd-configuration.xml","/test-thresholds-bug5764.xml");
+         
+         visitor.reload();
+
      }
 
      /*

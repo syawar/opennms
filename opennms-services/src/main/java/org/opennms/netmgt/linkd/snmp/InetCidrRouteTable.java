@@ -31,7 +31,7 @@ package org.opennms.netmgt.linkd.snmp;
 import java.net.InetAddress;
 
 import org.opennms.core.utils.ThreadCategory;
-import org.opennms.netmgt.capsd.snmp.SnmpTable;
+
 import org.opennms.netmgt.snmp.SnmpInstId;
 import org.opennms.netmgt.snmp.SnmpObjId;
 
@@ -64,6 +64,7 @@ public class InetCidrRouteTable extends SnmpTable<InetCidrRouteTableEntry>
         super(address, "ipRouteTable", InetCidrRouteTableEntry.ms_elemList);
    }
    
+   @Override
     protected InetCidrRouteTableEntry createTableEntry(SnmpObjId base, SnmpInstId inst, Object val) {
         return new InetCidrRouteTableEntry();
     }

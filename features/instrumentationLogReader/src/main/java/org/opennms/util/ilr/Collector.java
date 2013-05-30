@@ -53,6 +53,7 @@ public class Collector {
     public static final String SERVICE_TITLE_FORMAT = "%-40s%20s%15s%25s%15s%25s%15s%20s%25s%15s%15s\n";
     public static final String SERVICE_DATA_FORMAT = "%-40s%20s%15s%25s%15.1f%25s%15.1f%20s%25s%15s%15s\n";
     private String m_searchString = null;
+    private static boolean s_durationsMs = false;
 
 
     public enum SortColumn {
@@ -91,7 +92,13 @@ public class Collector {
     }
    public String getSearchString() {
        return m_searchString;
-   }
+    }
+    public static void setDurationsMs(boolean durationsMs) {
+        s_durationsMs = durationsMs;   
+    }
+    public static boolean getDurationsMs() {
+        return s_durationsMs;   
+    }
     private Set<String> m_threads = new HashSet<String>();
 
     private LogMessage m_firstMessage;
@@ -165,6 +172,7 @@ public class Collector {
 
     private abstract static class LongComparator implements Comparator<ServiceCollector> {
 
+        @Override
         public int compare(ServiceCollector o1, ServiceCollector o2) {
             Long a = Long.valueOf(getLong(o1));
             Long b = Long.valueOf(getLong(o2));
@@ -176,6 +184,7 @@ public class Collector {
     }
     private abstract static class DoubleComparator implements Comparator<ServiceCollector> {
 
+        @Override
         public int compare(ServiceCollector o1, ServiceCollector o2) {
             Double a = Double.valueOf(getDouble(o1));
             Double b = Double.valueOf(getDouble(o2));
@@ -356,6 +365,9 @@ public class Collector {
         out.println("Threads Used: " + this.getThreadCount());
     }
     public static String formatDuration(long millis) {
+        if (getDurationsMs()) {
+            return new Long(millis).toString();
+        }
         if (millis==0) {
             return "0s";
         }

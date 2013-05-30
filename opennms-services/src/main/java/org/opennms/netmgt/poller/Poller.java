@@ -237,6 +237,7 @@ public class Poller extends AbstractServiceDaemon {
     /**
      * <p>onInit</p>
      */
+    @Override
     protected void onInit() {
         
         // serviceUnresponsive behavior enabled/disabled?
@@ -310,7 +311,7 @@ public class Poller extends AbstractServiceDaemon {
         Timestamp closeTime = new Timestamp(closeDate.getTime());
         final String DB_CLOSE_OUTAGES_FOR_NODE = "UPDATE outages set ifregainedservice = ?, svcRegainedEventId = ? where outages.nodeId = ? AND (outages.ifregainedservice IS NULL)";
         Updater svcUpdater = new Updater(m_dataSource, DB_CLOSE_OUTAGES_FOR_NODE);
-        svcUpdater.execute(closeTime, new Integer(eventId), new Integer(nodeId));
+        svcUpdater.execute(closeTime, Integer.valueOf(eventId), Integer.valueOf(nodeId));
     }
     
     /**
@@ -325,7 +326,7 @@ public class Poller extends AbstractServiceDaemon {
         Timestamp closeTime = new Timestamp(closeDate.getTime());
         final String DB_CLOSE_OUTAGES_FOR_IFACE = "UPDATE outages set ifregainedservice = ?, svcRegainedEventId = ? where outages.nodeId = ? AND outages.ipAddr = ? AND (outages.ifregainedservice IS NULL)";
         Updater svcUpdater = new Updater(m_dataSource, DB_CLOSE_OUTAGES_FOR_IFACE);
-        svcUpdater.execute(closeTime, new Integer(eventId), new Integer(nodeId), ipAddr);
+        svcUpdater.execute(closeTime, Integer.valueOf(eventId), Integer.valueOf(nodeId), ipAddr);
     }
     
     /**
@@ -341,7 +342,7 @@ public class Poller extends AbstractServiceDaemon {
         Timestamp closeTime = new Timestamp(closeDate.getTime());
         final String DB_CLOSE_OUTAGES_FOR_SERVICE = "UPDATE outages set ifregainedservice = ?, svcRegainedEventId = ? where outageid in (select outages.outageid from outages, service where outages.nodeid = ? AND outages.ipaddr = ? AND outages.serviceid = service.serviceId AND service.servicename = ? AND outages.ifregainedservice IS NULL)";
         Updater svcUpdater = new Updater(m_dataSource, DB_CLOSE_OUTAGES_FOR_SERVICE);
-        svcUpdater.execute(closeTime, new Integer(eventId), new Integer(nodeId), ipAddr, serviceName);
+        svcUpdater.execute(closeTime, Integer.valueOf(eventId), Integer.valueOf(nodeId), ipAddr, serviceName);
     }
 
     private void createScheduler() {
@@ -362,6 +363,7 @@ public class Poller extends AbstractServiceDaemon {
     /**
      * <p>onStart</p>
      */
+    @Override
     protected void onStart() {
 		// get the category logger
         // start the scheduler
@@ -381,6 +383,7 @@ public class Poller extends AbstractServiceDaemon {
     /**
      * <p>onStop</p>
      */
+    @Override
     protected void onStop() {
         if(getScheduler()!=null) {
             getScheduler().stop();
@@ -400,6 +403,7 @@ public class Poller extends AbstractServiceDaemon {
 	/**
 	 * <p>onPause</p>
 	 */
+    @Override
 	protected void onPause() {
 		getScheduler().pause();
 	}
@@ -407,6 +411,7 @@ public class Poller extends AbstractServiceDaemon {
     /**
      * <p>onResume</p>
      */
+    @Override
     protected void onResume() {
 		getScheduler().resume();
 	}
@@ -475,6 +480,7 @@ public class Poller extends AbstractServiceDaemon {
 
             final PollableNode svcNode = node;
             final Runnable r = new Runnable() {
+                @Override
                 public void run() {
 					final int matchCount = scheduleMatchingServices("ifServices.nodeId = "+nodeId+" AND ifServices.ipAddr = '"+normalizedAddress+"' AND service.serviceName = '"+svcName+"'");
                     if (matchCount > 0) {
@@ -513,6 +519,7 @@ public class Poller extends AbstractServiceDaemon {
         final AtomicInteger count = new AtomicInteger(0);
         
         Querier querier = new Querier(m_dataSource, sql) {
+            @Override
             public void processRow(ResultSet rs) throws SQLException {
                 if (scheduleService(rs.getInt("nodeId"), rs.getString("nodeLabel"), rs.getString("ipAddr"), rs.getString("serviceName"), 
                                 "A".equals(rs.getString("status")), (Number)rs.getObject("svcLostEventId"), rs.getTimestamp("ifLostService"), 
@@ -685,6 +692,7 @@ public class Poller extends AbstractServiceDaemon {
      */
     public void refreshServicePackages() {
         PollableVisitor visitor = new PollableVisitorAdaptor() {
+            @Override
             public void visitService(PollableService service) {
                 service.refreshConfig();
             }
@@ -697,6 +705,7 @@ public class Poller extends AbstractServiceDaemon {
      */
     public void refreshServiceThresholds() {
         PollableVisitor visitor = new PollableVisitorAdaptor() {
+            @Override
             public void visitService(PollableService service) {
                 service.refreshThresholds();
             }

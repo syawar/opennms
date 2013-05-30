@@ -28,12 +28,13 @@
 
 package org.opennms.netmgt.model;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.LinkedList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * <p>OnmsMapList class.</p>
@@ -75,6 +76,7 @@ public class OnmsMapList extends LinkedList<OnmsMap> {
      * @param maps a {@link java.util.List} object.
      */
     public void setMaps(List<OnmsMap> maps) {
+        if (maps == this) return;
         clear();
         addAll(maps);
     }

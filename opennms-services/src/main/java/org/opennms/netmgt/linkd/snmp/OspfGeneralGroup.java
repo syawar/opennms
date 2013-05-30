@@ -31,8 +31,7 @@ package org.opennms.netmgt.linkd.snmp;
 import java.net.InetAddress;
 
 import org.opennms.core.utils.ThreadCategory;
-import org.opennms.netmgt.capsd.snmp.NamedSnmpVar;
-import org.opennms.netmgt.capsd.snmp.SnmpStore;
+
 import org.opennms.netmgt.snmp.AggregateTracker;
 import org.opennms.netmgt.snmp.SnmpResult;
 
@@ -83,16 +82,19 @@ public final class OspfGeneralGroup extends AggregateTracker {
     }
        
     /** {@inheritDoc} */
+    @Override
     protected void storeResult(SnmpResult res) {
         m_store.storeResult(res);
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void reportGenErr(String msg) {
         log().warn("Error retrieving lldpLocalGroup from "+m_address+". "+msg);
     }
 
     /** {@inheritDoc} */
+    @Override
     protected void reportNoSuchNameErr(String msg) {
         log().info("Error retrieving lldpLocalGroup from "+m_address+". "+msg);
     }

@@ -86,6 +86,7 @@ public class LatencyStoringServiceMonitorAdaptor implements ServiceMonitor {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void initialize(Map<String, Object> parameters) {
         m_serviceMonitor.initialize(parameters);
     }
@@ -95,11 +96,13 @@ public class LatencyStoringServiceMonitorAdaptor implements ServiceMonitor {
      *
      * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
      */
+    @Override
     public void initialize(MonitoredService svc) {
         m_serviceMonitor.initialize(svc);
     }
 
     /** {@inheritDoc} */
+    @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
         PollStatus status = m_serviceMonitor.poll(svc, parameters);
 
@@ -151,7 +154,12 @@ public class LatencyStoringServiceMonitorAdaptor implements ServiceMonitor {
             }
             LinkedHashMap<String, Double> attributes = new LinkedHashMap<String, Double>();
             for (String ds : entries.keySet()) {
-                attributes.put(ds, entries.get(ds).doubleValue());
+                Number sampleValue = entries.get(ds);
+                if (sampleValue == null) {
+                    attributes.put(ds, Double.NaN);
+                } else {
+                    attributes.put(ds, sampleValue.doubleValue());
+                }
             }
             if (m_thresholdingSet.isNodeInOutage()) {
                 log().info("applyThresholds: the threshold processing will be skipped because the service " + service + " is on a scheduled outage.");
@@ -291,11 +299,13 @@ public class LatencyStoringServiceMonitorAdaptor implements ServiceMonitor {
     /**
      * <p>release</p>
      */
+    @Override
     public void release() {
         m_serviceMonitor.release();
     }
 
     /** {@inheritDoc} */
+    @Override
     public void release(MonitoredService svc) {
         m_serviceMonitor.release(svc);
     }

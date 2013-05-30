@@ -101,6 +101,7 @@ public class MibObjField extends CustomField implements Button.ClickListener {
         layout.setComponentAlignment(toolbar, Alignment.MIDDLE_RIGHT);
 
         setWriteThrough(false);
+        setValidationVisible(true);
         setCompositionRoot(layout);
     }
 
@@ -155,6 +156,7 @@ public class MibObjField extends CustomField implements Button.ClickListener {
     /* (non-Javadoc)
      * @see com.vaadin.ui.Button.ClickListener#buttonClick(com.vaadin.ui.Button.ClickEvent)
      */
+    @Override
     public void buttonClick(Button.ClickEvent event) {
         final Button btn = event.getButton();
         if (btn == add) {
@@ -163,6 +165,14 @@ public class MibObjField extends CustomField implements Button.ClickListener {
         if (btn == delete) {
             deleteHandler();
         }
+    }
+
+    /* (non-Javadoc)
+     * @see org.vaadin.addon.customfield.CustomField#isValid()
+     */
+    @Override
+    public boolean isValid() {
+        return table.isValid(); // FIXME This is not working
     }
 
     /**
@@ -183,13 +193,14 @@ public class MibObjField extends CustomField implements Button.ClickListener {
             getApplication().getMainWindow().showNotification("Please select a MIB Object from the table.");
         } else {
             MessageBox mb = new MessageBox(getApplication().getMainWindow(),
-                    "Are you sure?",
-                    MessageBox.Icon.QUESTION,
-                    "Do you really want to continue?",
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
+                                           "Are you sure?",
+                                           MessageBox.Icon.QUESTION,
+                                           "Do you really want to remove the selected MIB Object?<br/>This action cannot be undone.",
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
             mb.addStyleName(Runo.WINDOW_DIALOG);
             mb.show(new EventListener() {
+                @Override
                 public void buttonClicked(ButtonType buttonType) {
                     if (buttonType == MessageBox.ButtonType.YES) {
                         table.removeItem(itemId);

@@ -2,8 +2,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2010-2012 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2012 The OpenNMS Group, Inc.
+ * Copyright (C) 2010-2013 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2013 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -34,6 +34,7 @@
 	session="true"
 	import="org.opennms.web.springframework.security.Authentication,
 		org.opennms.core.resource.Vault,
+		org.opennms.core.utils.WebSecurityUtils,
 		org.opennms.core.utils.DBUtils,
 		java.sql.Connection
 	"
@@ -99,7 +100,7 @@
   </tr>
   <tr>
     <td class="standardheader">User Agent:</td>
-    <td class="standard"><%=request.getHeader( "User-Agent" )%></td>
+    <td class="standard"><%=WebSecurityUtils.sanitizeString(request.getHeader( "User-Agent" ), false)%></td>
   </tr>
   <tr>
     <td class="standardheader">Database Type:</td>
@@ -115,7 +116,7 @@
 <div class="boxWrapper">
 <p>
   The <a href="http://www.opennms.org/">OpenNMS&reg;</a> software, as
-  distributed here, is copyright &copy; 2002-2012
+  distributed here, is copyright &copy; 2002-2013
   <a href="http://www.opennms.com">The OpenNMS Group, Inc.</a>.
   <a href="http://www.opennms.org/">OpenNMS&reg;</a> is a registered
   trademark of <a href="http://www.opennms.com">The OpenNMS Group, Inc.</a>

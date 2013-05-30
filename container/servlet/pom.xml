@@ -6,11 +6,11 @@
     <parent>
         <groupId>org.opennms</groupId>
         <artifactId>container</artifactId>
-        <version>1.11.4-SNAPSHOT</version>
+        <version>1.13.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.opennms.container</groupId>
-    <artifactId>servlet</artifactId>
+    <artifactId>org.opennms.container.servlet</artifactId>
     <packaging>war</packaging>
     <name>OpenNMS OSGi Container - Web Servlet</name>
 
@@ -21,6 +21,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.opennms.core</groupId>
             <artifactId>org.opennms.core.soa</artifactId>
             <scope>provided</scope>
@@ -28,13 +38,13 @@
         <dependency>
             <groupId>org.apache.karaf</groupId>
             <artifactId>org.apache.karaf.main</artifactId>
-            <version>${karaf.version}</version>
+            <version>${karafVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.http.proxy</artifactId>
-            <version>${felix.version}</version>
+            <version>${felixVersion}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -46,7 +56,7 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
-            <version>3.0.9</version>
+            <version>4.0.3</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

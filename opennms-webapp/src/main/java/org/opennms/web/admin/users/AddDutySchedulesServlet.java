@@ -69,6 +69,7 @@ public class AddDutySchedulesServlet extends HttpServlet {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession userSession = request.getSession(true);
 
@@ -77,7 +78,7 @@ public class AddDutySchedulesServlet extends HttpServlet {
         int dutyAddCount = WebSecurityUtils.safeParseInt(request.getParameter("numSchedules"));
 
         for (int j = 0; j < dutyAddCount; j++) {
-            user.addDutySchedule((new DutySchedule(new ArrayList<Boolean>(FALSE_LIST), 0, 0)).toString());
+            user.addDutySchedule((new DutySchedule(new ArrayList<Boolean>(FALSE_LIST), 0, 2359)).toString());
         }
 
         // forward the request for proper display

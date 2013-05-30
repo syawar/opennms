@@ -67,6 +67,7 @@ public class GetNodesServlet extends HttpServlet {
      *
      * @throws javax.servlet.ServletException if any.
      */
+    @Override
     public void init() throws ServletException {
         try {
             DataSourceFactory.init();
@@ -75,6 +76,7 @@ public class GetNodesServlet extends HttpServlet {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession user = request.getSession(true);
 
@@ -135,7 +137,7 @@ public class GetNodesServlet extends HttpServlet {
                     }
                 }
             }
-            userSession.setAttribute("lineItems.manage.jsp", new Integer(lineCount));
+            userSession.setAttribute("lineItems.manage.jsp", Integer.valueOf(lineCount));
         } finally {
             d.cleanUp();
         }

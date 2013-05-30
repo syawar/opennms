@@ -59,17 +59,20 @@ public abstract class EventForm extends Form implements ClickListener {
         "uei",
         "eventLabel",
         "descr",
-        "logmsgContent",
-        "logmsgDest",
+        "logMsgContent",         // Embedded from LogMsg object
+        "logMsgDest",            // Embedded from LogMsg object
         "severity",
-        "alarmData", // FIXME I need to figure it out how to deal with this.
+        "alarmDataReductionKey", // Embedded from AlarmData object
+        "alarmDataClearKey",     // Embedded from AlarmData object
+        "alarmDataAlarmType",    // Embedded from AlarmData object
+        "alarmDataAutoClean",    // Embedded from AlarmData object
+        "operinstruct",
         "maskElements",
         "maskVarbinds",
         "varbindsdecodeCollection"
         /*
          * Not Implemented:
          * 
-         * operinstruct
          * autoactionCollection (CustomField)
          * operactionCollection (CustomField)
          * correlation (CustomField)
@@ -140,17 +143,26 @@ public abstract class EventForm extends Form implements ClickListener {
      * @return the bean item
      */
     private BeanItem<org.opennms.netmgt.xml.eventconf.Event> createEventItem(org.opennms.netmgt.xml.eventconf.Event event) {
-        // Be sure that the nested elements exists to avoid problems.
-        if (event.getMask() == null)
+        // Be sure that the nested elements exists to avoid problems with vaadin fields.
+        if (event.getMask() == null) {
             event.setMask(new Mask());
-        if (event.getLogmsg() == null)
+        }
+        if (event.getLogmsg() == null) {
             event.setLogmsg(new Logmsg());
-        if (event.getAlarmData() == null)
-            event.setAlarmData(new AlarmData());
+        }
+        if (event.getAlarmData() == null) {
+            AlarmData a = new AlarmData();
+            a.setAutoClean(Boolean.FALSE);
+            event.setAlarmData(a);
+        }
         // Creating BeanItem
         BeanItem<org.opennms.netmgt.xml.eventconf.Event> item = new BeanItem<org.opennms.netmgt.xml.eventconf.Event>(event);
-        item.addItemProperty("logmsgContent", new NestedMethodProperty(item.getBean(), "logmsg.content"));
-        item.addItemProperty("logmsgDest", new NestedMethodProperty(item.getBean(), "logmsg.dest"));
+        item.addItemProperty("logMsgContent", new NestedMethodProperty(item.getBean(), "logmsg.content"));
+        item.addItemProperty("logMsgDest", new NestedMethodProperty(item.getBean(), "logmsg.dest"));
+        item.addItemProperty("alarmDataReductionKey", new NestedMethodProperty(item.getBean(), "alarmData.ReductionKey"));
+        item.addItemProperty("alarmDataClearKey", new NestedMethodProperty(item.getBean(), "alarmData.ClearKey"));
+        item.addItemProperty("alarmDataAlarmType", new NestedMethodProperty(item.getBean(), "alarmData.AlarmType"));
+        item.addItemProperty("alarmDataAutoClean", new NestedMethodProperty(item.getBean(), "alarmData.AutoClean"));
         item.addItemProperty("maskElements", new NestedMethodProperty(item.getBean(), "mask.maskelementCollection"));
         item.addItemProperty("maskVarbinds", new NestedMethodProperty(item.getBean(), "mask.varbindCollection"));
         return item;
@@ -181,6 +193,7 @@ public abstract class EventForm extends Form implements ClickListener {
     /* (non-Javadoc)
      * @see com.vaadin.ui.Button.ClickListener#buttonClick(com.vaadin.ui.Button.ClickEvent)
      */
+    @Override
     public void buttonClick(ClickEvent event) {
         Button source = event.getButton();
         if (source == save) {
@@ -197,13 +210,14 @@ public abstract class EventForm extends Form implements ClickListener {
         }
         if (source == delete) {
             MessageBox mb = new MessageBox(getApplication().getMainWindow(),
-                    "Are you sure?",
-                    MessageBox.Icon.QUESTION,
-                    "Do you really want to continue?",
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
+                                           "Are you sure?",
+                                           MessageBox.Icon.QUESTION,
+                                           "Do you really want to remove the event definition " + getEvent().getUei() + "?<br/>This action cannot be undone.",
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
             mb.addStyleName(Runo.WINDOW_DIALOG);
             mb.show(new EventListener() {
+                @Override
                 public void buttonClicked(ButtonType buttonType) {
                     if (buttonType == MessageBox.ButtonType.YES) {
                         setVisible(false);

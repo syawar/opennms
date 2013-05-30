@@ -55,6 +55,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"classpath:/META-INF/opennms/detectors.xml"})
+@Ignore
 public class AsyncDetectorFileDescriptorLeakTest {
 
     private SimpleServer m_server;
@@ -101,6 +102,7 @@ public class AsyncDetectorFileDescriptorLeakTest {
     private void setUpServer(final String banner, final int bannerDelay) throws Exception {
         m_server = new SimpleServer() {
             
+            @Override
             public void onInit() {
                 if (banner != null) {
                     setBanner(banner);
@@ -145,7 +147,6 @@ public class AsyncDetectorFileDescriptorLeakTest {
      * between the characters of the banner. We need to fix this behavior.
      */
     @Test
-    @Ignore
     public void testDetectorBannerTimeout() throws Throwable {
         // Add 50 milliseconds of delay in between sending bytes of the banner
         setUpServer("Banner", 50);

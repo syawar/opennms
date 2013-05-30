@@ -53,7 +53,7 @@ import org.opennms.web.servlet.MissingParameterException;
  * @since 1.8.1
  */
 public class ModifyAssetServlet extends HttpServlet {
-    private static final long serialVersionUID = 9203659232262966182L;
+    private static final long serialVersionUID = 1476437673416953289L;
     private static Set<String> s_allowHtmlFields;
     
     protected AssetModel model;
@@ -63,6 +63,7 @@ public class ModifyAssetServlet extends HttpServlet {
      *
      * @throws javax.servlet.ServletException if any.
      */
+    @Override
     public void init() throws ServletException {
         this.model = new AssetModel();
         initAllowHtmlFields();
@@ -80,6 +81,7 @@ public class ModifyAssetServlet extends HttpServlet {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String nodeIdString = request.getParameter("node");
         String isNewString = request.getParameter("isnew");
@@ -159,6 +161,9 @@ public class ModifyAssetServlet extends HttpServlet {
         asset.setCity(getRequestParameter(request, "city"));
         asset.setState(getRequestParameter(request, "state"));
         asset.setZip(getRequestParameter(request, "zip"));
+        asset.setCountry(getRequestParameter(request, "country"));
+        asset.setLongitude(getRequestParameter(request, "longitude"));
+        asset.setLatitude(getRequestParameter(request, "latitude"));
         asset.setBuilding(getRequestParameter(request, "building"));
         asset.setFloor(getRequestParameter(request, "floor"));
         asset.setRoom(getRequestParameter(request, "room"));

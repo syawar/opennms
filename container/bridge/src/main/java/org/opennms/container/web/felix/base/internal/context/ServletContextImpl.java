@@ -84,9 +84,9 @@ public final class ServletContextImpl
     }
 
     @Override
-    public Set getResourcePaths(String path)
+    public Set<String> getResourcePaths(String path)
     {
-        Enumeration paths = this.bundle.getEntryPaths(normalizePath(path));
+        Enumeration<?> paths = this.bundle.getEntryPaths(normalizePath(path));
         if ((paths == null) || !paths.hasMoreElements()) {
             return null;
         }
@@ -153,7 +153,7 @@ public final class ServletContextImpl
     }
 
     @Override
-    public Enumeration getInitParameterNames()
+    public Enumeration<?> getInitParameterNames()
     {
         return this.context.getInitParameterNames();
     }
@@ -165,7 +165,7 @@ public final class ServletContextImpl
     }
 
     @Override
-    public Enumeration getAttributeNames()
+    public Enumeration<?> getAttributeNames()
     {
         return (this.attributes != null) ? Collections.enumeration(this.attributes.keySet()) : this.context
             .getAttributeNames();
@@ -230,13 +230,13 @@ public final class ServletContextImpl
     }
 
     @Override
-    public Enumeration getServlets()
+    public Enumeration<?> getServlets()
     {
         return Collections.enumeration(Collections.emptyList());
     }
 
     @Override
-    public Enumeration getServletNames()
+    public Enumeration<?> getServletNames()
     {
         return Collections.enumeration(Collections.emptyList());
     }

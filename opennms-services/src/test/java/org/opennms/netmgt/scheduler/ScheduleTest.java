@@ -55,10 +55,12 @@ public class ScheduleTest extends TestCase {
         private volatile int runCount = 0;
         private volatile boolean m_callingAdjustSchedule;
         
+        @Override
         public boolean isReady() {
             return true;
         }
     
+        @Override
         public void run() {
             runCount++;
             if (isCallingAdjustSchedule())
@@ -82,6 +84,7 @@ public class ScheduleTest extends TestCase {
     /*
      * @see TestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         MockLogAppender.setupLogging();
@@ -94,6 +97,7 @@ public class ScheduleTest extends TestCase {
     /*
      * @see TestCase#tearDown()
      */
+    @Override
     protected void tearDown() throws Exception {
         MockLogAppender.assertNoWarningsOrGreater();
         super.tearDown();
@@ -227,7 +231,7 @@ public class ScheduleTest extends TestCase {
         assertEquals(currentTime, m_scheduler.getCurrentTime());
         assertEquals(entryCount, m_scheduler.getEntryCount());
         if (entryCount > 0)
-            assertNotNull(m_scheduler.getEntries().get(new Long(currentTime+interval)));
+            assertNotNull(m_scheduler.getEntries().get(Long.valueOf(currentTime+interval)));
         
     }
 

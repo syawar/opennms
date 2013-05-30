@@ -36,76 +36,46 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.opennms.features.topology.api.TopologyProvider;
-import org.opennms.features.topology.app.internal.support.IconRepositoryManager;
+import org.opennms.web.api.OnmsHeaderProvider;
 import org.ops4j.pax.vaadin.AbstractApplicationFactory;
 import org.ops4j.pax.vaadin.ScriptTag;
+import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 import com.vaadin.Application;
 
 public class TopologyWidgetTestApplicationFactory extends AbstractApplicationFactory {
     
-	private TopologyProvider m_topologyProvider;
-	private CommandManager m_commandManager = new CommandManager();
-	private IconRepositoryManager m_iconRepositoryManager = new IconRepositoryManager();
-	private WidgetManager m_widgetManager;
-    private String m_themeName = "reindeer";
+	private final BlueprintContainer m_blueprintContainer;
+	private final String m_beanName;
+	private OnmsHeaderProvider m_headerProvider;
 	
-	public CommandManager getCommandManager() {
-        return m_commandManager;
-    }
-
-    public void setCommandManager(CommandManager commandManager) {
-        m_commandManager = commandManager;
-    }
-
+	public TopologyWidgetTestApplicationFactory(BlueprintContainer container, String beanName) {
+		m_blueprintContainer = container;
+		m_beanName = beanName;
+	}
+	
     @Override
 	public Application createApplication(HttpServletRequest request) throws ServletException {
-    	LoggerFactory.getLogger(getClass()).debug("createApplication() for servlet path {}", request.getServletPath());
-		TopologyWidgetTestApplication application = new TopologyWidgetTestApplication(m_commandManager, m_topologyProvider, m_iconRepositoryManager);
-		application.setTheme(m_themeName);
-		
-		if(m_widgetManager != null) {
-		    application.setWidgetManager(m_widgetManager);
-		}
-		
-        LoggerFactory.getLogger(getClass()).debug("Application is " + application);
+        TopologyWidgetTestApplication application = (TopologyWidgetTestApplication) m_blueprintContainer.getComponentInstance(m_beanName);
+        application.setHeaderHtml(getHeader(request));
+        application.setUser(request.getRemoteUser());
+        LoggerFactory.getLogger(getClass()).debug(MessageFormatter.format("created {} for servlet path {}", application, request.getServletPath()).getMessage()/* , new Exception("Show me the stack trace") */);
         return application;
 	}
 
-	@Override
+
+    private String getHeader(HttpServletRequest request) {
+        if(m_headerProvider == null) return "";
+        
+        return m_headerProvider.getHeaderHtml(request);
+    }
+
+    @Override
 	public Class<? extends Application> getApplicationClass() throws ClassNotFoundException {
 		return TopologyWidgetTestApplication.class;
 	}
-
-    public IconRepositoryManager getIconRepositoryManager() {
-        return m_iconRepositoryManager;
-    }
-
-    public void setIconRepositoryManager(IconRepositoryManager iconRepositoryManager) {
-        m_iconRepositoryManager = iconRepositoryManager;
-    }
-    
-    public void setTheme(String themeName) {
-        m_themeName = themeName;
-    }
-
-	public TopologyProvider getTopologyProvider() {
-		return m_topologyProvider;
-	}
-
-	public void setTopologyProvider(TopologyProvider topologyProvider) {
-		m_topologyProvider = topologyProvider;
-	}
-
-    public WidgetManager getWidgetManager() {
-        return m_widgetManager;
-    }
-
-    public void setWidgetManager(WidgetManager widgetManager) {
-        m_widgetManager = widgetManager;
-    }
 
     @Override
     public Map<String, String> getAdditionalHeaders() {
@@ -120,5 +90,9 @@ public class TopologyWidgetTestApplicationFactory extends AbstractApplicationFac
         tags.add(new ScriptTag("http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js", "text/javascript", null));
         tags.add(new ScriptTag(null, "text/javascript", "CFInstall.check({ mode: \"overlay\" });"));
         return tags;
+    }
+    
+    public void setHeaderProvider(OnmsHeaderProvider headerProvider) {
+        m_headerProvider = headerProvider;
     }
 }

@@ -201,15 +201,18 @@ public class OpenNMSProvisionerTest {
         }
 
         @SuppressWarnings("deprecation")
+        @Override
         public void update() throws IOException, MarshalException, ValidationException {
             m_config = CastorUtils.unmarshal(PollerConfiguration.class, new StringReader(m_xml));
             setUpInternalData();
         }
 
+        @Override
         protected void saveXml(String xml) throws IOException {
             m_xml = xml;
         }
 
+        @Override
         public List<InetAddress> getIpList(Package pkg) {
             return new ArrayList<InetAddress>(0);
         }
@@ -229,7 +232,7 @@ public class OpenNMSProvisionerTest {
 
     private Map<String, Object> checkTcpConfiguration(String pkgName, String svcName, int retries, int timeout, int interval, int downtimeInterval, int downtimeDuration, int port, String banner) throws Exception {
         Map<String, Object> configParams = checkServiceConfiguration(pkgName, svcName, retries, timeout, interval, downtimeInterval, downtimeDuration);
-        assertEquals(new Integer(port), configParams.get("port"));
+        assertEquals(Integer.valueOf(port), configParams.get("port"));
         assertEquals(banner, configParams.get("banner"));
         return configParams;
     }
@@ -237,13 +240,13 @@ public class OpenNMSProvisionerTest {
     private Map<String, Object> checkServiceConfiguration(String pkgName, String svcName, int retries, int timeout, int interval, int downtimeInterval, int downtimeDuration) throws Exception {
         Map<String, Object> configParams = m_provisioner.getServiceConfiguration(pkgName, svcName);
         assertEquals(svcName, configParams.get("serviceid"));
-        assertEquals(new Integer(interval), configParams.get("interval"));
-        assertEquals(new Integer(downtimeInterval), configParams.get("downtime_interval"));
-        assertEquals(new Integer(downtimeDuration), configParams.get("downtime_duration"));
+        assertEquals(Integer.valueOf(interval), configParams.get("interval"));
+        assertEquals(Integer.valueOf(downtimeInterval), configParams.get("downtime_interval"));
+        assertEquals(Integer.valueOf(downtimeDuration), configParams.get("downtime_duration"));
         assertNull(configParams.get("downtime_interval1"));
         assertNull(configParams.get("downtime_duration1"));
-        assertEquals(new Integer(retries), configParams.get("retries"));
-        assertEquals(new Integer(timeout), configParams.get("timeout"));
+        assertEquals(Integer.valueOf(retries), configParams.get("retries"));
+        assertEquals(Integer.valueOf(timeout), configParams.get("timeout"));
         
         TestPollerConfigManager mgr = new TestPollerConfigManager(m_pollerConfig.getXml(), "localhost", false);
         
@@ -369,7 +372,7 @@ public class OpenNMSProvisionerTest {
     private Map<String, Object> checkHTTPConfiguration(String pkgName, String svcName, int retries, int timeout, int interval, int downtimeInterval, int downtimeDuration, String hostName, int port, String responseCode, String contentCheck, String url, String user, String passwd, String agent) throws Exception {
         Map<String, Object> configParams = checkServiceConfiguration(pkgName, svcName, retries, timeout, interval, downtimeInterval, downtimeDuration);
         assertEquals(hostName, configParams.get("hostname"));
-        assertEquals(new Integer(port), configParams.get("port"));
+        assertEquals(Integer.valueOf(port), configParams.get("port"));
         assertEquals(responseCode, configParams.get("response"));
         assertEquals(contentCheck, configParams.get("response_text"));
         assertEquals(user, configParams.get("user"));
@@ -437,14 +440,14 @@ public class OpenNMSProvisionerTest {
 
     private Map<String, Object> checkTCPConfiguration(String pkgName, String svcName, int retries, int timeout, int interval, int downtimeInterval, int downtimeDuration, int port, String contentCheck) throws Exception {
         Map<String, Object> configParams = checkServiceConfiguration(pkgName, svcName, retries, timeout, interval, downtimeInterval, downtimeDuration);
-        assertEquals(new Integer(port), configParams.get("port"));
+        assertEquals(Integer.valueOf(port), configParams.get("port"));
         assertEquals(contentCheck, configParams.get("banner"));
         return configParams;
     }
 
     private Map<String, Object> checkDNSConfiguration(String pkgName, String svcName, int retries, int timeout, int interval, int downtimeInterval, int downtimeDuration, int port, String lookup) throws Exception {
         Map<String, Object> configParams = checkServiceConfiguration(pkgName, svcName, retries, timeout, interval, downtimeInterval, downtimeDuration);
-        assertEquals(new Integer(port), configParams.get("port"));
+        assertEquals(Integer.valueOf(port), configParams.get("port"));
         assertEquals(lookup, configParams.get("lookup"));
         return configParams;
     }

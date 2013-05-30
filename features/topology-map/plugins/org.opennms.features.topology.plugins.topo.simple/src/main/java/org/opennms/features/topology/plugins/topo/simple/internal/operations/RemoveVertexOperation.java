@@ -30,30 +30,26 @@ package org.opennms.features.topology.plugins.topo.simple.internal.operations;
 
 import java.util.List;
 
-import org.opennms.features.topology.api.DisplayState;
-import org.opennms.features.topology.api.EditableTopologyProvider;
+import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.Operation;
 import org.opennms.features.topology.api.OperationContext;
+import org.opennms.features.topology.api.topo.VertexRef;
 import org.slf4j.LoggerFactory;
 
 
 public class RemoveVertexOperation implements Operation {
 
-    EditableTopologyProvider m_topologyProvider;
-    
-    public RemoveVertexOperation(EditableTopologyProvider topologyProvider) {
-        m_topologyProvider = topologyProvider;
-    }
-    
     @Override
-    public Undoer execute(List<Object> targets, OperationContext operationContext) {
-        DisplayState graphContainer = operationContext.getGraphContainer();
+    public Undoer execute(List<VertexRef> targets, OperationContext operationContext) {
+        GraphContainer graphContainer = operationContext.getGraphContainer();
         
         if (targets == null) {
             LoggerFactory.getLogger(getClass()).debug("need to handle selection!!!");
         } else {
-            for(Object target : targets) {
-                m_topologyProvider.removeVertex(target);
+            for(VertexRef target : targets) {
+            	if (operationContext.getGraphContainer().getBaseTopology().getVertexNamespace().equals(target.getNamespace())) {
+            		operationContext.getGraphContainer().getBaseTopology().removeVertex(target);
+            	}
             }
             
             
@@ -63,15 +59,15 @@ public class RemoveVertexOperation implements Operation {
     }
 
     @Override
-    public boolean display(List<Object> targets, OperationContext operationContext) {
+    public boolean display(List<VertexRef> targets, OperationContext operationContext) {
         return true;
     }
 
     @Override
-    public boolean enabled(List<Object> targets, OperationContext operationContext) {
+    public boolean enabled(List<VertexRef> targets, OperationContext operationContext) {
         if(targets != null) {
-            for(Object target : targets) {
-                if(!m_topologyProvider.containsVertexId(target)) return false;
+            for(VertexRef target : targets) {
+                if(operationContext.getGraphContainer().getBaseTopology().getVertex(target) == null) return false;
             }
             return true;
         }
@@ -80,7 +76,6 @@ public class RemoveVertexOperation implements Operation {
 
     @Override
     public String getId() {
-        // TODO Auto-generated method stub
-        return null;
+        return "RemoveVertex";
     }
 }

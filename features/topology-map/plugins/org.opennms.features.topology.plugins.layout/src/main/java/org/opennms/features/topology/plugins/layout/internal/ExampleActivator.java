@@ -29,7 +29,7 @@
 package org.opennms.features.topology.plugins.layout.internal;
 
 import java.util.Dictionary;
-import java.util.Properties;
+import java.util.Hashtable;
 
 import org.opennms.features.topology.plugins.layout.ExampleService;
 import org.osgi.framework.BundleActivator;
@@ -45,23 +45,25 @@ public final class ExampleActivator
     /**
      * Called whenever the OSGi framework starts our bundle
      */
+    @Override
     public void start( BundleContext bc )
         throws Exception
     {
         LoggerFactory.getLogger(getClass()).debug("STARTING {}", ExampleService.class.getName());
 
-        Dictionary<Object,Object> props = new Properties();
+        Dictionary<String,Object> props = new Hashtable<String,Object>();
         // add specific service properties here...
 
         LoggerFactory.getLogger(getClass()).debug("REGISTER {}", ExampleService.class.getName());
 
         // Register our example service implementation in the OSGi service registry
-        bc.registerService( ExampleService.class.getName(), new ExampleServiceImpl(), props );
+        bc.registerService( ExampleService.class, new ExampleServiceImpl(), props );
     }
 
     /**
      * Called whenever the OSGi framework stops our bundle
      */
+    @Override
     public void stop( BundleContext bc )
         throws Exception
     {

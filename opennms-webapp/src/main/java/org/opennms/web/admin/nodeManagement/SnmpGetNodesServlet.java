@@ -53,10 +53,6 @@ import org.opennms.core.utils.DBUtils;
  *
  * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog </A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
- * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog </A>
- * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
- * @version $Id: $
- * @since 1.8.1
  */
 public class SnmpGetNodesServlet extends HttpServlet {
     /**
@@ -73,6 +69,7 @@ public class SnmpGetNodesServlet extends HttpServlet {
      *
      * @throws javax.servlet.ServletException if any.
      */
+    @Override
     public void init() throws ServletException {
         try {
             DataSourceFactory.init();
@@ -81,6 +78,7 @@ public class SnmpGetNodesServlet extends HttpServlet {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession user = request.getSession(true);
 
@@ -131,7 +129,7 @@ public class SnmpGetNodesServlet extends HttpServlet {
 
                 }
             }
-            userSession.setAttribute("lineNodeItems.snmpmanage.jsp", new Integer(lineCount));
+            userSession.setAttribute("lineNodeItems.snmpmanage.jsp", Integer.valueOf(lineCount));
         } finally {
             d.cleanUp();
         }

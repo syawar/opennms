@@ -70,6 +70,7 @@ public class HibernateTrapdIpMgr implements TrapdIpMgr, InitializingBean {
      * <p>dataSourceSync</p>
      */
     @Transactional(readOnly = true)
+    @Override
     public synchronized void dataSourceSync() {
         m_knownips = m_ipInterfaceDao.getInterfacesForNodes();
     }
@@ -78,6 +79,7 @@ public class HibernateTrapdIpMgr implements TrapdIpMgr, InitializingBean {
      * @see org.opennms.netmgt.trapd.TrapdIpMgr#getNodeId(java.lang.String)
      */
     /** {@inheritDoc} */
+    @Override
     public synchronized long getNodeId(String addr) {
         if (addr == null) {
             return -1;
@@ -89,6 +91,7 @@ public class HibernateTrapdIpMgr implements TrapdIpMgr, InitializingBean {
      * @see org.opennms.netmgt.trapd.TrapdIpMgr#setNodeId(java.lang.String, long)
      */
     /** {@inheritDoc} */
+    @Override
     public synchronized long setNodeId(String addr, long nodeid) {
         if (addr == null || nodeid == -1) {
             return -1;
@@ -96,17 +99,18 @@ public class HibernateTrapdIpMgr implements TrapdIpMgr, InitializingBean {
         // Only add the address if it doesn't exist on the map. If it exists, only replace the current one if the new address is primary.
         boolean add = true;
         if (m_knownips.containsKey(InetAddressUtils.getInetAddress(addr))) {
-            OnmsIpInterface intf = m_ipInterfaceDao.findByNodeIdAndIpAddress(new Integer((int) nodeid), addr);
+            OnmsIpInterface intf = m_ipInterfaceDao.findByNodeIdAndIpAddress(Integer.valueOf((int) nodeid), addr);
             add = intf != null && intf.isPrimary();
             log().info("setNodeId: address found " + intf + ". Should be added? " + add);
         }
-        return add ? longValue(m_knownips.put(InetAddressUtils.getInetAddress(addr), new Integer((int) nodeid))) : -1;
+        return add ? longValue(m_knownips.put(InetAddressUtils.getInetAddress(addr), Integer.valueOf((int) nodeid))) : -1;
     }
 
     /* (non-Javadoc)
      * @see org.opennms.netmgt.trapd.TrapdIpMgr#removeNodeId(java.lang.String)
      */
     /** {@inheritDoc} */
+    @Override
     public synchronized long removeNodeId(String addr) {
         if (addr == null) {
             return -1;
@@ -120,6 +124,7 @@ public class HibernateTrapdIpMgr implements TrapdIpMgr, InitializingBean {
     /**
      * <p>clearKnownIpsMap</p>
      */
+    @Override
     public synchronized void clearKnownIpsMap() {
         m_knownips.clear();
     }

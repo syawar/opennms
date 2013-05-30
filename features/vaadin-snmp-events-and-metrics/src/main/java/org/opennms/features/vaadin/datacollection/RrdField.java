@@ -86,6 +86,7 @@ public class RrdField extends CustomField implements Button.ClickListener {
     public RrdField() {
         step.setCaption("RRD Step (in seconds)");
         step.setRequired(true);
+        step.setImmediate(true);
         step.setValidationVisible(true);
         step.setNullSettingAllowed(false);
         step.addValidator(new IntegerValidator("Invalid integer {0}"));
@@ -217,6 +218,7 @@ public class RrdField extends CustomField implements Button.ClickListener {
     /* (non-Javadoc)
      * @see com.vaadin.ui.Button.ClickListener#buttonClick(com.vaadin.ui.Button.ClickEvent)
      */
+    @Override
     public void buttonClick(Button.ClickEvent event) {
         final Button btn = event.getButton();
         if (btn == add) {
@@ -243,13 +245,14 @@ public class RrdField extends CustomField implements Button.ClickListener {
             getApplication().getMainWindow().showNotification("Please select a RRA from the table.");
         } else {
             MessageBox mb = new MessageBox(getApplication().getMainWindow(),
-                    "Are you sure?",
-                    MessageBox.Icon.QUESTION,
-                    "Do you really want to continue?",
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
+                                           "Are you sure?",
+                                           MessageBox.Icon.QUESTION,
+                                           "Do you really want to remove the selected RRA?<br/>This action cannot be undone.",
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
             mb.addStyleName(Runo.WINDOW_DIALOG);
             mb.show(new EventListener() {
+                @Override
                 public void buttonClicked(ButtonType buttonType) {
                     if (buttonType == MessageBox.ButtonType.YES) {
                         table.removeItem(itemId);

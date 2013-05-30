@@ -81,7 +81,7 @@ public class UserRestService extends OnmsRestService {
     ResourceContext m_context;
 
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public OnmsUserList getUsers() {
         final OnmsUserList list;
         readLock();
@@ -102,7 +102,7 @@ public class UserRestService extends OnmsRestService {
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Path("{username}")
     public OnmsUser getUser(@PathParam("username") final String username) {
         readLock();
@@ -125,8 +125,7 @@ public class UserRestService extends OnmsRestService {
         try {
             log().debug("addUser: Adding user " + user);
             m_userManager.save(user);
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getUser").build(user.getUsername())).build();
-            // return Response.ok(user).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo, user.getUsername())).build();
         } catch (final Throwable t) {
             throw getException(Status.BAD_REQUEST, t);
         } finally {
@@ -163,8 +162,7 @@ public class UserRestService extends OnmsRestService {
             } catch (final Throwable t) {
                 throw getException(Status.INTERNAL_SERVER_ERROR, t);
             }
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getUser").build(user.getUsername())).build();
-            // return Response.ok(user).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo)).build();
         } finally {
             writeUnlock();
         }

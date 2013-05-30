@@ -30,6 +30,8 @@ package org.opennms.features.topology.api;
 
 import java.util.List;
 
-public interface CheckedOperation extends Operation {
-    public boolean isChecked(List<Object> targets, OperationContext operationContext);
+import org.opennms.features.topology.api.topo.VertexRef;
+
+public interface CheckedOperation extends Operation, HistoryOperation {
+	boolean isChecked(List<VertexRef> targets, OperationContext operationContext);
 }

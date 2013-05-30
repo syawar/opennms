@@ -86,6 +86,7 @@ public class OnmsProblemEventHandler implements ProblemEventHandler {
     /* (non-Javadoc)
      * @see org.jsmiparser.util.problem.ProblemEventHandler#handle(org.jsmiparser.util.problem.ProblemEvent)
      */
+    @Override
     public void handle(ProblemEvent event) {
         m_severityCounters[event.getSeverity().ordinal()]++;
         m_totalCounter++;
@@ -95,6 +96,7 @@ public class OnmsProblemEventHandler implements ProblemEventHandler {
     /* (non-Javadoc)
      * @see org.jsmiparser.util.problem.ProblemEventHandler#isOk()
      */
+    @Override
     public boolean isOk() {
         for (int i = 0; i < m_severityCounters.length; i++) {
             if (i >= ProblemSeverity.ERROR.ordinal()) {
@@ -110,6 +112,7 @@ public class OnmsProblemEventHandler implements ProblemEventHandler {
     /* (non-Javadoc)
      * @see org.jsmiparser.util.problem.ProblemEventHandler#isNotOk()
      */
+    @Override
     public boolean isNotOk() {
         return !isOk();
     }
@@ -117,6 +120,7 @@ public class OnmsProblemEventHandler implements ProblemEventHandler {
     /* (non-Javadoc)
      * @see org.jsmiparser.util.problem.ProblemEventHandler#getSeverityCount(org.jsmiparser.util.problem.annotations.ProblemSeverity)
      */
+    @Override
     public int getSeverityCount(ProblemSeverity severity) {
         return m_severityCounters[severity.ordinal()];
     }
@@ -124,6 +128,7 @@ public class OnmsProblemEventHandler implements ProblemEventHandler {
     /* (non-Javadoc)
      * @see org.jsmiparser.util.problem.ProblemEventHandler#getTotalCount()
      */
+    @Override
     public int getTotalCount() {
         return m_totalCounter;
     }
@@ -168,10 +173,14 @@ public class OnmsProblemEventHandler implements ProblemEventHandler {
         File file = new File(data[0]);
         stream.println(sev + ": " + message + ", Source: " + file.getName() + ", Row: " + data[1] + ", Col: " + data[2]);
         try {
+            if (!file.exists()) {
+                LogUtils.warnf(this, "File %s doesn't exist", file);
+                return;
+            }
             FileInputStream fs= new FileInputStream(file);
             BufferedReader br = new BufferedReader(new InputStreamReader(fs));
             int line = Integer.parseInt(data[1]);
-            for(int i = 1; i < line; i++)
+            for (int i = 1; i < line; i++)
                 br.readLine();
             stream.println(br.readLine());
             br.close();
@@ -215,6 +224,15 @@ public class OnmsProblemEventHandler implements ProblemEventHandler {
      */
     public String getMessages() {
         return m_outputStream.size() > 0 ? m_outputStream.toString() : null;
+    }
+
+    /**
+     * Adds a new error message.
+     *
+     * @param errorMessage the error message
+     */
+    public void addError(String errorMessage) {
+        m_out.println(errorMessage);
     }
 
 }

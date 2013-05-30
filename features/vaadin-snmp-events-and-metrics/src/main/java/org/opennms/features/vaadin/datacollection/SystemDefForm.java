@@ -146,6 +146,7 @@ public abstract class SystemDefForm extends Form implements ClickListener {
     /* (non-Javadoc)
      * @see com.vaadin.ui.Button.ClickListener#buttonClick(com.vaadin.ui.Button.ClickEvent)
      */
+    @Override
     public void buttonClick(ClickEvent event) {
         Button source = event.getButton();
         if (source == save) {
@@ -162,13 +163,14 @@ public abstract class SystemDefForm extends Form implements ClickListener {
         }
         if (source == delete) {
             MessageBox mb = new MessageBox(getApplication().getMainWindow(),
-                    "Are you sure?",
-                    MessageBox.Icon.QUESTION,
-                    "Do you really want to continue?",
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
+                                           "Are you sure?",
+                                           MessageBox.Icon.QUESTION,
+                                           "Do you really want to remove the System Definition" + getSystemDef().getName() + "?<br/>This action cannot be undone.",
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
             mb.addStyleName(Runo.WINDOW_DIALOG);
             mb.show(new EventListener() {
+                @Override
                 public void buttonClicked(ButtonType buttonType) {
                     if (buttonType == MessageBox.ButtonType.YES) {
                         setVisible(false);

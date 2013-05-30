@@ -98,6 +98,7 @@ public class EditProvisioningGroupController extends SimpleFormController {
             m_formPath = "nodeEditForm.formData."+path;
         }
         
+        @Override
         public String toString() {
         	return new ToStringBuilder(this)
         		.append("action", getAction())
@@ -133,6 +134,13 @@ public class EditProvisioningGroupController extends SimpleFormController {
         TreeCommand treeCmd = (TreeCommand)command;
         String action = treeCmd.getAction();
         if (action == null) {
+            return doShow(request, response, treeCmd, errors);
+        } else if ("toggleFreeForm".equalsIgnoreCase(action)) {
+            Boolean isFreeForm = (Boolean)request.getSession().getAttribute("freeFormEditing");
+            if (isFreeForm == null) {
+                isFreeForm = false;
+            }
+            request.getSession().setAttribute("freeFormEditing", !isFreeForm);
             return doShow(request, response, treeCmd, errors);
         } else if ("addNode".equalsIgnoreCase(action)) {
             return doAddNode(request, response, treeCmd, errors);

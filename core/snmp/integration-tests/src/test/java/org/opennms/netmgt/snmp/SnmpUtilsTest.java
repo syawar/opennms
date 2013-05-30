@@ -66,36 +66,43 @@ public class SnmpUtilsTest extends MockSnmpAgentTestCase implements TrapProcesso
     private TestTrapListener m_trapListener;
 
     static private final class TestTrapProcessor implements TrapProcessor {
+        @Override
         public void setCommunity(String community) {
             // TODO Auto-generated method stub
             
         }
 
+        @Override
         public void setTimeStamp(long timeStamp) {
             // TODO Auto-generated method stub
             
         }
 
+        @Override
         public void setVersion(String version) {
             // TODO Auto-generated method stub
             
         }
 
+        @Override
         public void setAgentAddress(InetAddress agentAddress) {
             // TODO Auto-generated method stub
             
         }
 
+        @Override
         public void processVarBind(SnmpObjId name, SnmpValue value) {
             // TODO Auto-generated method stub
             
         }
 
+        @Override
         public void setTrapAddress(InetAddress trapAddress) {
             // TODO Auto-generated method stub
             
         }
 
+        @Override
         public void setTrapIdentity(TrapIdentity trapIdentity) {
             // TODO Auto-generated method stub
             
@@ -106,10 +113,12 @@ public class SnmpUtilsTest extends MockSnmpAgentTestCase implements TrapProcesso
         private boolean m_error = false;
         private int m_receivedTrapCount = 0;
 
+        @Override
         public void trapReceived(TrapNotification trapNotification) {
             m_receivedTrapCount++;
         }
 
+        @Override
         public void trapError(int error, String msg) {
             m_error = true;
         }
@@ -126,12 +135,14 @@ public class SnmpUtilsTest extends MockSnmpAgentTestCase implements TrapProcesso
     String m_strategyClass;
     int m_snmpVersion;
     boolean m_trapsSupported;
+    String m_oldProperty;
     
     public SnmpUtilsTest(String strategyClass, int snmpVersion, boolean trapsSupported) {
     	m_strategyClass = strategyClass;
     	m_snmpVersion = snmpVersion;
     	m_trapsSupported = trapsSupported;
     	
+    	m_oldProperty = System.getProperty("org.opennms.snmp.strategyClass");
     	System.setProperty("org.opennms.snmp.strategyClass", m_strategyClass);
     	
         setPropertiesResource(new ClassPathResource("snmpTestData1.properties"));
@@ -142,6 +153,12 @@ public class SnmpUtilsTest extends MockSnmpAgentTestCase implements TrapProcesso
     public void cleanupTrapListener() throws Exception {
     	if (m_trapListener != null) {
     		SnmpUtils.unregisterForTraps(m_trapListener, null, 9162);
+    	}
+    	
+    	if (m_oldProperty == null) {
+    		System.getProperties().remove("org.opennms.snmp.strategyClass");
+    	} else {
+    		System.setProperty("org.opennms.snmp.strategyClass", m_oldProperty);
     	}
     }
     
@@ -258,6 +275,7 @@ public class SnmpUtilsTest extends MockSnmpAgentTestCase implements TrapProcesso
         assertEquals("Unexpected number of traps Received", 1, m_trapListener.getReceivedTrapCount());
     }
     
+        @Override
     public TrapProcessor createTrapProcessor() {
         return new TestTrapProcessor();
     }
@@ -368,5 +386,14 @@ public class SnmpUtilsTest extends MockSnmpAgentTestCase implements TrapProcesso
         
     }
     
+    @Test
+    public void testGetProtoCounter64Value() {
+        SnmpValueFactory valueFactory = SnmpUtils.getValueFactory();
+        assertNotNull(valueFactory);
+
+        byte[] ourBytes = new byte[]{ 0x00, 0x00, (byte)0xde, (byte)0xad, (byte)0xbe, (byte)0xef, (byte)0xca, (byte)0xfe };
+        SnmpValue octStr = valueFactory.getOctetString(ourBytes);
+        assertEquals("Expecting 0x0000deadbeefcafe", new Long(0x0000deadbeefcafeL), SnmpUtils.getProtoCounter64Value(octStr));
+    }
     
 }

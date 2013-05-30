@@ -29,34 +29,49 @@
 package org.opennms.features.topology.api;
 
 import java.util.Collection;
-import java.util.List;
-import com.vaadin.data.Item;
-import com.vaadin.data.util.BeanContainer;
+
+import org.opennms.features.topology.api.topo.Criteria;
+import org.opennms.features.topology.api.topo.GraphProvider;
+import org.opennms.features.topology.api.topo.StatusProvider;
+import org.opennms.features.topology.api.topo.VertexRef;
+
+import com.vaadin.data.Property;
 
 public interface GraphContainer extends DisplayState {
 
-    public VertexContainer<?, ?> getVertexContainer();
+	public interface ChangeListener {
+		public void graphChanged(GraphContainer graphContainer);
+	}
 
-    public BeanContainer<?, ?> getEdgeContainer();
+	GraphProvider getBaseTopology();
 
-    public List<Object> getSelectedVertices();
+	void setBaseTopology(GraphProvider graphProvider);
 
-    public Collection<?> getVertexIds();
+	Criteria getCriteria(String namespace);
 
-    public Collection<?> getEdgeIds();
+	void setCriteria(Criteria critiera);
 
-    public Item getVertexItem(Object vertexId);
+	void addChangeListener(ChangeListener listener);
 
-    public Item getEdgeItem(Object edgeId);
+	void removeChangeListener(ChangeListener listener);
 
-    public Collection<?> getEndPointIdsForEdge(Object edgeId);
+	SelectionManager getSelectionManager();
 
-    public Collection<?> getEdgeIdsForVertex(Object vertexId);
+	void setSelectionManager(SelectionManager selectionManager);
 
-    public Object getVertexItemIdForVertexKey(Object key);
+	Graph getGraph();
 
-    public TopologyProvider getDataSource();
+	Collection<VertexRef> getVertexRefForest(Collection<VertexRef> vertexRefs);
+    
+	MapViewManager getMapViewManager();
 
-    public void setDataSource(TopologyProvider topologyProvider);
+	Property getScaleProperty();
 
+    StatusProvider getStatusProvider();
+
+    void setStatusProvider(StatusProvider statusProvider);
+
+    String getUserName();
+
+    void setUserName(String userName);
 }

@@ -28,9 +28,6 @@
 
 package org.opennms.web.controller.ncs;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.opennms.web.navigate.DisplayStatus;
 import org.opennms.web.navigate.PageNavEntry;
 
 public class NCSAlarmListNavItem implements PageNavEntry {
@@ -38,16 +35,14 @@ public class NCSAlarmListNavItem implements PageNavEntry {
     private String m_name;
     private String m_url;
     
+    @Override
     public String getName() {
         return m_name;
     }
 
+    @Override
     public String getUrl() {
         return m_url;
-    }
-
-    public DisplayStatus evaluate(HttpServletRequest request) {
-        return null;
     }
 
     public void setName(String name) {

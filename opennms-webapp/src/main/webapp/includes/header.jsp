@@ -56,7 +56,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-
 <%!
     public void init() throws ServletException {
         try {
@@ -71,13 +70,21 @@
     String noticeStatus;
     try {
         noticeStatus = NotifdConfigFactory.getPrettyStatus();
+        if ("Off".equals(noticeStatus)) {
+          noticeStatus="<b id=\"notificationOff\">Off</b>";
+        } else {
+          noticeStatus="<b id=\"notificationOn\">On</b>";
+        }
     } catch (Throwable t) {
-        noticeStatus = "<font color=\"ff0000\">Unknown</font>";
+        noticeStatus = "<b id=\"notificationOff\">Unknown</b>";
     }
     pageContext.setAttribute("noticeStatus", noticeStatus);
 final String baseHref = Util.calculateUrlBase( request );
 %>
 <c:choose>
+<c:when test="${param.docType == 'html5'}">
+<!DOCTYPE html>
+</c:when>
 <c:when test="${param.docType == 'html'}">
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 </c:when>
@@ -121,6 +128,7 @@ final String baseHref = Util.calculateUrlBase( request );
         <link rel="stylesheet" type="text/css" href="<%= baseHref %>css/print.css" media="print" />
     </c:when>
   </c:choose>
+  <link rel="shortcut icon" href="favicon.ico" />
   <c:forEach var="link" items="${paramValues.link}">
     <c:out value="${link}" escapeXml="false" />
   </c:forEach>
@@ -175,7 +183,7 @@ final String baseHref = Util.calculateUrlBase( request );
 			<p align="right">
 				<c:choose>
 					<c:when test="${!empty pageContext.request.remoteUser}">
-						User: <a href="<%= baseHref %>account/selfService/index.jsp" title="Account self-service"><strong>${pageContext.request.remoteUser}</strong></a> (Notices <c:out value="${noticeStatus}" escapeXml="false"/>)
+						User: <a href="<%= baseHref %>account/selfService/index.jsp" title="Account self-service"><strong>${pageContext.request.remoteUser}</strong></a>&nbsp;(Notices <c:out value="${noticeStatus}" escapeXml="false"/>)
 						- <a href="<%= baseHref %>j_spring_security_logout">Log out</a><br/>
 					</c:when>
 					<c:otherwise>

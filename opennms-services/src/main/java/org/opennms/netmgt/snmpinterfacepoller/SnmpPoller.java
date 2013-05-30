@@ -136,6 +136,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
     /**
      * <p>onStart</p>
      */
+    @Override
     protected void onStart() {
         // get the category logger
         // start the scheduler
@@ -154,6 +155,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
     /**
      * <p>onStop</p>
      */
+    @Override
     protected void onStop() {
         
         if(getScheduler()!=null) {
@@ -167,6 +169,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
     /**
      * <p>onPause</p>
      */
+    @Override
     protected void onPause() {
         getScheduler().pause();
     }
@@ -174,6 +177,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
     /**
      * <p>onResume</p>
      */
+    @Override
     protected void onResume() {
         getScheduler().resume();
     }
@@ -250,7 +254,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
             if (pkgName != null) {
                 log().debug("Scheduling snmppolling for node: " + nodeid +" ip address: " + ipaddress + " - Found package interface with name: " + pkgName);
                 scheduleSnmpCollection(getNetwork().create(nodeid,ipaddress,pkgName), pkgName);
-            } else {
+            } else if (!getPollerConfig().useCriteriaFilters()) {
                 log().debug("No SNMP Poll Package found for node: " + nodeid +" ip address: " + ipaddress + ". - Scheduling according with default interval");
                 scheduleSnmpCollection(getNetwork().create(nodeid, ipaddress, "null"), "null");
             }
@@ -297,15 +301,15 @@ public class SnmpPoller extends AbstractServiceDaemon {
                 log().debug("package interface status: Off");
             }
         }
-        
-        log().debug("excluding criteria used for default polling: " + excludingCriteria);
-        PollableSnmpInterface node = nodeGroup.createPollableSnmpInterface("null", excludingCriteria, 
+        if (!getPollerConfig().useCriteriaFilters()) {
+            log().debug("excluding criteria used for default polling: " + excludingCriteria);
+            PollableSnmpInterface node = nodeGroup.createPollableSnmpInterface("null", excludingCriteria, 
                 false, -1, false, -1, false, -1, false, -1);
 
-         node.setSnmpinterfaces(getNetwork().getContext().get(node.getParent().getNodeid(), excludingCriteria));
+            node.setSnmpinterfaces(getNetwork().getContext().get(node.getParent().getNodeid(), excludingCriteria));
 
-         getNetwork().schedule(node,getPollerConfig().getInterval(),getScheduler());
-        
+            getNetwork().schedule(node,getPollerConfig().getInterval(),getScheduler());
+        }
     }
     
     private void createScheduler() {
@@ -389,7 +393,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
     public void primarychangeHandler(Event event) {
         log().debug("primarychangeHandler: managing event: " + event.getUei());
 
-        getNetwork().delete(new Long(event.getNodeid()).intValue());
+        getNetwork().delete(Long.valueOf(event.getNodeid()).intValue());
         
         for (Parm parm : event.getParmCollection()){
             if (parm.isValid() && parm.getParmName().equals("newPrimarySnmpAddress")) {
@@ -416,7 +420,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
      */
     @EventHandler(uei = EventConstants.PROVISION_SCAN_COMPLETE_UEI)
     public void scanCompletedHaldler(Event event){
-        getNetwork().refresh(new Long(event.getNodeid()).intValue());
+        getNetwork().refresh(Long.valueOf(event.getNodeid()).intValue());
     }
 
     /**
@@ -426,7 +430,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
      */
     @EventHandler(uei = EventConstants.RESCAN_COMPLETED_EVENT_UEI)
     public void rescanCompletedHaldler(Event event){
-        getNetwork().refresh(new Long(event.getNodeid()).intValue());
+        getNetwork().refresh(Long.valueOf(event.getNodeid()).intValue());
     }
 
     /**
@@ -436,7 +440,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
      */
     @EventHandler(uei = EventConstants.NODE_DELETED_EVENT_UEI)
     public void nodeDeletedHandler(Event event) {
-        getNetwork().delete(new Long(event.getNodeid()).intValue());
+        getNetwork().delete(Long.valueOf(event.getNodeid()).intValue());
     }
 
     /**
@@ -514,7 +518,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
      */
     @EventHandler(uei = EventConstants.NODE_UP_EVENT_UEI)
     public void nodeUpHandler(Event event) {
-        getNetwork().activate(new Long(event.getNodeid()).intValue());
+        getNetwork().activate(Long.valueOf(event.getNodeid()).intValue());
 
     }
 
@@ -525,7 +529,7 @@ public class SnmpPoller extends AbstractServiceDaemon {
      */
     @EventHandler(uei = EventConstants.NODE_DOWN_EVENT_UEI)
     public void nodeDownHandler(Event event) {
-        getNetwork().suspend(new Long(event.getNodeid()).intValue());
+        getNetwork().suspend(Long.valueOf(event.getNodeid()).intValue());
     }
 
 }

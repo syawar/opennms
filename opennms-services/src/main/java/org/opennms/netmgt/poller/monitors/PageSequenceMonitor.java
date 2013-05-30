@@ -38,7 +38,6 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -241,6 +240,7 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
             super(uri);
         }
 
+        @Override
         public void setQueryParameters(List<NameValuePair> parms) {
             try {
                 UrlEncodedFormEntity entity = new UrlEncodedFormEntity(parms, "UTF-8");
@@ -257,6 +257,7 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
             super(uri);
         }
 
+        @Override
         public void setQueryParameters(List<NameValuePair> parms) {
             URI uri = this.getURI();
             URI uriWithQueryString = null;
@@ -327,7 +328,16 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
                 PageSequenceHttpUriRequest method = getMethod(uri);
 
                 if (getVirtualHost(svc) != null) {
-                    method.getParams().setParameter(ClientPNames.VIRTUAL_HOST, new HttpHost(getVirtualHost(svc), uri.getPort()));
+                    // According to the standard, adding the default ports to the host header is optional, and this makes IIS 7.5 happy.
+                    HttpHost host = null;
+                    if ("https".equals(uri.getScheme()) && uri.getPort() == 443) { // Suppress the addition of default port for HTTPS
+                        host = new HttpHost(getVirtualHost(svc));
+                    } else if ("http".equals(uri.getScheme()) && uri.getPort() == 80) { //  Suppress the addition of default port for HTTP
+                        host = new HttpHost(getVirtualHost(svc));
+                    } else {  // Add the port if it is non-standard
+                        host = new HttpHost(getVirtualHost(svc), uri.getPort());
+                    }
+                    method.getParams().setParameter(ClientPNames.VIRTUAL_HOST, host);
                 }
 
                 if (getUserAgent() != null) {
@@ -583,11 +593,11 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
         public static final String KEY = PageSequenceMonitorParameters.class.getName();
 
         @SuppressWarnings({ "unchecked" })
-        static synchronized PageSequenceMonitorParameters get(Map paramterMap) {
-            PageSequenceMonitorParameters parms = (PageSequenceMonitorParameters) paramterMap.get(KEY);
+        static synchronized PageSequenceMonitorParameters get(Map parameterMap) {
+            PageSequenceMonitorParameters parms = (PageSequenceMonitorParameters) parameterMap.get(KEY);
             if (parms == null) {
-                parms = new PageSequenceMonitorParameters(paramterMap);
-                paramterMap.put(KEY, parms);
+                parms = new PageSequenceMonitorParameters(parameterMap);
+                parameterMap.put(KEY, parms);
             }
             return parms;
         }
@@ -613,7 +623,7 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
         }
 
         Map<String, String> getParameterMap() {
-            return Collections.unmodifiableMap(m_parameterMap);
+            return m_parameterMap;
         }
 
         HttpPageSequence getPageSequence() {
@@ -634,7 +644,7 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
         }
 
         private String getStringParm(String key, String deflt) {
-            return ParameterMap.getKeyedString(this.getParameterMap(), key, deflt);
+            return ParameterMap.getKeyedString(getParameterMap(), key, deflt);
         }
 
         private int getIntParm(String key, int defValue) {
@@ -673,6 +683,7 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
     }
 
     /** {@inheritDoc} */
+    @Override
     public PollStatus poll(final MonitoredService svc, final Map<String, Object> parameterMap) {
         DefaultHttpClient client = null;
         PollStatus serviceStatus = PollStatus.unavailable("Poll not completed yet");

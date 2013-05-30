@@ -56,7 +56,6 @@ import org.opennms.netmgt.rrd.RrdGraphDetails;
 import org.opennms.netmgt.rrd.RrdStrategy;
 import org.opennms.netmgt.rrd.RrdUtils;
 
-import antlr.StringUtils;
 
 /**
  * Provides a JRobin based implementation of RrdStrategy. It uses JRobin 1.4 in
@@ -97,6 +96,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
             m_value = value;
         }
         
+        @Override
         public double getValue(long timestamp) {
             if (m_startTime <= timestamp && m_endTime >= timestamp) {
                 return m_value;
@@ -116,6 +116,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setConfigurationProperties(final Properties configurationParameters) {
         m_configurationProperties = configurationParameters;
         if(!s_initialized) {
@@ -140,11 +141,13 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      * @param rrdFile a {@link org.jrobin.core.RrdDb} object.
      * @throws java.lang.Exception if any.
      */
+    @Override
     public void closeFile(final RrdDb rrdFile) throws Exception {
         rrdFile.close();
     }
 
     /** {@inheritDoc} */
+    @Override
 	public RrdDef createDefinition(final String creator,
 			final String directory, final String rrdName, int step,
 			final List<RrdDataSource> dataSources, final List<String> rraList) throws Exception {
@@ -189,6 +192,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      * @param rrdDef a {@link org.jrobin.core.RrdDef} object.
      * @throws java.lang.Exception if any.
      */
+    @Override
     public void createFile(final RrdDef rrdDef,  Map<String, String> attributeMappings) throws Exception {
         if (rrdDef == null) {
         	log().debug("createRRD: skipping RRD file");
@@ -213,6 +217,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      *
      * Opens the JRobin RrdDb by name and returns it.
      */
+    @Override
     public RrdDb openFile(final String fileName) throws Exception {
         RrdDb rrd = new RrdDb(fileName);
         return rrd;
@@ -223,6 +228,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      *
      * Creates a sample from the JRobin RrdDb and passes in the data provided.
      */
+    @Override
     public void updateFile(final RrdDb rrdFile, final String owner, final String data) throws Exception {
         Sample sample = rrdFile.createSample();
         sample.setAndUpdate(data);
@@ -244,18 +250,20 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      *
      * Fetch the last value from the JRobin RrdDb file.
      */
+    @Override
     public Double fetchLastValue(final String fileName, final String ds, final int interval) throws NumberFormatException, org.opennms.netmgt.rrd.RrdException {
         return fetchLastValue(fileName, ds, "AVERAGE", interval);
     }
 
     /** {@inheritDoc} */
+    @Override
     public Double fetchLastValue(final String fileName, final String ds, final String consolidationFunction, final int interval)
             throws org.opennms.netmgt.rrd.RrdException {
         RrdDb rrd = null;
         try {
             long now = System.currentTimeMillis();
             long collectTime = (now - (now % interval)) / 1000L;
-            rrd = new RrdDb(fileName);
+            rrd = new RrdDb(fileName, true);
             FetchData data = rrd.createFetchRequest(consolidationFunction, collectTime, collectTime).fetchData();
             if(log().isDebugEnabled()) {
             	//The "toString" method of FetchData is quite computationally expensive; 
@@ -282,10 +290,11 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
     }
     
     /** {@inheritDoc} */
+    @Override
     public Double fetchLastValueInRange(final String fileName, final String ds, final int interval, final int range) throws NumberFormatException, org.opennms.netmgt.rrd.RrdException {
         RrdDb rrd = null;
         try {
-        	rrd = new RrdDb(fileName);
+        	rrd = new RrdDb(fileName, true);
          	long now = System.currentTimeMillis();
             long latestUpdateTime = (now - (now % interval)) / 1000L;
             long earliestUpdateTime = ((now - (now % interval)) - range) / 1000L;
@@ -329,8 +338,15 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
     }
 
     private Color getColor(final String colorValue) {
-        int colorVal = Integer.parseInt(colorValue, 16);
-        return new Color(colorVal);
+        int rVal = Integer.parseInt(colorValue.substring(0, 2), 16);
+        int gVal = Integer.parseInt(colorValue.substring(2, 4), 16);
+        int bVal = Integer.parseInt(colorValue.substring(4, 6), 16);
+        if (colorValue.length() == 6) {
+            return new Color(rVal, gVal, bVal);
+        }
+
+        int aVal = Integer.parseInt(colorValue.substring(6, 8), 16);
+        return new Color(rVal, gVal, bVal, aVal);
     }
 
     // For compatibility with RRDtool defs, the colour value for
@@ -344,6 +360,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
     }
 
     /** {@inheritDoc} */
+    @Override
     public InputStream createGraph(final String command, final File workDir) throws IOException, org.opennms.netmgt.rrd.RrdException {
         return createGraphReturnDetails(command, workDir).getInputStream();
     }
@@ -358,6 +375,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      * used to construct an RrdGraph and a PNG image will be created. An input
      * stream returning the bytes of the PNG image is returned.
      */
+    @Override
     public RrdGraphDetails createGraphReturnDetails(final String command, final File workDir) throws IOException, org.opennms.netmgt.rrd.RrdException {
 
         try {
@@ -387,6 +405,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
     }
     
     /** {@inheritDoc} */
+    @Override
     public void promoteEnqueuedFiles(Collection<String> rrdFiles) {
         // no need to do anything since this strategy doesn't queue
     }
@@ -669,6 +688,12 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
                 String[] color = tokenize(stack[0], "#", true);
                 graphDef.stack(color[0], getColor(color[1]), (stack.length > 1 ? stack[1] : ""));
 
+            } else if (arg.startsWith("HRULE:")) {
+                String definition = arg.substring("HRULE:".length());
+                String hrule[] = tokenize(definition, ":", true);
+                String[] color = tokenize(hrule[0], "#", true);
+                Double value = Double.valueOf(color[0]);
+                graphDef.hrule(value, getColor(color[1]), hrule[1]);
             } else if (arg.endsWith("/rrdtool") || arg.equals("graph") || arg.equals("-")) {
             	// ignore, this is just a leftover from the rrdtool-specific options
 
@@ -743,22 +768,22 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
     }
 
     /**
-     * @param colorArg Should have the form COLORTAG#RRGGBB
+     * @param colorArg Should have the form COLORTAG#RRGGBB[AA]
      * @see http://www.jrobin.org/support/man/rrdgraph.html
      */
     private void parseGraphColor(final RrdGraphDef graphDef, final String colorArg) throws IllegalArgumentException {
-        // Parse for format COLORTAG#RRGGBB
+        // Parse for format COLORTAG#RRGGBB[AA]
         String[] colorArgParts = tokenize(colorArg, "#", false);
         if (colorArgParts.length != 2) {
-            throw new IllegalArgumentException("--color must be followed by value with format COLORTAG#RRGGBB");
+            throw new IllegalArgumentException("--color must be followed by value with format COLORTAG#RRGGBB[AA]");
         }
 
         String colorTag = colorArgParts[0].toUpperCase();
         String colorHex = colorArgParts[1].toUpperCase();
 
         // validate hex color input is actually an RGB hex color value
-        if (colorHex.length() != 6) {
-            throw new IllegalArgumentException("--color must be followed by value with format COLORTAG#RRGGBB");
+        if (colorHex.length() != 6 && colorHex.length() != 8) {
+            throw new IllegalArgumentException("--color must be followed by value with format COLORTAG#RRGGBB[AA]");
         }
 
         // this might throw NumberFormatException, but whoever wrote
@@ -808,6 +833,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      *
      * @return a {@link java.lang.String} object.
      */
+    @Override
     public String getStats() {
         return "";
     }
@@ -820,6 +846,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      *
      * @return a int.
      */
+    @Override
     public int getGraphLeftOffset() {
         return 74;
     }
@@ -829,6 +856,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      *
      * @return a int.
      */
+    @Override
     public int getGraphRightOffset() {
         return -15;
     }
@@ -838,6 +866,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      *
      * @return a int.
      */
+    @Override
     public int getGraphTopOffsetWithText() {
         return -61;
     }
@@ -847,6 +876,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      *
      * @return a {@link java.lang.String} object.
      */
+    @Override
     public String getDefaultFileExtension() {
         return ".jrb";
     }
@@ -882,7 +912,7 @@ public class JRobinRrdStrategy implements RrdStrategy<RrdDef,RrdDb> {
      * @return an array of {@link java.lang.String} objects.
      */
     public static String[] tokenizeWithQuotingAndEscapes(final String line, final String delims, final boolean processQuoted, final String tokens) {
-        ThreadCategory log = ThreadCategory.getInstance(StringUtils.class);
+        ThreadCategory log = ThreadCategory.getInstance(JRobinRrdStrategy.class);
         List<String> tokenList = new LinkedList<String>();
     
         StringBuffer currToken = new StringBuffer();

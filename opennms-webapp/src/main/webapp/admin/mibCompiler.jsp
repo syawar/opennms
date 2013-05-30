@@ -35,13 +35,13 @@
 %>
 
 <jsp:include page="/includes/header.jsp" flush="false" >
-  <jsp:param name="title" value="MIB Compiler" />
-  <jsp:param name="headTitle" value="MIB Compiler" />
+  <jsp:param name="title" value="SNMP MIB Compiler" />
+  <jsp:param name="headTitle" value="SNMP MIB Compiler" />
   <jsp:param name="location" value="admin" />
   <jsp:param name="breadcrumb" value="<a href='admin/index.jsp'>Admin</a>" />
-  <jsp:param name="breadcrumb" value="MIB Compiler" />
+  <jsp:param name="breadcrumb" value="SNMP MIB Compiler" />
   <jsp:param name="vaadinEmbeddedStyles" value="true" />
 </jsp:include>
 
-<iframe src="osgi/mib-compiler" frameborder="0" style="height:100%; width:100%;"></iframe>
+<iframe src="mib-compiler" frameborder="0" style="height:100%; width:100%;"></iframe>
 <jsp:include page="/includes/footer.jsp" flush="true"/>

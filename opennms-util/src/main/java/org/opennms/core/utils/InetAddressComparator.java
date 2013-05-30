@@ -44,6 +44,7 @@ import java.util.Comparator;
  */
 public class InetAddressComparator implements Comparator<InetAddress> {
 
+    @Override
     public int compare(InetAddress addr1, InetAddress addr2) {
         if (addr1 == null) {
             if (addr2 == null) {
@@ -67,7 +68,7 @@ public class InetAddressComparator implements Comparator<InetAddress> {
                         return 1;
                     } else {
                         // Two Inet6Address instances
-                        int scopeComparison = new Integer(((Inet6Address)addr1).getScopeId()).compareTo(((Inet6Address)addr2).getScopeId());
+                        int scopeComparison = Integer.valueOf(((Inet6Address)addr1).getScopeId()).compareTo(((Inet6Address)addr2).getScopeId());
                         if (scopeComparison == 0) {
                             // If the scope IDs are identical, then compare the addresses
                             return new ByteArrayComparator().compare(addr1.getAddress(), addr2.getAddress());

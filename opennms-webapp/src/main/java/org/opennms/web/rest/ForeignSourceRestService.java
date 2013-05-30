@@ -157,7 +157,7 @@ public class ForeignSourceRestService extends OnmsRestService {
      */
     @GET
     @Path("default")
-    @Produces( { MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public ForeignSource getDefaultForeignSource() throws ParseException {
         readLock();
         try {
@@ -211,7 +211,7 @@ public class ForeignSourceRestService extends OnmsRestService {
      * @throws java.text.ParseException if any.
      */
     @GET
-    @Produces( { MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public ForeignSourceCollection getForeignSources() throws ParseException {
         readLock();
         
@@ -252,7 +252,7 @@ public class ForeignSourceRestService extends OnmsRestService {
      */
     @GET
     @Path("{foreignSource}")
-    @Produces( { MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public ForeignSource getForeignSource(@PathParam("foreignSource") String foreignSource) {
         readLock();
         try {
@@ -270,7 +270,7 @@ public class ForeignSourceRestService extends OnmsRestService {
      */
     @GET
     @Path("{foreignSource}/detectors")
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public DetectorCollection getDetectors(@PathParam("foreignSource") String foreignSource) {
         readLock();
         try {
@@ -289,7 +289,7 @@ public class ForeignSourceRestService extends OnmsRestService {
      */
     @GET
     @Path("{foreignSource}/detectors/{detector}")
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public DetectorWrapper getDetector(@PathParam("foreignSource") String foreignSource, @PathParam("detector") String detector) {
         readLock();
         try {
@@ -312,7 +312,7 @@ public class ForeignSourceRestService extends OnmsRestService {
      */
     @GET
     @Path("{foreignSource}/policies")
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public PolicyCollection getPolicies(@PathParam("foreignSource") String foreignSource) {
         readLock();
         try {
@@ -331,7 +331,7 @@ public class ForeignSourceRestService extends OnmsRestService {
      */
     @GET
     @Path("{foreignSource}/policies/{policy}")
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public PolicyWrapper getPolicy(@PathParam("foreignSource") String foreignSource, @PathParam("policy") String policy) {
         readLock();
         try {
@@ -360,8 +360,7 @@ public class ForeignSourceRestService extends OnmsRestService {
         try {
             debug("addForeignSource: Adding foreignSource %s", foreignSource.getName());
             m_pendingForeignSourceRepository.save(foreignSource);
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getForeignSource").build(foreignSource.getName())).build();
-            // return Response.ok(foreignSource).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo, foreignSource.getName())).build();
         } finally {
             writeUnlock();
         }
@@ -385,8 +384,7 @@ public class ForeignSourceRestService extends OnmsRestService {
             ForeignSource fs = getActiveForeignSource(foreignSource);
             fs.addDetector(detector);
             m_pendingForeignSourceRepository.save(fs);
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getDetector").build(foreignSource, detector.getName())).build();
-            // return Response.ok(detector).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo, detector.getName())).build();
         } finally {
             writeUnlock();
         }
@@ -410,8 +408,7 @@ public class ForeignSourceRestService extends OnmsRestService {
             ForeignSource fs = getActiveForeignSource(foreignSource);
             fs.addPolicy(policy);
             m_pendingForeignSourceRepository.save(fs);
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getPolicy").build(foreignSource, policy.getName())).build();
-            // return Response.ok(policy).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo, policy.getName())).build();
         } finally {
             writeUnlock();
         }
@@ -445,8 +442,7 @@ public class ForeignSourceRestService extends OnmsRestService {
             }
             debug("updateForeignSource: foreign source %s updated", foreignSource);
             m_pendingForeignSourceRepository.save(fs);
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getForeignSource").build(foreignSource)).build();
-            // return Response.ok(fs).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo)).build();
         } finally {
             writeUnlock();
         }

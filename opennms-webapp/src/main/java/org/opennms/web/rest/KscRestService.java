@@ -87,7 +87,7 @@ public class KscRestService extends OnmsRestService {
     SecurityContext m_securityContext;
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Transactional
     public KscReportCollection getReports() throws ParseException {
         readLock();
@@ -102,7 +102,7 @@ public class KscRestService extends OnmsRestService {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Path("{reportId}")
     @Transactional
     public KscReport getReport(@PathParam("reportId") final Integer reportId) {
@@ -172,7 +172,7 @@ public class KscRestService extends OnmsRestService {
             } catch (final Exception e) {
                 throw getException(Status.BAD_REQUEST, e.getMessage());
             }
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getReport").build(kscReportId)).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo)).build();
         } finally {
             writeUnlock();
         }
@@ -206,6 +206,7 @@ public class KscRestService extends OnmsRestService {
         }
 
         public void setKscReports(final List<KscReport> reports) {
+            if (reports == this) return;
             clear();
             addAll(reports);
         }

@@ -413,6 +413,7 @@ public class JdbcCapsdDbSyncer implements InitializingBean, CapsdDbSyncer {
     @Override
     public void syncServices() {
         m_jdbcTemplate.execute(new ConnectionCallback<Object>() {
+            @Override
             public Object doInConnection(Connection con) throws SQLException, DataAccessException {
                 syncServices(con);
                 return null;
@@ -485,6 +486,7 @@ public class JdbcCapsdDbSyncer implements InitializingBean, CapsdDbSyncer {
     public List<String> syncServicesTable() {
         return m_jdbcTemplate.execute(new ConnectionCallback<List<String>>() {
 
+            @Override
             public List<String> doInConnection(Connection con) throws SQLException, DataAccessException {
                 return syncServicesTable(con);
             }
@@ -518,7 +520,7 @@ public class JdbcCapsdDbSyncer implements InitializingBean, CapsdDbSyncer {
             ResultSet rs = loadStmt.executeQuery();
             d.watch(rs);
             while (rs.next()) {
-                Integer id = new Integer(rs.getInt(1));
+                Integer id = Integer.valueOf(rs.getInt(1));
                 String name = rs.getString(2);
     
                 m_serviceIdToName.put(id, name);
@@ -572,6 +574,7 @@ public class JdbcCapsdDbSyncer implements InitializingBean, CapsdDbSyncer {
     public void syncManagementState() {
         m_jdbcTemplate.execute(new ConnectionCallback<Object>() {
 
+            @Override
             public Object doInConnection(Connection con) throws SQLException, DataAccessException {
                 syncManagementState(con);
                 return null;
@@ -877,6 +880,7 @@ public class JdbcCapsdDbSyncer implements InitializingBean, CapsdDbSyncer {
     public void syncSnmpPrimaryState() {
         m_jdbcTemplate.execute(new ConnectionCallback<Object>() {
 
+            @Override
             public Object doInConnection(Connection con) throws SQLException, DataAccessException {
                 syncSnmpPrimaryState(con);
                 return null;
@@ -963,7 +967,7 @@ public class JdbcCapsdDbSyncer implements InitializingBean, CapsdDbSyncer {
                 }
     
                 // New node or existing node?
-                ifList = nodes.get(new Integer(nodeId));
+                ifList = nodes.get(Integer.valueOf(nodeId));
                 if (ifList == null) {
                     // Create new interface entry list
                     ifList = new ArrayList<LightWeightIfEntry>();
@@ -1249,6 +1253,7 @@ public class JdbcCapsdDbSyncer implements InitializingBean, CapsdDbSyncer {
     public boolean isInterfaceInDB(final InetAddress ifAddress) {
         return m_jdbcTemplate.execute(new ConnectionCallback<Boolean>() {
 
+            @Override
             public Boolean doInConnection(Connection con) throws SQLException, DataAccessException {
                     return isInterfaceInDB(con, ifAddress) ? Boolean.TRUE : Boolean.FALSE;
             }

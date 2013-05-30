@@ -38,18 +38,15 @@ import java.util.TreeMap;
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.opennms.netmgt.dao.NodeDao;
 import org.opennms.netmgt.dao.ResourceDao;
 import org.opennms.netmgt.dao.RrdDao;
 import org.opennms.netmgt.dao.castor.statsd.PackageReport;
 import org.opennms.netmgt.dao.castor.statsd.StatsdPackage;
 import org.opennms.netmgt.dao.support.BottomNAttributeStatisticVisitor;
-import org.opennms.netmgt.dao.support.FilterWalker;
 import org.opennms.netmgt.filter.FilterDao;
 import org.opennms.netmgt.mock.MockResourceType;
 import org.opennms.netmgt.model.AttributeStatisticVisitorWithResults;
-import org.opennms.netmgt.model.EntityVisitor;
 import org.opennms.netmgt.model.ExternalValueAttribute;
 import org.opennms.netmgt.model.OnmsAttribute;
 import org.opennms.netmgt.model.OnmsNode;
@@ -260,7 +257,7 @@ public class ReportDefinitionTest extends TestCase {
         packageReport.setEnabled(true);
         packageReport.setPackage(new StatsdPackage());
         packageReport.setReport(null);
-        packageReport.setRetainInterval(new Long(86400 * 1000));
+        packageReport.setRetainInterval(Long.valueOf(86400 * 1000));
         packageReport.setSchedule("hmm");
         return packageReport;
     }

@@ -112,6 +112,7 @@ public abstract class EventPanel extends Panel {
 
         HorizontalLayout toolbar = new HorizontalLayout();
         toolbar.addComponent(new Button("Save Events File", new Button.ClickListener() {
+            @Override
             public void buttonClick(ClickEvent event) {
                 events.setEvent(eventTable.getOnmsEvents());
                 logger.info("The events have been saved.");
@@ -119,6 +120,7 @@ public abstract class EventPanel extends Panel {
             }
         }));
         toolbar.addComponent(new Button("Cancel", new Button.ClickListener() {
+            @Override
             public void buttonClick(Button.ClickEvent event) {
                 logger.info("Event processing has been canceled");
                 cancel();
@@ -128,6 +130,7 @@ public abstract class EventPanel extends Panel {
         mainLayout.setComponentAlignment(toolbar, Alignment.MIDDLE_RIGHT);
 
         eventTable = new EventTable(events) {
+            @Override
             public void updateExternalSource(org.opennms.netmgt.xml.eventconf.Event event) {
                 eventForm.setEventDataSource(event);
                 eventForm.setVisible(true);
@@ -160,6 +163,7 @@ public abstract class EventPanel extends Panel {
         mainLayout.setComponentAlignment(add, Alignment.MIDDLE_RIGHT);
 
         eventForm = new EventForm() {
+            @Override
             public void saveEvent(org.opennms.netmgt.xml.eventconf.Event event) {
                 if (isNew) {
                     eventTable.addEvent(event);
@@ -169,9 +173,11 @@ public abstract class EventPanel extends Panel {
                 }
                 eventTable.refreshRowCache();
             }
+            @Override
             public void deleteEvent(org.opennms.netmgt.xml.eventconf.Event event) {
                 logger.info("Event " + event.getUei() + " has been removed.");
-                eventTable.removeItem(event);
+                eventTable.select(null);
+                eventTable.removeItem(event.getUei());
                 eventTable.refreshRowCache();
             }
         };
@@ -212,16 +218,17 @@ public abstract class EventPanel extends Panel {
      */
     public void processEvents(final Events events, final Logger logger) {
         final File configDir = new File(ConfigFileConstants.getHome(), "etc/events/");
-        final File file = new File(configDir, fileName.replaceFirst("\\..*$", ".xml"));
+        final File file = new File(configDir, fileName);
         if (file.exists()) {
             MessageBox mb = new MessageBox(getApplication().getMainWindow(),
-                    "Are you sure?",
-                    MessageBox.Icon.QUESTION,
-                    "Do you really want to override the existig file?<br/>All current information will be lost.",
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
+                                           "Are you sure?",
+                                           MessageBox.Icon.QUESTION,
+                                           "Do you really want to override the existig file?<br/>All current information will be lost.",
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
             mb.addStyleName(Runo.WINDOW_DIALOG);
             mb.show(new EventListener() {
+                @Override
                 public void buttonClicked(ButtonType buttonType) {
                     if (buttonType == MessageBox.ButtonType.YES) {
                         validateFile(file, events, logger);
@@ -250,13 +257,14 @@ public abstract class EventPanel extends Panel {
             saveFile(file, events, logger);
         } else {
             MessageBox mb = new MessageBox(getApplication().getMainWindow(),
-                    "Are you sure?",
-                    MessageBox.Icon.QUESTION,
-                    eventCount + " of the new events are already on the configuration files. Do you really want to override those events ?",
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
-                    new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
+                                           "Are you sure?",
+                                           MessageBox.Icon.QUESTION,
+                                           eventCount + " of the new events are already on the configuration files. Do you really want to override those events ?",
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.YES, "Yes"),
+                                           new MessageBox.ButtonConfig(MessageBox.ButtonType.NO, "No"));
             mb.addStyleName(Runo.WINDOW_DIALOG);
             mb.show(new EventListener() {
+                @Override
                 public void buttonClicked(ButtonType buttonType) {
                     if (buttonType == MessageBox.ButtonType.YES) {
                         saveFile(file, events, logger);

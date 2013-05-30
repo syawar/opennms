@@ -45,7 +45,6 @@ import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.dns.annotations.DNSEntry;
 import org.opennms.core.test.dns.annotations.DNSZone;
 import org.opennms.core.test.dns.annotations.JUnitDNSServer;
-import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.model.PollStatus;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.ServiceMonitor;
@@ -101,7 +100,7 @@ public class DnsMonitorTest {
         final Map<String, Object> m = new ConcurrentSkipListMap<String, Object>();
 
         final ServiceMonitor monitor = new DnsMonitor();
-        final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, InetAddressUtils.getLocalHostAddress(), "DNS");
+        final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("127.0.0.1"), "DNS");
 
         m.put("port", "9153");
         m.put("retry", "2");
@@ -110,7 +109,7 @@ public class DnsMonitorTest {
         
         final PollStatus status = monitor.poll(svc, m);
         MockUtil.println("Reason: "+status.getReason());
-        assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
+        assertEquals("Expected service to be available", PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
     }
     
     @Test
@@ -119,7 +118,7 @@ public class DnsMonitorTest {
         final Map<String, Object> m = new ConcurrentSkipListMap<String, Object>();
 
         final ServiceMonitor monitor = new DnsMonitor();
-        final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, InetAddressUtils.getLocalHostAddress(), "DNS");
+        final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("127.0.0.1"), "DNS");
 
         m.put("port", "9153");
         m.put("retry", "2");
@@ -153,7 +152,7 @@ public class DnsMonitorTest {
         final Map<String, Object> m = new ConcurrentSkipListMap<String, Object>();
 
         final ServiceMonitor monitor = new DnsMonitor();
-        final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, InetAddressUtils.getLocalHostAddress(), "DNS");
+        final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("127.0.0.1"), "DNS");
 
         m.put("port", "9153");
         m.put("retry", "1");

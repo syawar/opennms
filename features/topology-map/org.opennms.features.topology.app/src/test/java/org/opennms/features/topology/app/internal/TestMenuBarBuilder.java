@@ -41,8 +41,10 @@ import java.util.Properties;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opennms.features.topology.api.CheckedOperation;
+import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.Operation;
 import org.opennms.features.topology.api.OperationContext;
+import org.opennms.features.topology.api.topo.VertexRef;
 
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
@@ -50,8 +52,6 @@ import com.vaadin.ui.MenuBar.MenuItem;
 
 public class TestMenuBarBuilder {
 
-    private MenuBar m_menubar = new MenuBar();
-    
     @Test
     public void createMenuTest() {
         MenuBarBuilder builder = new MenuBarBuilder();
@@ -297,19 +297,19 @@ public class TestMenuBarBuilder {
         return new CheckedOperation() {
 
             @Override
-            public Undoer execute(List<Object> targets, OperationContext operationContext) {
+            public Undoer execute(List<VertexRef> targets, OperationContext operationContext) {
                 // TODO Auto-generated method stub
                 return null;
             }
 
             @Override
-            public boolean display(List<Object> targets, OperationContext operationContext) {
+            public boolean display(List<VertexRef> targets, OperationContext operationContext) {
                 // TODO Auto-generated method stub
                 return false;
             }
 
             @Override
-            public boolean enabled(List<Object> targets, OperationContext operationContext) {
+            public boolean enabled(List<VertexRef> targets, OperationContext operationContext) {
                 // TODO Auto-generated method stub
                 return false;
             }
@@ -321,10 +321,23 @@ public class TestMenuBarBuilder {
             }
 
 			@Override
-			public boolean isChecked(List<Object> targets,
+			public boolean isChecked(List<VertexRef> targets,
 					OperationContext operationContext) {
 				// TODO Auto-generated method stub
 				return false;
+			}
+
+			@Override
+			public void applyHistory(GraphContainer context,
+					Map<String, String> settings) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public Map<String, String> createHistory(GraphContainer context) {
+				// TODO Auto-generated method stub
+				return null;
 			}};
 	}
 
@@ -372,19 +385,19 @@ public class TestMenuBarBuilder {
         return new Operation() {
 
             @Override
-            public Undoer execute(List<Object> targets, OperationContext operationContext) {
+            public Undoer execute(List<VertexRef> targets, OperationContext operationContext) {
                 // TODO Auto-generated method stub
                 return null;
             }
 
             @Override
-            public boolean display(List<Object> targets, OperationContext operationContext) {
+            public boolean display(List<VertexRef> targets, OperationContext operationContext) {
                 // TODO Auto-generated method stub
                 return false;
             }
 
             @Override
-            public boolean enabled(List<Object> targets, OperationContext operationContext) {
+            public boolean enabled(List<VertexRef> targets, OperationContext operationContext) {
                 // TODO Auto-generated method stub
                 return false;
             }
@@ -408,6 +421,7 @@ public class TestMenuBarBuilder {
     }
     
     private Command menuCommand = new Command() {
+        @Override
         public void menuSelected(MenuItem selectedItem) {
             
         }

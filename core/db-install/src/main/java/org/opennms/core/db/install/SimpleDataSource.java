@@ -32,8 +32,10 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -85,6 +87,7 @@ public class SimpleDataSource implements DataSource {
      * @return a {@link java.sql.Connection} object.
      * @throws java.sql.SQLException if any.
      */
+    @Override
     public Connection getConnection() throws SQLException {
         if (m_timeout == null) {
             return DriverManager.getConnection(m_url, m_properties);
@@ -98,6 +101,7 @@ public class SimpleDataSource implements DataSource {
     }
 
     /** {@inheritDoc} */
+    @Override
     public Connection getConnection(String username, String password) throws SQLException {
         throw new UnsupportedOperationException("getConnection(String, String) not implemented");
     }
@@ -108,6 +112,7 @@ public class SimpleDataSource implements DataSource {
      * @return a {@link java.io.PrintWriter} object.
      * @throws java.sql.SQLException if any.
      */
+    @Override
     public PrintWriter getLogWriter() throws SQLException {
         throw new UnsupportedOperationException("getLogWriter() not implemented");
     }
@@ -118,18 +123,26 @@ public class SimpleDataSource implements DataSource {
      * @return a int.
      * @throws java.sql.SQLException if any.
      */
+    @Override
     public int getLoginTimeout() throws SQLException {
         return m_timeout == null ? -1 : m_timeout;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
         throw new UnsupportedOperationException("setLogWriter(PrintWriter) not implemented");
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setLoginTimeout(int seconds) throws SQLException {
         m_timeout = seconds;
+    }
+
+    /** {@inheritDoc} */
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new SQLFeatureNotSupportedException("getParentLogger not supported");
     }
 
     /**
@@ -140,6 +153,7 @@ public class SimpleDataSource implements DataSource {
      * @return a T object.
      * @throws java.sql.SQLException if any.
      */
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         return null;  //TODO
     }
@@ -151,6 +165,7 @@ public class SimpleDataSource implements DataSource {
      * @return a boolean.
      * @throws java.sql.SQLException if any.
      */
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;  //TODO
     }
@@ -214,6 +229,7 @@ public class SimpleDataSource implements DataSource {
      *
      * @return a {@link java.lang.String} object.
      */
+    @Override
     public String toString() {
         StringBuffer props = new StringBuffer();
         if (m_properties.isEmpty()) {

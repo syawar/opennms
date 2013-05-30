@@ -49,7 +49,6 @@ import org.opennms.netmgt.model.OnmsAcknowledgment;
 import org.opennms.netmgt.model.OnmsAcknowledgmentCollection;
 import org.opennms.netmgt.model.OnmsAlarm;
 import org.opennms.netmgt.model.OnmsNotification;
-import org.opennms.netmgt.model.acknowledgments.AckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -79,9 +78,6 @@ public class AcknowledgmentRestService extends OnmsRestService {
     @Autowired
     private NotificationDao m_notificationDao;
     
-    @Autowired
-    private AckService m_ackSvc;
-    
     @Context 
     UriInfo m_uriInfo;
 
@@ -95,7 +91,7 @@ public class AcknowledgmentRestService extends OnmsRestService {
      * @return a {@link org.opennms.netmgt.model.OnmsAcknowledgment} object.
      */
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Path("{id}")
     @Transactional
     public OnmsAcknowledgment getAcknowledgment(@PathParam("id") String alarmId) {
@@ -132,7 +128,7 @@ public class AcknowledgmentRestService extends OnmsRestService {
      * @return a {@link org.opennms.netmgt.model.OnmsAcknowledgmentCollection} object.
      */
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Transactional
     public OnmsAcknowledgmentCollection getAcks() {
         readLock();
@@ -199,7 +195,7 @@ public class AcknowledgmentRestService extends OnmsRestService {
 	            "Must supply the 'action' parameter, set to either 'ack, 'unack', 'clear', or 'esc'");
 	        }
 
-	        m_ackSvc.processAck(ack);
+	        m_ackDao.processAck(ack);
 	        return ack;
     	} finally {
     		writeUnlock();

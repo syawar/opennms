@@ -64,6 +64,7 @@ public final class DefaultEventHandlerImpl implements InitializingBean, EventHan
      * @see org.opennms.netmgt.eventd.EventHandler#createRunnable(org.opennms.netmgt.xml.event.Log)
      */
     /** {@inheritDoc} */
+    @Override
     public EventHandlerRunnable createRunnable(Log eventLog) {
         return new EventHandlerRunnable(eventLog);
     }
@@ -86,6 +87,7 @@ public final class DefaultEventHandlerImpl implements InitializingBean, EventHan
          * event parms, add event to database and send event to appropriate
          * listeners.
          */
+        @Override
         public void run() {
             Events events = m_eventLog.getEvents();
             if (events == null || events.getEventCount() <= 0) {
@@ -94,35 +96,36 @@ public final class DefaultEventHandlerImpl implements InitializingBean, EventHan
             }
 
             for (final Event event : events.getEventCollection()) {
-                if (log().isDebugEnabled()) {
+                final ThreadCategory log = log();
+                if (log.isDebugEnabled()) {
                     // Log the uei, source, and other important aspects
-                	final String uuid = event.getUuid();
-                    log().debug("Event {");
-                    log().debug("  uuid  = " + (uuid != null && uuid.length() > 0 ? uuid : "<not-set>"));
-                    log().debug("  uei   = " + event.getUei());
-                    log().debug("  src   = " + event.getSource());
-                    log().debug("  iface = " + event.getInterface());
-                    log().debug("  time  = " + event.getTime());
+                    final String uuid = event.getUuid();
+                    log.debug("Event {");
+                    log.debug("  uuid  = " + (uuid != null && uuid.length() > 0 ? uuid : "<not-set>"));
+                    log.debug("  uei   = " + event.getUei());
+                    log.debug("  src   = " + event.getSource());
+                    log.debug("  iface = " + event.getInterface());
+                    log.debug("  time  = " + event.getTime());
                     if (event.getParmCollection().size() > 0) {
-                        log().debug("  parms {");
+                        log.debug("  parms {");
                         for (final Parm parm : event.getParmCollection()) {
                             if ((parm.getParmName() != null) && (parm.getValue().getContent() != null)) {
-                                log().debug("    (" + parm.getParmName().trim() + ", " + parm.getValue().getContent().trim() + ")");
+                                log.debug("    (" + parm.getParmName().trim() + ", " + parm.getValue().getContent().trim() + ")");
                             }
                         }
-                        log().debug("  }");
+                        log.debug("  }");
                     }
-                    log().debug("}");
+                    log.debug("}");
                 }
 
                 for (final EventProcessor eventProcessor : m_eventProcessors) {
                     try {
                         eventProcessor.process(m_eventLog.getHeader(), event);
                     } catch (SQLException e) {
-                        log().warn("Unable to process event using processor " + eventProcessor + "; not processing with any later processors.  Exception: " + e, e);
+                        log.warn("Unable to process event using processor " + eventProcessor + "; not processing with any later processors.  Exception: " + e, e);
                         break;
                     } catch (Throwable t) {
-                        log().warn("Unknown exception processing event with processor " + eventProcessor + "; not processing with any later processors.  Exception: " + t, t);
+                        log.warn("Unknown exception processing event with processor " + eventProcessor + "; not processing with any later processors.  Exception: " + t, t);
                         break;
                     }
                 }

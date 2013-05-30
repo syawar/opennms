@@ -55,6 +55,7 @@ public class IfSnmpCollectorTestCase extends OpenNMSTestCase {
     private volatile boolean m_hasRun = false;
     
     public static class JoeSnmpIfSnmpCollectorTestCase extends IfSnmpCollectorTestCase {
+        @Override
         public void setUp() throws Exception {
             System.setProperty("org.opennms.snmp.strategyClass", "org.opennms.netmgt.snmp.joesnmp.JoeSnmpStrategy");
             super.setUp();
@@ -62,6 +63,7 @@ public class IfSnmpCollectorTestCase extends OpenNMSTestCase {
     }
 
     public static class SNMP4JIfSnmpCollectorTestCase extends IfSnmpCollectorTestCase {
+        @Override
         public void setUp() throws Exception {
             System.setProperty("org.opennms.snmp.strategyClass", "org.opennms.netmgt.snmp.snmp4j.Snmp4JStrategy");
             super.setUp();
@@ -193,7 +195,7 @@ public class IfSnmpCollectorTestCase extends OpenNMSTestCase {
     public final void testGetIfSpeed() {
         Long ifSpeed = m_ifSnmpc.getInterfaceSpeed(4);
         assertNotNull("ifSpeed should not be null", ifSpeed);
-        assertEquals("ifSpeed", new Long(10000000), ifSpeed);
+        assertEquals("ifSpeed", Long.valueOf(10000000), ifSpeed);
     }
 
     public final void testGetIfAlias() {

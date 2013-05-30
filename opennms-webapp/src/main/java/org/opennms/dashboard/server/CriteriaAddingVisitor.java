@@ -55,14 +55,6 @@ import org.springframework.util.Assert;
  * @author <a href="mailto:brozow@opennms.org">Mathew Brozowski</a>
  * @author <a href="mailto:dj@opennms.org">DJ Gregor</a>
  * @author <a href="mailto:jeffg@opennms.org">Jeff Gehlbach</a>
- * @author <a href="mailto:brozow@opennms.org">Mathew Brozowski</a>
- * @author <a href="mailto:dj@opennms.org">DJ Gregor</a>
- * @author <a href="mailto:jeffg@opennms.org">Jeff Gehlbach</a>
- * @author <a href="mailto:brozow@opennms.org">Mathew Brozowski</a>
- * @author <a href="mailto:dj@opennms.org">DJ Gregor</a>
- * @author <a href="mailto:jeffg@opennms.org">Jeff Gehlbach</a>
- * @version $Id: $
- * @since 1.8.1
  */
 public class CriteriaAddingVisitor implements Visitor, InitializingBean {
     
@@ -83,6 +75,7 @@ public class CriteriaAddingVisitor implements Visitor, InitializingBean {
     /**
      * <p>visitAll</p>
      */
+    @Override
     public void visitAll() {
         
         addCriteriaForCategories(m_criteria, m_survView.getColumnCategories());
@@ -91,6 +84,7 @@ public class CriteriaAddingVisitor implements Visitor, InitializingBean {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void visitGroup(SurveillanceGroup group) {
 
         if (group.isColumn()) {
@@ -104,6 +98,7 @@ public class CriteriaAddingVisitor implements Visitor, InitializingBean {
     }
     
     /** {@inheritDoc} */
+    @Override
     public void visitIntersection(SurveillanceGroup row, SurveillanceGroup column) {
         
         addCriteriaForCategories(m_criteria, m_survView.getCategoriesForRow(row.getId()));

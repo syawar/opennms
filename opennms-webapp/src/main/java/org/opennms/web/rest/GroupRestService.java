@@ -81,7 +81,7 @@ public class GroupRestService extends OnmsRestService {
     ResourceContext m_context;
 
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     public OnmsGroupList getGroups() {
         readLock();
         
@@ -103,7 +103,7 @@ public class GroupRestService extends OnmsRestService {
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Path("{groupName}")
     public OnmsGroup getGroup(@PathParam("groupName") final String groupName) {
         readLock();
@@ -128,7 +128,7 @@ public class GroupRestService extends OnmsRestService {
         try {
             log().debug("addGroup: Adding group " + group);
             m_groupManager.save(group);
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getGroup").build(group.getName())).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo, group.getName())).build();
         } catch (final Throwable t) {
             throw getException(Status.BAD_REQUEST, t);
         } finally {
@@ -166,7 +166,7 @@ public class GroupRestService extends OnmsRestService {
             } catch (final Throwable t) {
                 throw getException(Status.INTERNAL_SERVER_ERROR, t);
             }
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getGroup").build(groupName)).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo)).build();
         } finally {
             writeUnlock();
         }
@@ -196,7 +196,7 @@ public class GroupRestService extends OnmsRestService {
             final OnmsGroup group = getOnmsGroup(groupName);
             group.addUser(userName);
             m_groupManager.save(group);
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getGroup").build(groupName)).build();
+            return Response.seeOther(getRedirectUri(m_uriInfo)).build();
         } catch (final Throwable t) {
             throw getException(Status.INTERNAL_SERVER_ERROR, t);
         } finally {

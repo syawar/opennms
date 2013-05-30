@@ -58,6 +58,14 @@ public class D3Transform extends JavaScriptObject {
         return this.scale;
     }-*/;
     
+    public final native double getScaleX() /*-{
+    	return this.scale[0];
+    }-*/;
+    
+    public final native double getScaleY() /*-{
+		return this.scale[1];
+	}-*/;
+    
     public final native double getRotate() /*-{
         return this.rotate;
     }-*/;
@@ -65,4 +73,5 @@ public class D3Transform extends JavaScriptObject {
     public final native double getSkew() /*-{
         return this.skew;
     }-*/;
+    
 }

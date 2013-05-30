@@ -31,15 +31,8 @@ package org.opennms.features.topology.app.internal.gwt.client;
 import org.opennms.features.topology.app.internal.gwt.client.d3.D3;
 import org.opennms.features.topology.app.internal.gwt.client.d3.D3Behavior;
 import org.opennms.features.topology.app.internal.gwt.client.d3.Func;
-import org.opennms.features.topology.app.internal.gwt.client.tracker.LoadTracker;
-import org.opennms.features.topology.app.internal.gwt.client.tracker.LoadTracker.LoadTrackerHandler;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArrayString;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.Image;
 
 public class GWTVertex extends JavaScriptObject {
     
@@ -52,16 +45,12 @@ public class GWTVertex extends JavaScriptObject {
     
     protected GWTVertex() {};
     
+    public static native GWTVertex create(String id, int x, int y) /*-{
+    	return {"id":id, "x":x, "y":y, "initialX":0, "initialY":0, "selected":false, "iconUrl":"", "semanticZoomLevel":0, "group":null, "status":"", "statusCount":""};
+	}-*/;
+
     public final native String getId()/*-{
         return this.id;
-    }-*/;
-    
-    public final native int getX()/*-{
-        return this.x;
-    }-*/;
-    
-    public final native int getY()/*-{
-        return this.y;
     }-*/;
     
     public final native void setSelected(boolean selected) /*-{
@@ -79,7 +68,23 @@ public class GWTVertex extends JavaScriptObject {
     public final native String getLabel() /*-{
     	return this.label;
     }-*/;
-
+    
+    public final native void setStatus(String status) /*-{
+        this.status = status;
+    }-*/;
+    
+    public final native String getStatus()/*-{
+        return this.status;
+    }-*/;
+    
+    public final native void setStatusCount(String count) /*-{
+        this.statusCount = count;
+    }-*/;
+    
+    public final native String getStatusCount() /*-{
+        return this.statusCount;
+    }-*/;
+    
     public final native void setIpAddr(String ipAddr) /*-{
         this.ipAddr = ipAddr;
     }-*/;
@@ -96,9 +101,13 @@ public class GWTVertex extends JavaScriptObject {
     	return this.nodeID;
 	}-*/;
     
-    public static native GWTVertex create(String id, int x, int y) /*-{
-        return {"id":id, "x":x, "y":y, "selected":false, "actions":[], "iconUrl":"", "semanticZoomLevel":0, "group":null};
-    }-*/;
+    public final native int getX()/*-{
+    	return this.x;
+	}-*/;
+
+    public final native int getY()/*-{
+    	return this.y;
+	}-*/;
 
     public final native void setX(int newX) /*-{
         this.x = newX;
@@ -108,55 +117,39 @@ public class GWTVertex extends JavaScriptObject {
         this.y = newY;
     }-*/;
     
-    public final native JsArrayString actionKeys() /*-{
-    	return this.actions;
-    }-*/;
-    
-    public final native JsArrayString actionKeys(JsArrayString keys) /*-{
-    	this.actions = keys;
-    	return this.actions;
-    }-*/;
-    
+    public final native int getInitialX()/*-{
+    	return this.initialX;
+	}-*/;
+
+    public final native int getInitialY()/*-{
+    	return this.initialY;
+	}-*/;
+
+    public final native void setInitialX(int initialX) /*-{
+    	this.initialX = initialX;
+	}-*/;
+
+    public final native void setInitialY(int initialY) /*-{
+    	this.initialY = initialY;
+	}-*/;
+
     public final String getTooltipText() {
         return getLabel();
     }
     
     
-    public final native int getSemanticZoomLevel() /*-{
-		return this.semanticZoomLevel;
-	}-*/;
-    
-	public final void setActionKeys(String[] keys) {
-    	JsArrayString actionKeys = actionKeys(newStringArray());
-    	for(String key : keys) {
-    		actionKeys.push(key);
-    	}
-    }
-
-	private JsArrayString newStringArray() {
-		return JsArrayString.createArray().<JsArrayString>cast();
-	}
-    
-    public final String[] getActionKeys() {
-    	JsArrayString actionKeys = actionKeys();
-    	String[] keys = new String[actionKeys.length()];
-    	for(int i = 0; i < keys.length; i++) {
-    		keys[i] = actionKeys.get(i);
-    	}
-    	return keys;
-    }
-    
     public final native String getIconUrl() /*-{
         return this.iconUrl;
     }-*/;
     
-    public final native void setIcon(String iconUrl) /*-{
+    public final native void setIconUrl(String iconUrl) /*-{
         this.iconUrl = iconUrl;
     }-*/;
 
     static Func<String, GWTVertex> selectedFill() {
     	return new Func<String, GWTVertex>(){
     
+                    @Override
     		public String call(GWTVertex vertex, int index) {
     			return vertex.isSelected() ? "blue" : "black";
     		}
@@ -166,6 +159,7 @@ public class GWTVertex extends JavaScriptObject {
     protected static Func<String, GWTVertex> selectionFilter() {
         return new Func<String, GWTVertex>(){
 
+            @Override
             public String call(GWTVertex vertex, int index) {
                 return vertex.isSelected() ? "1" : "0";
             }
@@ -173,8 +167,53 @@ public class GWTVertex extends JavaScriptObject {
         };
     }
     
+    protected static Func<String, GWTVertex> getCircleId(){
+        return new Func<String, GWTVertex>(){
+
+            @Override
+            public String call(GWTVertex vertex, int index) {
+                return "circle-" + vertex.getId();
+            }
+            
+        };
+    }
+    
+    protected static Func<String, GWTVertex> getStatusClass(){
+        return new Func<String, GWTVertex>(){
+
+            @Override
+            public String call(GWTVertex vertex, int index) {
+                if(vertex.getStatus().equals("")) {
+                    return "status";
+                }
+                return "status " + vertex.getStatus();
+            }
+            
+        };
+    }
+    
+    protected static Func<String, GWTVertex> getStatusCountText(){
+        return new Func<String, GWTVertex>(){
+
+            @Override
+            public String call(GWTVertex vertex, int index) {
+                return vertex.getStatusCount();
+            }
+            
+        };
+    }
+    
+    protected static Func<String, GWTVertex> showStatusCount(){
+        return new Func<String, GWTVertex>(){
+
+            @Override
+            public String call(GWTVertex vertex, int index) {
+                return !vertex.getStatusCount().equals("") && !vertex.getStatusCount().equals("0") ? "1" : "0";
+            }
+        };
+    }
+    
     protected static Func<String, GWTVertex> getClassName() {
-        // TODO Auto-generated method stub
         return new Func<String, GWTVertex>(){
 
             @Override
@@ -183,83 +222,15 @@ public class GWTVertex extends JavaScriptObject {
             }};
     }
     
-    protected static Func<String, GWTVertex> strokeFilter(){
-        return new Func<String, GWTVertex>(){
-
-            @Override
-            public String call(GWTVertex datum, int index) {
-                return datum.isSelected() ? "blue" : "none";
-            }
-            
-        };
-    }
-
     static Func<String, GWTVertex> getTranslation() {
     	return new Func<String, GWTVertex>() {
     
-    		public String call(GWTVertex datum, int index) {
-    			return "translate( " + datum.getX() + "," + datum.getY() + ")";
+                    @Override
+    		public String call(GWTVertex vertex, int index) {
+    			return "translate( " + vertex.getX() + "," + vertex.getY() + ")";
     		}
     		
     	};
-    }
-    
-    static Func<String, GWTVertex> loadIconAndSize(final D3 bgImage, final D3 imageSelection, final D3 circleSelection, final D3 textSelection){
-        return new Func<String, GWTVertex>(){
-
-            public String call(GWTVertex datum, final int index) {
-                LoadTracker tracker = LoadTracker.get();
-                tracker.trackImageLoad(datum.getIconUrl(), new LoadTrackerHandler() {
-
-                    @Override
-                    public void onImageLoad(Image img) {
-                        double widthRatio = 48.0/img.getWidth();
-                        double heightRatio = 48.0/img.getHeight();
-                        double scaleFactor = Math.min(widthRatio, heightRatio);
-                        int width = (int) (img.getWidth() * scaleFactor);
-                        int height = (int) (img.getHeight() * scaleFactor);
-                        
-                        String strWidth = width + "px";
-                        String strHeight = height + "px";
-                        String x = "-" + width/2 + "px";
-                        String y = "-" + height/2 + "px";
-                        
-                        Element imgElem = D3.getElement(imageSelection, index);
-                        imgElem.setAttribute("width", strWidth);
-                        imgElem.setAttribute("height", strHeight);
-                        imgElem.setAttribute("x", x);
-                        imgElem.setAttribute("y", y);
-                        
-                        Element bgImgElem = D3.getElement(bgImage, index);
-                        int length = (Math.max(width, height) + 10);
-                        bgImgElem.setAttribute("width", length +"px");
-                        bgImgElem.setAttribute("height", length + "px");
-                        bgImgElem.setAttribute("x", "-" + Math.round(length/2));
-                        bgImgElem.setAttribute("y", "-" + Math.round(length/2));
-                        
-                        Element rectElem = D3.getElement(circleSelection, index);
-                        rectElem.setAttribute("class", "highlight");
-                        rectElem.setAttribute("fill", "yellow");
-                        rectElem.setAttribute("x", -(width/2 + 2) + "px");
-                        rectElem.setAttribute("y", -(height/2 + 2) + "px");
-                        rectElem.setAttribute("r", ((Math.max(width, height) + 9)/2) + "px" );
-                        rectElem.setAttribute("opacity", "0");
-                        
-                        textSelection.text(label());
-                        Element textElem = D3.getElement(textSelection, index);
-                        textElem.setAttribute("class", "vertex-label");
-                        textElem.setAttribute("x", "0px");
-                        textElem.setAttribute("y",  "" + (height/2 + 5) + "px");
-                        textElem.setAttribute("text-anchor", "middle");
-                        textElem.setAttribute("alignment-baseline", "text-before-edge");
-                    }
-                    
-                });
-                
-                
-                return datum.getIconUrl();
-            }
-        };
     }
     
     static Func<String, GWTVertex> label() {
@@ -273,12 +244,25 @@ public class GWTVertex extends JavaScriptObject {
     	};
     }
     
+    static Func<String, GWTVertex> iconUrl() {
+    	return new Func<String, GWTVertex>() {
+
+			@Override
+			public String call(GWTVertex datum, int index) {
+				return datum.getIconUrl();
+			}
+    		
+    	};
+    }
+    
     public static D3Behavior draw() {
         return new D3Behavior() {
 
             @Override
             public D3 run(D3 selection) {
-                return selection.attr("class", GWTVertex.getClassName()).attr("transform", GWTVertex.getTranslation()).select(".highlight").attr("opacity", GWTVertex.selectionFilter());
+                selection.select(".status").attr("class", getStatusClass());
+                selection.select(".status-counter").style("opacity", showStatusCount()).text(getStatusCountText());
+                return selection.attr("class", GWTVertex.getClassName()).attr("transform", GWTVertex.getTranslation()).select("text").text(label());
             }
         };
     }
@@ -296,24 +280,61 @@ public class GWTVertex extends JavaScriptObject {
 
             @Override
             public D3 run(D3 selection) {
+                int width = 80;
+                int height = 80;
                 D3 vertex = selection.append("g").attr("class", "vertex");
                 vertex.attr("opacity",1e-6);
                 vertex.style("cursor", "pointer");
                 
-                ImageElement img = DOM.createImg().cast();
-                
                 D3 circleSelection = vertex.append("circle");
+                D3 statusIndicator = vertex.append("circle");
                 D3 bgImage = vertex.append("svg:image");
                 bgImage.attr("xlink:href", getBackgroundImage());
                 D3 imageSelection = vertex.append("svg:image");
+                D3 statusCounter = vertex.append("foreignObject");
                 D3 textSelection = vertex.append("text");
                 
-                imageSelection.attr("xlink:href", loadIconAndSize(bgImage, imageSelection, circleSelection, textSelection));
-//                      .attr("x", "-24px")
-//                      .attr("y", "-24px")
-//                      .attr("width", "48px")
-//                      .attr("height", "48px");
                 
+                bgImage.attr("width", width +"px")
+                    .attr("height", height + "px")
+                    .attr("x", "-" + Math.round(width/2))
+                    .attr("y", "-" + Math.round(height/2));
+                
+                imageSelection.attr("xlink:href", iconUrl())
+                	.attr("x", "-24px")
+                	.attr("y", "-24px")
+                	.attr("width", "48px")
+                	.attr("height", "48px");
+                
+                int circleRadius = 38;
+                circleSelection.attr("class", "highlight")
+                    .attr("cx", -0.5)
+                    .attr("cy", -0.55)
+                    .attr("r", circleRadius + 1.5 + "px" )
+                    .attr("stroke-width", "2px")
+                    .attr("fill-opacity", 0);
+                
+                statusIndicator.attr("class", "status")
+                    .attr("cx", 0)
+                    .attr("cy", 0)
+                    .attr("r", circleRadius + "px")
+                    .attr("opacity", "0");
+                    
+                statusCounter.attr("class", "node-status-counter")
+                    .attr("x", 10)
+                    .attr("y", -40)
+                    .attr("height", 24)
+                    .attr("width", 24).append("xhtml:span")
+                        .attr("class", "status-counter").text("2");
+                
+                
+                textSelection.text(label())
+                    .attr("class", "vertex-label")
+                    .attr("x", "0px")
+                    .attr("y",  "" + (height/2) + "px")
+                    .attr("text-anchor", "middle")
+                    .attr("alignment-baseline", "text-before-edge");
+
                 vertex.call(draw());
                 
                 return vertex;
@@ -324,26 +345,5 @@ public class GWTVertex extends JavaScriptObject {
     public static final native void logDocument(Object doc)/*-{
         $wnd.console.log(doc)
     }-*/;
-    
-	public final native void setParent(GWTGroup group) /*-{
-		this.group = group;
-	}-*/;
-	
-	public final native GWTGroup getParent() /*-{
-		return this.group;
-	}-*/;
 
-	public final native void setSemanticZoomLevel(int semanticZoomLevel) /*-{
-		this.semanticZoomLevel = semanticZoomLevel;
-	}-*/;
-
-	public final GWTVertex getDisplayVertex(int semanticZoomLevel) {
-		
-		if(getParent() == null || getSemanticZoomLevel() <= semanticZoomLevel) {
-			return this;
-		}else {
-			return getParent().getDisplayVertex(semanticZoomLevel);
-		}
-		
-	}
 }

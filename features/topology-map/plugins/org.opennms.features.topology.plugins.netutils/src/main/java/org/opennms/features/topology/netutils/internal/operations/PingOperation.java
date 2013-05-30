@@ -32,6 +32,8 @@ import java.util.List;
 
 import org.opennms.features.topology.api.AbstractOperation;
 import org.opennms.features.topology.api.OperationContext;
+import org.opennms.features.topology.api.OperationContext.DisplayLocation;
+import org.opennms.features.topology.api.topo.VertexRef;
 import org.opennms.features.topology.netutils.internal.Node;
 import org.opennms.features.topology.netutils.internal.PingWindow;
 
@@ -39,13 +41,14 @@ public class PingOperation extends AbstractOperation {
 
 	private String pingURL;
 
-	public Undoer execute(final List<Object> targets, final OperationContext operationContext) {
+        @Override
+	public Undoer execute(final List<VertexRef> targets, final OperationContext operationContext) {
 	    String ipAddr = "";
 	    String label = "";
 	    int nodeID = -1;
 
             if (targets != null) {
-                for (final Object target : targets) {
+                for (final VertexRef target : targets) {
                     final String addrValue = getIpAddrValue(operationContext, target);
                     final String labelValue = getLabelValue(operationContext, target);
                     final Integer nodeValue = getNodeIdValue(operationContext, target);
@@ -62,7 +65,20 @@ public class PingOperation extends AbstractOperation {
             operationContext.getMainWindow().addWindow(new PingWindow(node, getPingURL()));
             return null;
 	}
+	
+	@Override
+    public boolean display(final List<VertexRef> targets, final OperationContext operationContext) {
+        if (operationContext.getDisplayLocation() == DisplayLocation.MENUBAR) {
+        	return true;
+        } else if(targets != null && targets.size() > 0 && targets.get(0) != null) {
+            return true;
+        }else {
+            return false;
+        }
+        
+    }
 
+        @Override
 	public String getId() {
 	    return "ping";
 	}

@@ -28,6 +28,8 @@
 
 package org.opennms.netmgt.ticketd;
 
+import java.util.HashMap;
+
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.opennms.netmgt.dao.AlarmDao;
@@ -153,6 +155,7 @@ public class DefaultTicketerServiceLayerTest extends TestCase {
         m_alarmDao.saveOrUpdate(m_alarm);
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
+            @Override
             public Object answer() throws Throwable {
                 OnmsAlarm alarm = (OnmsAlarm) EasyMock.getCurrentArguments()[0];
                 assertEquals(state, alarm.getTTicketState());
@@ -174,6 +177,7 @@ public class DefaultTicketerServiceLayerTest extends TestCase {
         }
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
+            @Override
             public Object answer() throws Throwable {
                 Ticket ticket = (Ticket) EasyMock.getCurrentArguments()[0];
                 assertEquals(state, ticket.getState());
@@ -197,6 +201,7 @@ public class DefaultTicketerServiceLayerTest extends TestCase {
         }
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
+            @Override
             public Object answer() throws Throwable {
                 Ticket ticket = (Ticket) EasyMock.getCurrentArguments()[0];
                 assertNull(ticket.getId());
@@ -269,7 +274,7 @@ public class DefaultTicketerServiceLayerTest extends TestCase {
 
         m_easyMockUtils.replayAll();
 
-        m_defaultTicketerServiceLayer.createTicketForAlarm(m_alarm.getId());
+        m_defaultTicketerServiceLayer.createTicketForAlarm(m_alarm.getId(), new HashMap<String, String>());
 
         m_easyMockUtils.verifyAll();
     }
@@ -294,7 +299,7 @@ public class DefaultTicketerServiceLayerTest extends TestCase {
 
         m_easyMockUtils.replayAll();
 
-        m_defaultTicketerServiceLayer.createTicketForAlarm(m_alarm.getId());
+        m_defaultTicketerServiceLayer.createTicketForAlarm(m_alarm.getId(),new HashMap<String, String>());
 
         m_easyMockUtils.verifyAll();
     }
@@ -365,6 +370,7 @@ public class DefaultTicketerServiceLayerTest extends TestCase {
         }
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
+            @Override
             public Object answer() throws Throwable {
                 Ticket ticket = (Ticket) EasyMock.getCurrentArguments()[0];
                 assertEquals(Ticket.State.OPEN, ticket.getState());

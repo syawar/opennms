@@ -66,6 +66,7 @@ public class Dashboard implements EntryPoint, ErrorHandler {
     /**
      * <p>onModuleLoad</p>
      */
+    @Override
     public void onModuleLoad() {
         
         
@@ -110,14 +111,17 @@ public class Dashboard implements EntryPoint, ErrorHandler {
         
         SurveillanceListener listener = new SurveillanceListener() {
 
+            @Override
             public void onAllClicked(Dashlet viewer) {
                 setSurveillanceSet(SurveillanceSet.DEFAULT);
             }
 
+            @Override
             public void onIntersectionClicked(Dashlet viewer, SurveillanceIntersection intersection) {
                 setSurveillanceSet(intersection);
             }
 
+            @Override
             public void onSurveillanceGroupClicked(Dashlet viewer, SurveillanceGroup group) {
                 setSurveillanceSet(group);
             }
@@ -163,13 +167,13 @@ public class Dashboard implements EntryPoint, ErrorHandler {
      */
     public void add(Widget widget, String elementId) {
         RootPanel panel = RootPanel.get(elementId);
-        if (panel == null) {
-            throw new IllegalArgumentException("element with id '"+elementId+"' not found!");
+        if (panel != null) {
+            panel.add(widget);
         }
-        panel.add(widget);
     }
 
     /** {@inheritDoc} */
+    @Override
     public void error(Throwable e) {
         error(e.toString());
     }
@@ -199,6 +203,7 @@ public class Dashboard implements EntryPoint, ErrorHandler {
         
         ok.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent arg0) {
                 dialog.hide();
             }

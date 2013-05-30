@@ -35,15 +35,17 @@ import static org.opennms.core.utils.InetAddressUtils.str;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.criterion.Restrictions;
+import org.opennms.core.criteria.CriteriaBuilder;
+import org.opennms.core.criteria.Alias.JoinType;
+import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ThreadCategory;
 
 import org.opennms.netmgt.EventConstants;
 import org.opennms.netmgt.dao.IpInterfaceDao;
 import org.opennms.netmgt.dao.SnmpInterfaceDao;
-import org.opennms.netmgt.model.OnmsCriteria;
 import org.opennms.netmgt.model.OnmsIpInterface;
 import org.opennms.netmgt.model.OnmsSnmpInterface;
+import org.opennms.netmgt.model.PrimaryType;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.opennms.netmgt.model.events.EventIpcManager;
 import org.opennms.netmgt.snmpinterfacepoller.pollable.PollContext;
@@ -163,11 +165,13 @@ public class DefaultPollContext implements PollContext {
      *
      * @return a {@link java.lang.String} object.
      */
+    @Override
     public String getServiceName() {
         return m_serviceName;
     }
     
     /** {@inheritDoc} */
+    @Override
     public void setServiceName(String serviceName) {
         m_serviceName=serviceName;
     }
@@ -176,6 +180,7 @@ public class DefaultPollContext implements PollContext {
      * @see org.opennms.netmgt.poller.pollables.PollContext#sendEvent(org.opennms.netmgt.xml.event.Event)
      */
     /** {@inheritDoc} */
+    @Override
     public void sendEvent(Event event) {
         getEventManager().sendNow(event);
     }
@@ -188,6 +193,7 @@ public class DefaultPollContext implements PollContext {
      * @see org.opennms.netmgt.poller.pollables.PollContext#createEvent(java.lang.String, int, java.net.InetAddress, java.lang.String, java.util.Date)
      */
     /** {@inheritDoc} */
+    @Override
     public Event createEvent(String uei, int nodeId, String address, Date date, OnmsSnmpInterface snmpinterface) {
         
             log().debug("createEvent: uei = " + uei + " nodeid = " + nodeId + " date = " + date);
@@ -213,14 +219,17 @@ public class DefaultPollContext implements PollContext {
     }
 
     /** {@inheritDoc} */
+    @Override
     public List<OnmsSnmpInterface> get(int nodeId, String criteria) {
-        final OnmsCriteria onmsCriteria = new OnmsCriteria(OnmsSnmpInterface.class);
-        onmsCriteria.add(Restrictions.sqlRestriction(criteria + " and nodeid = " + nodeId + "and snmppoll = 'P'"));
-        return getSnmpInterfaceDao().findMatching(onmsCriteria);
+        CriteriaBuilder builder = new CriteriaBuilder(OnmsSnmpInterface.class);
+        builder.sql(criteria).eq("node.id", nodeId).eq("poll", "P");
+        builder.alias("ipInterfaces", "ipInterface", JoinType.LEFT_JOIN);
+        return getSnmpInterfaceDao().findMatching(builder.toCriteria());
 
     }
 
     /** {@inheritDoc} */
+    @Override
     public void update(OnmsSnmpInterface snmpinterface) {
     	OnmsSnmpInterface dbSnmpInterface = getSnmpInterfaceDao().findByNodeIdAndIfIndex(snmpinterface.getNode().getId(), snmpinterface.getIfIndex());
     	if (dbSnmpInterface == null)  {
@@ -236,16 +245,16 @@ public class DefaultPollContext implements PollContext {
 
 	@Override
 	public List<OnmsIpInterface> getPollableNodesByIp(String ipaddr) {
-		final OnmsCriteria criteria = new OnmsCriteria(OnmsIpInterface.class);
-		criteria.add(Restrictions.sqlRestriction(" ipaddr = '" + ipaddr + "' and  issnmpprimary = 'P' and ismanaged='M'"));
-		return getIpInterfaceDao().findMatching(criteria);
+                CriteriaBuilder builder = new CriteriaBuilder(OnmsIpInterface.class);
+                builder.eq("ipAddress", InetAddressUtils.addr(ipaddr)).eq("isSnmpPrimary", PrimaryType.PRIMARY).eq("isManaged", "M");
+		return getIpInterfaceDao().findMatching(builder.toCriteria());
 	}
 
 	@Override
 	public List<OnmsIpInterface> getPollableNodes() {
-		final OnmsCriteria criteria = new OnmsCriteria(OnmsIpInterface.class);
-		criteria.add(Restrictions.sqlRestriction("issnmpprimary = 'P' and ismanaged='M'"));
-		return getIpInterfaceDao().findMatching(criteria);
+                CriteriaBuilder builder = new CriteriaBuilder(OnmsIpInterface.class);
+                builder.eq("isSnmpPrimary", PrimaryType.PRIMARY).eq("isManaged", "M");
+		return getIpInterfaceDao().findMatching(builder.toCriteria());
 	}
 
 }

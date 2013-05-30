@@ -28,6 +28,8 @@
 
 package org.opennms.web.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -41,12 +43,12 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import org.opennms.core.criteria.CriteriaBuilder;
+import org.opennms.netmgt.dao.AcknowledgmentDao;
 import org.opennms.netmgt.dao.AlarmDao;
 import org.opennms.netmgt.model.AckAction;
 import org.opennms.netmgt.model.OnmsAcknowledgment;
 import org.opennms.netmgt.model.OnmsAlarm;
 import org.opennms.netmgt.model.OnmsAlarmCollection;
-import org.opennms.netmgt.model.acknowledgments.AckService;
 import org.opennms.web.springframework.security.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -65,7 +67,7 @@ public class AlarmRestService extends AlarmRestServiceBase {
     private AlarmDao m_alarmDao;
 
     @Autowired
-    private AckService m_ackService;
+    private AcknowledgmentDao m_ackDao;
 
     @Context
     UriInfo m_uriInfo;
@@ -83,7 +85,7 @@ public class AlarmRestService extends AlarmRestServiceBase {
      * @return a {@link org.opennms.netmgt.model.OnmsAlarm} object.
      */
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Path("{alarmId}")
     @Transactional
     public OnmsAlarm getAlarm(@PathParam("alarmId")
@@ -124,8 +126,7 @@ public class AlarmRestService extends AlarmRestServiceBase {
      * @return a {@link org.opennms.netmgt.model.OnmsAlarmCollection} object.
      */
     @GET
-    @Path("/")
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Transactional
     public OnmsAlarmCollection getAlarms() {
         readLock();
@@ -202,8 +203,8 @@ public class AlarmRestService extends AlarmRestServiceBase {
             } else {
                 throw new IllegalArgumentException("Must supply one of the 'ack', 'escalate', or 'clear' parameters, set to either 'true' or 'false'.");
             }
-            m_ackService.processAck(acknowledgement);
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getAlarm").build(alarmId)).build();
+            m_ackDao.processAck(acknowledgement);
+            return Response.seeOther(getRedirectUri(m_uriInfo)).build();
         } finally {
             writeUnlock();
         }
@@ -240,7 +241,8 @@ public class AlarmRestService extends AlarmRestServiceBase {
             formProperties.remove("ackUser");
             assertUserCredentials(ackUser);
 
-            for (final OnmsAlarm alarm : m_alarmDao.findMatching(builder.toCriteria())) {
+            final List<OnmsAlarm> alarms = m_alarmDao.findMatching(builder.toCriteria());
+            for (final OnmsAlarm alarm : alarms) {
                 final OnmsAcknowledgment acknowledgement = new OnmsAcknowledgment(alarm, ackUser);
                 acknowledgement.setAckAction(AckAction.UNSPECIFIED);
                 if (ackValue != null) {
@@ -260,9 +262,14 @@ public class AlarmRestService extends AlarmRestServiceBase {
                 } else {
                     throw new IllegalArgumentException("Must supply one of the 'ack', 'escalate', or 'clear' parameters, set to either 'true' or 'false'.");
                 }
-                m_ackService.processAck(acknowledgement);
+                m_ackDao.processAck(acknowledgement);
             }
-            return Response.seeOther(m_uriInfo.getBaseUriBuilder().path(this.getClass(), "getAlarms").build()).build();
+            
+            if (alarms.size() == 1) {
+                return Response.seeOther(getRedirectUri(m_uriInfo, alarms.get(0).getId())).build();
+            } else {
+                return Response.seeOther(getRedirectUri(m_uriInfo)).build();
+            }
         } finally {
             writeUnlock();
         }

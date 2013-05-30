@@ -27,7 +27,10 @@
  *******************************************************************************/
 package org.opennms.features.vaadin.events;
 
+import org.opennms.netmgt.model.OnmsSeverity;
+
 import com.vaadin.data.Item;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
@@ -35,6 +38,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.FormFieldFactory;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.AbstractSelect.NewItemHandler;
 
 /**
  * A factory for creating Event Field objects.
@@ -47,32 +51,66 @@ public final class EventFormFieldFactory implements FormFieldFactory {
     /* (non-Javadoc)
      * @see com.vaadin.ui.FormFieldFactory#createField(com.vaadin.data.Item, java.lang.Object, com.vaadin.ui.Component)
      */
+    @Override
     public Field createField(Item item, Object propertyId, Component uiContext) {
-        if ("logmsgDest".equals(propertyId)) {
+        if ("logMsgDest".equals(propertyId)) {
             final ComboBox dest = new ComboBox("Destination");
             dest.addItem("logndisplay");
+            dest.addItem("logonly");
+            dest.addItem("suppress");
             dest.addItem("donotpersist");
             dest.addItem("discardtraps");
             dest.setNullSelectionAllowed(false);
             dest.setRequired(true);
             return dest;
         }
-        if ("logmsgContent".equals(propertyId)) {
+        if ("logMsgContent".equals(propertyId)) {
             final TextArea content = new TextArea("Log Message");
             content.setWidth("100%");
             content.setRows(10);
             content.setRequired(true);
+            content.setNullRepresentation("");
             return content;
+        }
+        if ("alarmDataAlarmType".equals(propertyId)) {
+            final ComboBox f = new ComboBox("Alarm Type");
+            f.addItem(new Integer(1));
+            f.addItem(new Integer(2));
+            f.addItem(new Integer(3));
+            f.setNewItemHandler(new NewItemHandler() {
+                @Override
+                public void addNewItem(String newItemCaption) {
+                    try {
+                        f.addItem(new Integer(newItemCaption));
+                    } catch (Exception e) {}
+                }
+            });
+            f.setDescription("<b>1</b> to be a problem that has a possible resolution, alarm-type set to <b>2</b> to be a resolution event, and alarm-type set to <b>3</b> for events that have no possible resolution");
+            f.setNullSelectionAllowed(false);
+            return f;
+        }
+        if ("alarmDataAutoClean".equals(propertyId)) {
+            final CheckBox f = new CheckBox("Auto Clean");
+            f.setWidth("100%");
+            return f;
+        }
+        if ("alarmDataReductionKey".equals(propertyId)) {
+            final TextField f = new TextField("Reduction Key");
+            f.setWidth("100%");
+            f.setNullRepresentation("");
+            return f;
+        }
+        if ("alarmDataClearKey".equals(propertyId)) {
+            final TextField f = new TextField("Clear Key");
+            f.setWidth("100%");
+            f.setNullRepresentation("");
+            return f;
         }
         if ("severity".equals(propertyId)) {
             final ComboBox severity = new ComboBox("Severity");
-            severity.addItem("Indeterminate");
-            severity.addItem("Clear");
-            severity.addItem("Normal");
-            severity.addItem("Warning");
-            severity.addItem("Minor");
-            severity.addItem("Mayor");
-            severity.addItem("Critical");
+            for (String sev : OnmsSeverity.names()) {
+                severity.addItem(sev.substring(0, 1).toUpperCase() + sev.substring(1).toLowerCase());
+            }
             severity.setNullSelectionAllowed(false);
             severity.setRequired(true);
             return severity;
@@ -82,7 +120,20 @@ public final class EventFormFieldFactory implements FormFieldFactory {
             descr.setWidth("100%");
             descr.setRows(10);
             descr.setRequired(true);
+            descr.setNullRepresentation("");
             return descr;
+        }
+        if ("operinstruct".equals(propertyId)) {
+            final TextArea oper = new TextArea("Operator Instructions") {
+                @Override
+                public Object getValue() { // This is because of the intern usage on Event.setOperInstruct()
+                    return super.getValue() == null ? "" : super.getValue();
+                }
+            };
+            oper.setWidth("100%");
+            oper.setRows(10);
+            oper.setNullRepresentation("");
+            return oper;
         }
         if ("maskElements".equals(propertyId)) {
             final MaskElementField field = new MaskElementField();
@@ -97,11 +148,6 @@ public final class EventFormFieldFactory implements FormFieldFactory {
         if ("varbindsdecodeCollection".equals(propertyId)) {
             final VarbindsDecodeField field = new VarbindsDecodeField();
             field.setCaption("Varbind Decodes");
-            return field;
-        }
-        if ("alarmData".equals(propertyId)) {
-            final AlarmDataField field = new AlarmDataField();
-            field.setCaption("Alarm Data");
             return field;
         }
         if ("uei".equals(propertyId)) {

@@ -1575,7 +1575,7 @@ public final class RescanProcessor implements Runnable {
             rs = loadStmt.executeQuery();
             d.watch(rs);
             while (rs.next()) {
-                Integer id = new Integer(rs.getInt(1));
+                Integer id = Integer.valueOf(rs.getInt(1));
                 String name = rs.getString(2);
                 serviceNames.put(id, name);
             }
@@ -2661,6 +2661,7 @@ public final class RescanProcessor implements Runnable {
     /**
      * This is where all the work of the class is done.
      */
+    @Override
     public void run() {
         // perform rescan of the node
         DbNodeEntry dbNodeEntry = getNode();
