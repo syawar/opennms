@@ -28,7 +28,6 @@
 
 package org.opennms.rest.client;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -36,34 +35,12 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.opennms.core.test.MockLogAppender;
-import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
-import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
-import org.opennms.core.test.http.annotations.JUnitHttpServer;
-import org.opennms.core.test.http.annotations.Webapp;
-import org.opennms.netmgt.dao.DatabasePopulator;
 import org.opennms.rest.client.internal.JerseyClientImpl;
 import org.opennms.rest.client.internal.JerseyDataLinkInterfaceService;
 import org.opennms.rest.model.ClientDataLinkInterface;
-import org.opennms.test.JUnitConfigurationEnvironment;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
-@RunWith(OpenNMSJUnit4ClassRunner.class)
-@ContextConfiguration(locations= {
-        "classpath:/META-INF/opennms/applicationContext-commonConfigs.xml",
-        "classpath:/META-INF/opennms/applicationContext-dao.xml",
-        "classpath:/META-INF/opennms/applicationContext-soa.xml",
-        "classpath:/META-INF/opennms/applicationContext-daemon.xml",
-        "classpath:/META-INF/opennms/applicationContext-databasePopulator.xml"
-})
-@JUnitConfigurationEnvironment
-@JUnitTemporaryDatabase
-@JUnitHttpServer(port = 10342, webapps = @Webapp(context = "/opennms", path = "src/test/resources/opennmsRestWebServices"))
 public class ClientDataLinkInterfaceServiceTest {
-    @Autowired
-    private DatabasePopulator m_databasePopulator;
     
     private JerseyDataLinkInterfaceService m_datalinkinterfaceservice;
     
@@ -72,9 +49,8 @@ public class ClientDataLinkInterfaceServiceTest {
         MockLogAppender.setupLogging(true, "DEBUG");
         m_datalinkinterfaceservice = new JerseyDataLinkInterfaceService();
         JerseyClientImpl jerseyClient = new JerseyClientImpl(
-                                                         "http://127.0.0.1:10342/opennms/rest/","demo","demo");
+                                                         "http://demo.opennms.org/opennms/rest/","demo","demo");
         m_datalinkinterfaceservice.setJerseyClient(jerseyClient);
-        m_databasePopulator.populateDatabase();        
     }
 
     @After
@@ -88,76 +64,12 @@ public class ClientDataLinkInterfaceServiceTest {
         
         
         List<ClientDataLinkInterface> datalinkinterfacelist = m_datalinkinterfaceservice.getAll();
-        assertTrue(3 == datalinkinterfacelist.size());
+        assertEquals(49 , datalinkinterfacelist.size());
         for (ClientDataLinkInterface datalinkinterface: datalinkinterfacelist) {
-            Integer datalinkinterfaceId = datalinkinterface.getId();
-            if (datalinkinterfaceId == 64) {
-                checkId64(datalinkinterface);
-            } else if (datalinkinterfaceId == 65) {
-                checkId65(datalinkinterface);
-            } else if (datalinkinterfaceId == 66 ) {
-                 checkId66(datalinkinterface);
-            } else {
-                assertTrue(false);
-            }
+        	System.out.println(datalinkinterface);
         }
-        
-        ClientDataLinkInterface datalinkinterface = m_datalinkinterfaceservice.get(64);
-        checkId64(datalinkinterface);
-
-        datalinkinterface = m_datalinkinterfaceservice.get(65);
-        checkId65(datalinkinterface);
-
-        datalinkinterface = m_datalinkinterfaceservice.get(66);
-        checkId66(datalinkinterface);
-
-        int count = m_datalinkinterfaceservice.countAll();
-        assertEquals(3,count);
   
     }
 
-/*
- * <link id="66"><ifIndex>1</ifIndex><lastPollTime>2012-07-15T12:59:37.747+02:00</lastPollTime>
- * <linkTypeId>-1</linkTypeId>
- * <nodeId>2</nodeId><nodeParentId>1</nodeParentId>
- * <parentIfIndex>1</parentIfIndex><status>A</status></link>
- */
-    private void checkId66(ClientDataLinkInterface datalinkinterface) {
-        assertTrue(1==datalinkinterface.getIfIndex());
-        assertTrue(2==datalinkinterface.getNodeId());
-        assertTrue(1==datalinkinterface.getNodeParentId());
-        assertTrue(1==datalinkinterface.getParentIfIndex());
-        assertTrue(-1==datalinkinterface.getLinkTypeId());
-        assertTrue("A".equals(datalinkinterface.getStatus()));
-    }
-
-    /*
-     * <link id="65"><ifIndex>2</ifIndex><lastPollTime>2012-07-15T12:59:37.663+02:00</lastPollTime>
-     * <linkTypeId>-1</linkTypeId>
-     * <nodeId>1</nodeId><nodeParentId>1</nodeParentId>
-     * <parentIfIndex>1</parentIfIndex><status>A</status></link>
-     */
-    private void checkId65(ClientDataLinkInterface datalinkinterface) {
-        assertTrue(2==datalinkinterface.getIfIndex());
-        assertTrue(1==datalinkinterface.getNodeId());
-        assertTrue(1==datalinkinterface.getNodeParentId());
-        assertTrue(1==datalinkinterface.getParentIfIndex());
-        assertTrue(-1==datalinkinterface.getLinkTypeId());
-        assertTrue("A".equals(datalinkinterface.getStatus()));
-    }
-/*
- * <link id="64"><ifIndex>1</ifIndex><lastPollTime>2012-07-15T12:59:37.604+02:00</lastPollTime>
- * <linkTypeId>-1</linkTypeId>
- * <nodeId>1</nodeId><nodeParentId>1</nodeParentId>
- * <parentIfIndex>1</parentIfIndex><status>A</status></link>
- */
-    private void checkId64(ClientDataLinkInterface datalinkinterface) {
-        assertTrue(1==datalinkinterface.getIfIndex());
-        assertTrue(1==datalinkinterface.getNodeId());
-        assertTrue(1==datalinkinterface.getNodeParentId());
-        assertTrue(1==datalinkinterface.getParentIfIndex());
-        assertTrue(-1==datalinkinterface.getLinkTypeId());
-        assertTrue("A".equals(datalinkinterface.getStatus()));
-    }
 
 }

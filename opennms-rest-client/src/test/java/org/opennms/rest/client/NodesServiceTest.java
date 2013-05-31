@@ -32,20 +32,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.test.MockLogAppender;
+import org.opennms.netmgt.model.OnmsNode;
+import org.opennms.netmgt.model.OnmsNodeList;
 import org.opennms.rest.client.internal.JerseyClientImpl;
-import org.opennms.rest.client.internal.JerseyNodesService;
-import org.opennms.rest.model.ClientOnmsNode;
-import org.opennms.rest.model.ClientOnmsNodeList;
+import org.opennms.rest.client.internal.JerseyNodesModelService;
 import static junit.framework.Assert.assertEquals;
 
-public class ClientNodesServiceTest {
+public class NodesServiceTest {
     
-    private JerseyNodesService m_nodesservice;
+    private JerseyNodesModelService m_nodesservice;
     
     @Before
     public void setUp() throws Exception {
         MockLogAppender.setupLogging(true, "DEBUG");
-        m_nodesservice = new JerseyNodesService();
+        m_nodesservice = new JerseyNodesModelService();
         JerseyClientImpl jerseyClient = new JerseyClientImpl(
                                                          "http://demo.opennms.org/opennms/rest/","demo","demo");
         m_nodesservice.setJerseyClient(jerseyClient);
@@ -61,12 +61,21 @@ public class ClientNodesServiceTest {
         
         
         
-        ClientOnmsNodeList nodeslist = m_nodesservice.getAll();
+        OnmsNodeList nodeslist = m_nodesservice.getAll();
         assertEquals(45, nodeslist.getCount());
         assertEquals(45,nodeslist.getTotalCount());
-        for (ClientOnmsNode node: nodeslist){
+        for (OnmsNode node: nodeslist){
         	System.out.println(node);
         }
+          
+    }
+
+    @Test
+    public void testNode() throws Exception {
+        
+        OnmsNode node = m_nodesservice.get(40);
+        assertEquals("mudd.internal.opennms.com", node.getLabel());
+        	System.out.println(node);
           
     }
 

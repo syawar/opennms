@@ -8,7 +8,7 @@ import org.opennms.rest.model.ClientDataLinkInterfaceList;
 
 public class JerseyDataLinkInterfaceService extends JerseyAbstractService implements DataLinkInterfaceService {
 
-    private static String LINK_REST_PATH = "links/";
+    private final static String LINK_REST_PATH = "links/";
 
     private JerseyClientImpl m_jerseyClient;
         

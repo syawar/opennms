@@ -54,4 +54,16 @@ public class JerseyClientImpl {
     	return m_webResource.path(relativePath).queryParams(queryParams).accept(MediaType.TEXT_PLAIN).get(String.class);
     }
 
+    public <T> void post(Class<T> clazz,Object o, String relativePath) {
+    	m_webResource.path(relativePath).type(MediaType.APPLICATION_XML_TYPE).post(new GenericType<T>(clazz),o);
+    }
+    
+    public <T> void put(Class<T> clazz,Object o, String relativePath) {
+    	m_webResource.path(relativePath).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).put(new GenericType<T>(clazz),o);
+    }
+    
+    public void delete(String relativePath) {
+    	m_webResource.path(relativePath).delete();
+    }
+
 }

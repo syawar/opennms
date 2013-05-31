@@ -8,7 +8,7 @@ import org.opennms.rest.model.ClientOnmsNodeList;
 
 public class JerseyNodesService extends JerseyAbstractService implements NodesService {
 
-    private static String NODES_REST_PATH = "nodes/";
+    private final static String NODES_REST_PATH = "nodes/";
 
     private JerseyClientImpl m_jerseyClient;
         

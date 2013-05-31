@@ -28,27 +28,29 @@
 
 package org.opennms.rest.client;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.test.MockLogAppender;
+import org.opennms.netmgt.model.DataLinkInterface;
 import org.opennms.rest.client.internal.JerseyClientImpl;
-import org.opennms.rest.client.internal.JerseyNodesService;
-import org.opennms.rest.model.ClientOnmsNode;
-import org.opennms.rest.model.ClientOnmsNodeList;
-import static junit.framework.Assert.assertEquals;
+import org.opennms.rest.client.internal.JerseyDataLinkInterfaceModelService;
 
-public class ClientNodesServiceTest {
+public class DataLinkInterfaceServiceTest {
     
-    private JerseyNodesService m_nodesservice;
+    private JerseyDataLinkInterfaceModelService m_datalinkinterfaceservice;
     
     @Before
     public void setUp() throws Exception {
         MockLogAppender.setupLogging(true, "DEBUG");
-        m_nodesservice = new JerseyNodesService();
+        m_datalinkinterfaceservice = new JerseyDataLinkInterfaceModelService();
         JerseyClientImpl jerseyClient = new JerseyClientImpl(
                                                          "http://demo.opennms.org/opennms/rest/","demo","demo");
-        m_nodesservice.setJerseyClient(jerseyClient);
+        m_datalinkinterfaceservice.setJerseyClient(jerseyClient);
     }
 
     @After
@@ -57,17 +59,17 @@ public class ClientNodesServiceTest {
     }
     
     @Test
-    public void testNodes() throws Exception {
+    public void testLinks() throws Exception {
         
         
         
-        ClientOnmsNodeList nodeslist = m_nodesservice.getAll();
-        assertEquals(45, nodeslist.getCount());
-        assertEquals(45,nodeslist.getTotalCount());
-        for (ClientOnmsNode node: nodeslist){
-        	System.out.println(node);
+        List<DataLinkInterface> datalinkinterfacelist = m_datalinkinterfaceservice.getAll();
+        assertEquals(49 , datalinkinterfacelist.size());
+        for (DataLinkInterface datalinkinterface: datalinkinterfacelist) {
+        	System.out.println(datalinkinterface);
         }
-          
+  
     }
+
 
 }
