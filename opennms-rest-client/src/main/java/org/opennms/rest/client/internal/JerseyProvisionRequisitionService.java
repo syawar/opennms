@@ -18,7 +18,7 @@ import org.opennms.rest.client.ProvisionRequisitionService;
 public class JerseyProvisionRequisitionService extends JerseyAbstractService implements
 		ProvisionRequisitionService {
 
-	private final static String REQUISITIONS_PATH = "requisitions/";
+	private final static String REQUISITIONS_PATH = "requisitions";
 	private final static String REQUISITIONS_COUNT_PATH = "requisitions/count";
 
 	private final static String REQUISITIONS_DEPLOYED_PATH = "requisitions/deployed";
