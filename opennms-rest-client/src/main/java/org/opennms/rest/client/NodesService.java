@@ -2,19 +2,19 @@ package org.opennms.rest.client;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.opennms.rest.model.ClientOnmsNode;
-import org.opennms.rest.model.ClientOnmsNodeList;
+import org.opennms.netmgt.model.OnmsNode;
+import org.opennms.netmgt.model.OnmsNodeList;
 
-public interface NodesService extends FilterService{
+public interface NodesService extends RestFilterService{
 
 
-    public ClientOnmsNodeList getAll();
+    public OnmsNodeList getAll();
 
-    public ClientOnmsNodeList getWithDefaultsQueryParams();
+    public OnmsNodeList getWithDefaultsQueryParams();
 
-    public ClientOnmsNodeList find(MultivaluedMap<String, String> queryParams);
+    public OnmsNodeList find(MultivaluedMap<String, String> queryParams);
 
-    public ClientOnmsNode get(Integer id);
+    public OnmsNode get(Integer id);
     
     
 

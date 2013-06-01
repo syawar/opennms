@@ -33,19 +33,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.rest.client.internal.JerseyClientImpl;
-import org.opennms.rest.client.internal.JerseyNodesService;
+import org.opennms.rest.client.internal.JerseyClientNodesService;
 import org.opennms.rest.model.ClientOnmsNode;
 import org.opennms.rest.model.ClientOnmsNodeList;
 import static junit.framework.Assert.assertEquals;
 
 public class ClientNodesServiceTest {
     
-    private JerseyNodesService m_nodesservice;
+    private JerseyClientNodesService m_nodesservice;
     
     @Before
     public void setUp() throws Exception {
         MockLogAppender.setupLogging(true, "DEBUG");
-        m_nodesservice = new JerseyNodesService();
+        m_nodesservice = new JerseyClientNodesService();
         JerseyClientImpl jerseyClient = new JerseyClientImpl(
                                                          "http://demo.opennms.org/opennms/rest/","demo","demo");
         m_nodesservice.setJerseyClient(jerseyClient);

@@ -2,7 +2,7 @@ package org.opennms.rest.client;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-public interface FilterService {
+public interface RestFilterService {
 
 	public MultivaluedMap<String, String> setLimit(Integer limit);
 	

@@ -37,17 +37,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.rest.client.internal.JerseyClientImpl;
-import org.opennms.rest.client.internal.JerseyDataLinkInterfaceService;
+import org.opennms.rest.client.internal.JerseyClientDataLinkInterfaceService;
 import org.opennms.rest.model.ClientDataLinkInterface;
 
 public class ClientDataLinkInterfaceServiceTest {
     
-    private JerseyDataLinkInterfaceService m_datalinkinterfaceservice;
+    private JerseyClientDataLinkInterfaceService m_datalinkinterfaceservice;
     
     @Before
     public void setUp() throws Exception {
         MockLogAppender.setupLogging(true, "DEBUG");
-        m_datalinkinterfaceservice = new JerseyDataLinkInterfaceService();
+        m_datalinkinterfaceservice = new JerseyClientDataLinkInterfaceService();
         JerseyClientImpl jerseyClient = new JerseyClientImpl(
                                                          "http://demo.opennms.org/opennms/rest/","demo","demo");
         m_datalinkinterfaceservice.setJerseyClient(jerseyClient);

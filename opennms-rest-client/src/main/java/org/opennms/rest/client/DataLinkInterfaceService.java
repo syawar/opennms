@@ -2,20 +2,20 @@ package org.opennms.rest.client;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.opennms.rest.model.ClientDataLinkInterface;
-import org.opennms.rest.model.ClientDataLinkInterfaceList;
+import org.opennms.netmgt.model.DataLinkInterface;
+import org.opennms.netmgt.model.DataLinkInterfaceList;
 
-public interface DataLinkInterfaceService extends FilterService{
+public interface DataLinkInterfaceService extends RestFilterService{
 
     public int countAll();
 
-    public ClientDataLinkInterfaceList getAll();
+    public DataLinkInterfaceList getAll();
 
-    public ClientDataLinkInterfaceList getWithDefaultsQueryParams();
+    public DataLinkInterfaceList getWithDefaultsQueryParams();
 
-    public ClientDataLinkInterfaceList find(MultivaluedMap<String, String> queryParams);
+    public DataLinkInterfaceList find(MultivaluedMap<String, String> queryParams);
 
-    public ClientDataLinkInterface get(Integer id);
+    public DataLinkInterface get(Integer id);
     
     
 
