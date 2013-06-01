@@ -6,6 +6,16 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class JerseyAbstractService {
 
+    private JerseyClientImpl m_jerseyClient;
+    
+    public JerseyClientImpl getJerseyClient() {
+        return m_jerseyClient;
+    }
+
+    public void setJerseyClient(JerseyClientImpl jerseyClient) {
+        m_jerseyClient = jerseyClient;
+    }
+
 	public MultivaluedMap<String, String> setLimit(Integer limit) {
 		MultivaluedMap< String, String> queryParams = new MultivaluedMapImpl();
 		queryParams.add("limit", Integer.toString(limit));
@@ -93,5 +103,6 @@ public class JerseyAbstractService {
 		queryParams.add("query", sqlStatement);
 		return queryParams;
 	}
+	
 	
 }

@@ -10,16 +10,6 @@ public class JerseyNodesService extends JerseyAbstractService implements NodesSe
 
     private final static String NODES_REST_PATH = "nodes/";
 
-    private JerseyClientImpl m_jerseyClient;
-        
-    public JerseyClientImpl getJerseyClient() {
-        return m_jerseyClient;
-    }
-
-    public void setJerseyClient(JerseyClientImpl jerseyClient) {
-        m_jerseyClient = jerseyClient;
-    }
-
     public OnmsNodeList getAll() {
     	MultivaluedMap<String, String> queryParams = setLimit(0);
         return getJerseyClient().get(OnmsNodeList.class, NODES_REST_PATH,queryParams);                
