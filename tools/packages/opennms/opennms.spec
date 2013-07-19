@@ -654,7 +654,7 @@ find $RPM_BUILD_ROOT%{instprefix}/system ! -type d | \
 	sed -e "s|^$RPM_BUILD_ROOT|%attr(755,root,root) |" | \
 	grep -v '/ncs/' | \
 	grep -v 'opennms-topology-runtime-ncs' | \
-	sort >> %{_tpmmpath}/files.main
+	sort >> %{_tmppath}/files.main
 
 # jetty
 find $RPM_BUILD_ROOT%{jettydir} ! -type d | \
