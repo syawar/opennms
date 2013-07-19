@@ -125,7 +125,11 @@ install: build
 	# Setup NCS
 	install -d -m 755 debian/opennms-ncs/usr/share/java/opennms
 	install -d -m 755 debian/opennms-ncs/etc/opennms/drools-engine.d
+	install -d -m 755 debian/opennms-ncs/etc/opennms/events
 	install -d -m 755 debian/opennms-ncs/var/lib/opennms/etc-pristine/drools-engine.d
+	install -d -m 755 debian/opennms-ncs/var/lib/opennms/etc-pristine/events
+	install -d -m 755 debian/opennms-ncs/var/lib/opennms/system/org/opennms/features/topology/plugins/ncs
+	install -d -m 755 debian/opennms-ncs/var/lib/opennms/system/org/opennms/osgi/features/topology/opennms-topology-runtime-ncs
 	install -d -m 755 debian/opennms-ncs/var/lib/opennms/xsds
 	install -d -m 755 debian/opennms-ncs/usr/share/opennms/jetty-webapps/opennms/WEB-INF/jsp/alarm
 	install -d -m 755 debian/opennms-ncs/usr/share/opennms/jetty-webapps/opennms/WEB-INF/lib
@@ -200,6 +204,7 @@ install: build
 	# NCS
 	mv debian/temp/lib/ncs-*.jar                                                               debian/opennms-ncs/usr/share/java/opennms/
 	mv debian/temp/etc/drools-engine.d/ncs                                                     debian/opennms-ncs/etc/opennms/drools-engine.d/
+	mv debian/temp/etc/events/ncs-component.events.xml                                         debian/opennms-ncs/etc/opennms/events/
 	mv debian/temp/etc/ncs-northbounder-configuration.xml                                      debian/opennms-ncs/etc/opennms/
 	mv debian/temp/share/xsds/ncs-*.xsd                                                        debian/opennms-ncs/var/lib/opennms/xsds/
 	mv debian/temp/jetty-webapps/opennms/WEB-INF/lib/ncs-*.jar                                 debian/opennms-ncs/usr/share/opennms/jetty-webapps/opennms/WEB-INF/lib/
