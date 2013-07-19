@@ -184,9 +184,6 @@ Requires:	opennms-webapp-jetty = %{version}-%{release}
 NCS provides a framework for doing correlation of service events across
 disparate nodes.
 
-*Note* if you install this package, don't forget to add
-ncs-component.events.xml to your eventconf.xml file!
-
 %{extrainfo}
 %{extrainfo2}
 
@@ -561,7 +558,6 @@ find $RPM_BUILD_ROOT%{instprefix}/etc ! -type d | \
 	sed -e "s,^$RPM_BUILD_ROOT,%config(noreplace) ," | \
 	grep -v '%{_initrddir}/opennms-remote-poller' | \
 	grep -v '%{_sysconfdir}/sysconfig/opennms-remote-poller' | \
-	grep -v 'ncs-component.events.xml' | \
 	grep -v 'ncs-northbounder-configuration.xml' | \
 	grep -v 'drools-engine.d/ncs' | \
 	grep -v '3gpp' | \
@@ -585,7 +581,6 @@ find $RPM_BUILD_ROOT%{sharedir}/etc-pristine ! -type d | \
 	sed -e "s,^$RPM_BUILD_ROOT,," | \
 	grep -v '%{_initrddir}/opennms-remote-poller' | \
 	grep -v '%{_sysconfdir}/sysconfig/opennms-remote-poller' | \
-	grep -v 'ncs-component.events.xml' | \
 	grep -v 'ncs-northbounder-configuration.xml' | \
 	grep -v 'ncs.xml' | \
 	grep -v 'drools-engine.d/ncs' | \
@@ -719,7 +714,6 @@ rm -rf $RPM_BUILD_ROOT
 %{jettydir}/%{servletdir}/WEB-INF/lib/ncs-*
 %config(noreplace) %{instprefix}/etc/drools-engine.d/ncs/*
 %config(noreplace) %{instprefix}/etc/ncs-northbounder-configuration.xml
-%config(noreplace) %{instprefix}/etc/events/ncs-component.events.xml
 %{sharedir}/xsds/ncs-*.xsd
 %config %{jettydir}/%{servletdir}/WEB-INF/ncs*.xml
 %config %{jettydir}/%{servletdir}/WEB-INF/jsp/alarm/ncs-*
@@ -727,7 +721,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{sharedir}/etc-pristine/drools-engine.d/ncs
 %{sharedir}/etc-pristine/drools-engine.d/ncs/*
 %{sharedir}/etc-pristine/ncs-northbounder-configuration.xml
-%{sharedir}/etc-pristine/events/ncs-component.events.xml
 
 %files webapp-jetty -f %{_tmppath}/files.jetty
 %defattr(644 root root 755)
