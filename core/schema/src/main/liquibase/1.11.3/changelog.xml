@@ -16,5 +16,8 @@
 
     <!-- Add a new table for the access point monitor -->
     <include file="1.11.3/tables/accesspoints.xml" />
+    
+    <!-- Add new columns in asset table for passive Snmp Poller -->
+    <include file="1.11.3/tables/passiveSnmpAssets.xml" />
 
 </databaseChangeLog>

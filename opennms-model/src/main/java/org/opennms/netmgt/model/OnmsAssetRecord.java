@@ -396,6 +396,35 @@ public class OnmsAssetRecord implements Serializable {
      * VMware managed entity state
      */
     private String m_vmwareState;
+    
+    /**
+     * SNMP host-List
+     */
+    private String m_hostList;
+    
+    /**
+     * SNMP MIB
+     */
+    private String m_snmpMib;
+    
+    /**
+     * Mac Address
+     */
+    private String m_macAddress;
+    
+    /**
+     * SNMP comparator
+     */
+    private String m_snmpComparator;
+    
+    /**
+     * SNMP compare to value
+     */
+    private String m_compareValue;
+    
+    /**
+     * 
+     */
 
     /**
      * default constructor
@@ -1798,6 +1827,109 @@ public class OnmsAssetRecord implements Serializable {
     }
 
     /**
+     * <p>getHostList</p>
+     * <p/>
+     * 
+     * Get the SNMP passive monitor host list
+	 * @return a {@link java.lang.String} object
+	 */
+    @Column(name = "hostList", length = 1023)
+	public String getHostList() {
+		return m_hostList;
+	}
+
+	/**
+	 * <p>setHostList</p>
+     * <p/>
+     * 
+     * Set SNMP passive poller host list
+	 * @param m_hostList a {@link java.lang.String} object
+	 */
+	public void setHostList(String m_hostList) {
+		this.m_hostList = m_hostList;
+	}
+
+	/**
+	 * <p>getSnmpMib</p>
+	 * </p>
+	 * Get snmp mib for poller
+	 * @return a {@link java.lang.String} object
+	 */
+	@Column(name = "snmpMib", length = 200)
+	public String getSnmpMib() {
+		return m_snmpMib;
+	}
+
+	/*** <p>setSnmpMib</p>
+	 * </p>
+	 * Set SNMP mib for poller
+	 * @param m_snmpMib a {@link java.lang.String} object
+	 */
+	public void setSnmpMib(String m_snmpMib) {
+		this.m_snmpMib = m_snmpMib;
+	}
+
+	/**<p>getMacAddress</p>
+	 * </p>
+	 * Get mac address for node
+	 * @return a {@link java.lang.String} object
+	 */
+	@Column(name = "macAddress", length = 200)
+	public String getMacAddress() {
+		return m_macAddress;
+	}
+
+	/*** <p>setMacAddress</p>
+	 * </p>
+	 * set mac address for node
+	 * @param m_macAddress a {@link java.lang.String} object
+	 */
+	public void setMacAddress(String m_macAddress) {
+		this.m_macAddress = m_macAddress;
+	}
+
+	/**<p>getSnmpComparator</p>
+	 * </p>
+	 * get comparator for snmp poller
+	 * @return a {@link java.lang.String} object
+	 */
+	@Column(name = "snmpComparator", length = 20)
+	public String getSnmpComparator() {
+		return m_snmpComparator;
+	}
+
+	/*** <p>setSnmpComparator</p>
+	 * </p>
+	 * set comparator for snmp poller
+	 * @param m_snmpComparator a {@link java.lang.String} object
+	 */
+	public void setSnmpComparator(String m_snmpComparator) {
+		this.m_snmpComparator = m_snmpComparator;
+	}
+	
+	/**
+	 * <p>getCompareValue</p>
+	 * </p>
+	 * get the compare value for snmp poller
+	 * 
+	 * @return a {@link java.lang.String} object
+	 */
+	@Column(name = "compareValue", length = 200)
+	public String getCompareValue() {
+		return m_compareValue;
+	}
+
+	/**
+	 * <p>setCompareValue</p>
+	 * </p>
+	 * set the compare value for snmp poller
+	 * @param m_compareValue a {@link java.lang.String} object
+	 */
+	public void setCompareValue(String m_compareValue) {
+		this.m_compareValue = m_compareValue;
+	}
+
+	/**
      * {@inheritDoc}
      */
     @Override
@@ -1865,6 +1997,11 @@ public class OnmsAssetRecord implements Serializable {
         .append("admin", getAdmin())
         .append("snmpcommunity", getSnmpcommunity())
         .append("rackunitheight", getRackunitheight())
+        .append("macAddress", getMacAddress())
+        .append("snmpMib", getSnmpMib())
+        .append("snmpComparator", getSnmpComparator())
+        .append("compareValue", getCompareValue())
+        .append("hostList", getHostList())
         .append("vmwareManagedObjectId", getVmwareManagedObjectId())
         .append("vmwareManagedEntityType", getVmwareManagedEntityType())
         .append("vmwareManagementServer", getVmwareManagementServer())
@@ -1934,4 +2071,6 @@ public class OnmsAssetRecord implements Serializable {
             }
         }
     }
+
+	
 }
