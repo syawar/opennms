@@ -258,16 +258,16 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
     FieldSetTextArea sComment;
     
     @UiField
-    FieldSetSuggestBox sSnmpMib;
+    FieldSetTextBox sSnmpMib;
     
     @UiField
-    FieldSetSuggestBox sMacAddress;
+    FieldSetTextBox sMacAddress;
     
     @UiField
-    FieldSetSuggestBox sSnmpComparator;
+    FieldSetTextBox sSnmpComparator;
     
     @UiField
-    FieldSetSuggestBox sCompareValue;
+    FieldSetTextBox sCompareValue;
     
     @UiField
     FieldSetTextArea sHostList;

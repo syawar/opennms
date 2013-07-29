@@ -345,16 +345,16 @@
                                         </h3>
                                 </g:HTMLPanel>
                                 <g:HTMLPanel styleName="disclosureBodyPanel">
-                                <onms_fs:FieldSetSuggestBox ui:field="sSnmpMib"
+                                <onms_fs:FieldSetTextBox ui:field="sSnmpMib"
                                                 name="{con.snmpMib}" value="" helpText="{con.snmpMibHelp}"
                                                 maxLength="200" />
-                                <onms_fs:FieldSetSuggestBox ui:field="sMacAddress"
+                                <onms_fs:FieldSetTextBox ui:field="sMacAddress"
                                                 name="{con.macAddress}" value="" helpText="{con.macAddressHelp}"
                                                 maxLength="200" />
-                                <onms_fs:FieldSetSuggestBox ui:field="sSnmpComparator"
+                                <onms_fs:FieldSetTextBox ui:field="sSnmpComparator"
                                                 name="{con.snmpComparator}" value="" helpText="{con.snmpComparatorHelp}"
                                                 maxLength="20" />
-                                <onms_fs:FieldSetSuggestBox ui:field="sCompareValue"
+                                <onms_fs:FieldSetTextBox ui:field="sCompareValue"
                                                 name="{con.compareValue}" value="" helpText="{con.compareValueHelp}"
                                                 maxLength="20" />
                                          <onms_fs:FieldSetTextArea ui:field="sHostList"
