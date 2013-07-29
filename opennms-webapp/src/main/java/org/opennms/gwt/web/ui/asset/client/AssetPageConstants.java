@@ -772,4 +772,50 @@ public interface AssetPageConstants extends com.google.gwt.i18n.client.Constants
     @DefaultStringValue("VMware managed entity state")
     @Key("vmwareStateHelp")
     String vmwareStateHelp();
+    
+    @DefaultStringValue("Passive SNMP Poll Settings")
+    @Key("passivePollerHeader")
+    String passivePollerHeader();
+    
+    @DefaultStringValue("Host List")
+    @Key("hostList")
+    String hostList();
+
+    @DefaultStringValue("The host list for passive snmp poller")
+    @Key("hostListHelp")
+    String hostListHelp();
+    
+    @DefaultStringValue("MAC ADDRESS")
+    @Key("macAddress")
+    String macAddress();
+    
+    @DefaultStringValue("The mac Address for this node")
+    @Key("macAddressHelp")
+    String macAddressHelp();
+    
+    @DefaultStringValue("SNMP MIB")
+    @Key("snmpMib")
+    String snmpMib();
+    
+    @DefaultStringValue("The mib for passive SNMP polling")
+    @Key("snmpMibHelp")
+    String snmpMibHelp();
+    
+    @DefaultStringValue("SNMP Comparator")
+    @Key("snmpComparator")
+    String snmpComparator();
+    
+    @DefaultStringValue("The comparator for results e.g =, gt")
+    @Key("snmpComparatorHelp")
+    String snmpComparatorHelp();
+    
+    @DefaultStringValue("SNMP Compare Value")
+    @Key("compareValue")
+    String compareValue();
+    
+    @DefaultStringValue("The compared operand")
+    @Key("compareValueHelp")
+    String compareValueHelp();
+    
+    
 }

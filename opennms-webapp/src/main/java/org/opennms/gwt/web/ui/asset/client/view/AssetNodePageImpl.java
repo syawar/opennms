@@ -256,6 +256,23 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 
     @UiField
     FieldSetTextArea sComment;
+    
+    @UiField
+    FieldSetSuggestBox sSnmpMib;
+    
+    @UiField
+    FieldSetSuggestBox sMacAddress;
+    
+    @UiField
+    FieldSetSuggestBox sSnmpComparator;
+    
+    @UiField
+    FieldSetSuggestBox sCompareValue;
+    
+    @UiField
+    FieldSetTextArea sHostList;
+    
+    
 
     @UiField
     Button saveButton;
@@ -305,6 +322,7 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
         saveDataHardware();
         saveDataComments();
         saveDataVmware();
+        saveDataPassiveSnmp();
 
         return m_asset;
     }
@@ -404,6 +422,12 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
         fieldSetList.add(sVmwareState);
 
         fieldSetList.add(sComment);
+        
+        fieldSetList.add(sSnmpMib);
+        fieldSetList.add(sMacAddress);
+        fieldSetList.add(sSnmpComparator);
+        fieldSetList.add(sCompareValue);
+        fieldSetList.add(sHostList);
     }
 
     @Override
@@ -505,6 +529,14 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
         m_asset.setVmwareTopologyInfo(sVmwareTopologyInfo.getValue());
         m_asset.setVmwareState(sVmwareState.getValue());
     }
+    
+    private void saveDataPassiveSnmp(){
+    	m_asset.setHostList(sHostList.getValue());
+    	m_asset.setSnmpMib(sSnmpMib.getValue());
+    	m_asset.setSnmpComparator(sSnmpComparator.getValue());
+    	m_asset.setCompareValue(sCompareValue.getValue());
+    	m_asset.setMacAddress(sMacAddress.getValue());
+    }
 
     @Override
     public void setData(AssetCommand asset) {
@@ -522,6 +554,7 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
         setDataHardware(m_asset);
         setDataComments(m_asset);
         setDataVmware(m_asset);
+        setDataPassiveSnmp(m_asset);
         DateTimeFormat m_formater = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM);
         lastModified.setText(con.lastModified() + " " + m_formater.format(asset.getLastModifiedDate()) + " | "
                 + asset.getLastModifiedBy());
@@ -724,6 +757,14 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
         sVmwareManagementServer.setValue(asset.getVmwareManagementServer());
         sVmwareTopologyInfo.setValue(asset.getVmwareTopologyInfo());
         sVmwareState.setValue(asset.getVmwareState());
+    }
+    
+    private void setDataPassiveSnmp(AssetCommand asset){
+    	sSnmpMib.setValue(asset.getSnmpMib());
+    	sSnmpComparator.setValue(asset.getSnmpComparator());
+    	sMacAddress.setValue(asset.getMacAddress());
+    	sCompareValue.setValue(asset.getCompareValue());
+    	sHostList.setValue(asset.getHostList());
     }
 
     @Override

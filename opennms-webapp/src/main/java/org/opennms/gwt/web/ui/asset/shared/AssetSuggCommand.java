@@ -154,6 +154,32 @@ public class AssetSuggCommand implements IsSerializable {
      * VMware managed entity state
      */
     private Set<String> m_vmwareState;
+    
+    /**
+     *  the Snmp mib
+     */
+    private Set<String> m_snmpMib;
+    
+    /**
+     * the Mac Address for this node
+     */
+    private Set<String> m_macAddress;
+    
+    /**
+     *  the comparator for snmp
+     */
+    private Set<String> m_snmpComparator;
+
+    /**
+     * the value to compare for passive snmp
+     */
+    private Set<String> m_compareValue;
+    
+
+    /**
+     * the host list for passive snmp polling
+     */
+    private Set<String> m_hostList;
 
     public AssetSuggCommand() {
         m_additionalhardware = new TreeSet<String>();
@@ -204,6 +230,11 @@ public class AssetSuggCommand implements IsSerializable {
         m_vmwareManagementServer = new TreeSet<String>();
         m_vmwareTopologyInfo = new TreeSet<String>();
         m_vmwareState = new TreeSet<String>();
+        AddSnmpMib(new TreeSet<String>());
+        m_macAddress = new TreeSet<String>();
+        m_snmpComparator = new TreeSet<String>();
+        m_compareValue = new TreeSet<String>();
+        m_hostList = new TreeSet<String>();
         initUnchangedEntry();
     }
 
@@ -494,6 +525,38 @@ public class AssetSuggCommand implements IsSerializable {
             m_vmwareState.add(vmwareState);
         }
     }
+    
+
+	
+	public void AddHostList(String hostList){
+		if((hostList != null) && !"".equals(hostList)){
+			m_hostList.add(hostList);
+		}
+	}
+	
+	public void AddCompareValue(String compareValue){
+		if((compareValue != null) && !"".equals(compareValue)){
+			m_compareValue.add(compareValue);
+		}
+	}
+	
+	public void AddSnmpComparator(String snmpComparator){
+		if((snmpComparator != null) && !"".equals(snmpComparator)){
+			m_snmpComparator.add(snmpComparator);
+		}
+	}
+	
+	public void AddMacAddress(String macAddress){
+		if((macAddress != null) && !"".equals(macAddress)){
+			m_macAddress.add(macAddress);
+		}
+	}
+
+	public void AddSnmpMib(String snmpMib) {
+		if (( snmpMib != null) && !"".equals(snmpMib)) {
+			m_snmpMib.add(snmpMib);
+		}
+	}
 
     public Collection<String> getAdditionalhardware() {
         return m_additionalhardware;
@@ -686,6 +749,28 @@ public class AssetSuggCommand implements IsSerializable {
     public Collection<String> getVmwareState() {
         return m_vmwareState;
     }
+    
+
+	public Collection<String> getSnmpMib() {
+		return m_snmpMib;
+	}
+	
+	public Collection<String> getMacAddress(){
+		return m_macAddress;
+	}
+	
+	public Collection<String> getSnmpComparator(){
+		return m_snmpComparator;
+	}
+	
+	public Collection<String> getCompareValue(){
+		return m_compareValue;
+	}
+	
+	public Collection<String> getHostList(){
+		return m_hostList;
+	}
+	
 
     private void initUnchangedEntry() {
         m_additionalhardware.add("");
@@ -737,4 +822,5 @@ public class AssetSuggCommand implements IsSerializable {
         m_vmwareTopologyInfo.add("");
         m_vmwareState.add("");
     }
+
 }

@@ -335,6 +335,33 @@
 						maxLength="-1" />
 				</g:HTMLPanel>
 			</onms:DisclosurePanelCookie>
+			
+			<onms:DisclosurePanelCookie cookieName="passiveSnmpPoller"
+                                ui:field="passiveSnmpDiscPanel">
+
+                                <g:HTMLPanel styleName="disclosureBodyPanel">
+                                        <h3>
+                                                <g:Label ui:field="passivePollerHeader" text="{con.passivePollerHeader}" />
+                                        </h3>
+                                </g:HTMLPanel>
+                                <g:HTMLPanel styleName="disclosureBodyPanel">
+                                <onms_fs:FieldSetSuggestBox ui:field="sSnmpMib"
+                                                name="{con.snmpMib}" value="" helpText="{con.snmpMibHelp}"
+                                                maxLength="200" />
+                                <onms_fs:FieldSetSuggestBox ui:field="sMacAddress"
+                                                name="{con.macAddress}" value="" helpText="{con.macAddressHelp}"
+                                                maxLength="200" />
+                                <onms_fs:FieldSetSuggestBox ui:field="sSnmpComparator"
+                                                name="{con.snmpComparator}" value="" helpText="{con.snmpComparatorHelp}"
+                                                maxLength="20" />
+                                <onms_fs:FieldSetSuggestBox ui:field="sCompareValue"
+                                                name="{con.compareValue}" value="" helpText="{con.compareValueHelp}"
+                                                maxLength="20" />
+                                         <onms_fs:FieldSetTextArea ui:field="sHostList"
+                                                name="{con.hostList}" value="" helpText="{con.hostListHelp}"
+                                                maxLength="-1" />
+                                </g:HTMLPanel>
+            </onms:DisclosurePanelCookie>
 
 			<g:HorizontalPanel>
 				<g:Button ui:field="saveButton" text="{con.saveButton}" />

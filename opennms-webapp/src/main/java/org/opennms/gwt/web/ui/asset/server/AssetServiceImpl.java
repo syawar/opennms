@@ -246,6 +246,13 @@ public class AssetServiceImpl extends RemoteServiceServlet implements AssetServi
             // VMware topology assets
             suggestion.addVmwareTopologyInfo(asset.getVmwareTopologyInfo());
             suggestion.addVmwareState(geolocation.getState());
+            
+            //passive snmp poller assets
+            suggestion.AddSnmpMib(asset.getSnmpMib());
+            suggestion.AddSnmpComparator(asset.getSnmpComparator());
+            suggestion.AddHostList(asset.getHostList());
+            suggestion.AddMacAddress(asset.getMacAddress());
+            suggestion.AddCompareValue(asset.getCompareValue());
 
         }
         return suggestion;

@@ -201,6 +201,16 @@ public class AssetCommand implements IsSerializable {
     private String m_vmwareTopologyInfo;
 
     private String m_vmwareState;
+    
+    private String m_hostList;
+    
+    private String m_snmpMib;
+    
+    private String m_snmpComparator;
+    
+    private String m_compareValue;
+    
+    private String m_macAddress;
 
     public AssetCommand() {
         m_autoenableOptions = new ArrayList<String>();
@@ -533,6 +543,41 @@ public class AssetCommand implements IsSerializable {
     public String getVmwareState() {
         return m_vmwareState;
     }
+    
+    /**
+	 * @return the m_hostList
+	 */
+	public String getHostList() {
+		return m_hostList;
+	}
+
+	/**
+	 * @return the m_snmpMib
+	 */
+	public String getSnmpMib() {
+		return m_snmpMib;
+	}
+
+	/**
+	 * @return the m_snmpComparator
+	 */
+	public String getSnmpComparator() {
+		return m_snmpComparator;
+	}
+
+	/**
+	 * @return the m_compareValue
+	 */
+	public String getCompareValue() {
+		return m_compareValue;
+	}
+
+	/**
+	 * @return the m_macAddress
+	 */
+	public String getMacAddress() {
+		return m_macAddress;
+	}
 
     // --- Setter ---
 
@@ -859,6 +904,45 @@ public class AssetCommand implements IsSerializable {
     public void setVmwareState(String vmwareState) {
         m_vmwareState = vmwareState;
     }
+    
+
+	/**
+	 * @param m_macAddress the m_macAddress to set
+	 */
+	public void setMacAddress(String m_macAddress) {
+		this.m_macAddress = m_macAddress;
+	}
+	
+	/**
+	 * @param m_hostList the m_hostList to set
+	 */
+	public void setHostList(String m_hostList) {
+		this.m_hostList = m_hostList;
+	}
+	
+	/**
+	 * @param m_compareValue the m_compareValue to set
+	 */
+	public void setCompareValue(String m_compareValue) {
+		this.m_compareValue = m_compareValue;
+	}
+	
+
+	/**
+	 * @param m_snmpComparator the m_snmpComparator to set
+	 */
+	public void setSnmpComparator(String m_snmpComparator) {
+		this.m_snmpComparator = m_snmpComparator;
+	}
+	
+
+	/**
+	 * @param m_snmpMib the m_snmpMib to set
+	 */
+	public void setSnmpMib(String m_snmpMib) {
+		this.m_snmpMib = m_snmpMib;
+	}
+
 
     // --- nice toString() ---
     @Override
@@ -894,6 +978,10 @@ public class AssetCommand implements IsSerializable {
                 + ", m_vendorPhone=" + m_vendorPhone + ", m_zip=" + m_zip + ", m_vmwareManagedObjectId="
                 + m_vmwareManagedObjectId + ", m_vmwareManagedEntityType=" + m_vmwareManagedEntityType
                 + ", m_vmwareManagementServer=" + m_vmwareManagementServer + ", m_vmwareTopologyInfo=" + m_vmwareTopologyInfo +
-                ", m_vmwareState=" + m_vmwareState + "]";
+                ", m_vmwareState=" + m_vmwareState + ",m_snmpMib="+ m_snmpMib+",m_macAddress="+m_macAddress
+                +",m_snmpComparator="+m_snmpComparator+",m_compareValue="+m_compareValue+",m_hostList="+m_hostList+"]";
     }
+
+	
+
 }
