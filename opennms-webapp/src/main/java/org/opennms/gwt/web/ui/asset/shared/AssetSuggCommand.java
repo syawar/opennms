@@ -230,7 +230,7 @@ public class AssetSuggCommand implements IsSerializable {
         m_vmwareManagementServer = new TreeSet<String>();
         m_vmwareTopologyInfo = new TreeSet<String>();
         m_vmwareState = new TreeSet<String>();
-        AddSnmpMib(new TreeSet<String>());
+        m_snmpMib = (new TreeSet<String>());
         m_macAddress = new TreeSet<String>();
         m_snmpComparator = new TreeSet<String>();
         m_compareValue = new TreeSet<String>();
