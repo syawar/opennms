@@ -258,16 +258,16 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
     FieldSetTextArea sComment;
     
     @UiField
-    FieldSetTextBox sSnmpMib;
+    FieldSetSuggestBox sSnmpMib;
     
     @UiField
-    FieldSetTextBox sMacAddress;
+    FieldSetSuggestBox sMacAddress;
     
     @UiField
-    FieldSetTextBox sSnmpComparator;
+    FieldSetSuggestBox sSnmpComparator;
     
     @UiField
-    FieldSetTextBox sCompareValue;
+    FieldSetSuggestBox sCompareValue;
     
     @UiField
     FieldSetTextArea sHostList;
@@ -668,6 +668,15 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
         setDataSuggAuth(assetSugg);
         setDataSuggHardware(assetSugg);
         setDataSuggVmware(assetSugg);
+        setDataSuggPassiveSnmp(assetSugg);
+    }
+    
+    private void setDataSuggPassiveSnmp(AssetSuggCommand assetSugg){
+    	sSnmpMib.setSuggestions(assetSugg.getSnmpMib());
+    	sMacAddress.setSuggestions(assetSugg.getMacAddress());
+    	sSnmpComparator.setSuggestions(assetSugg.getSnmpComparator());
+    	sCompareValue.setSuggestions(assetSugg.getCompareValue());
+    	//sHostList.setSuggestions(assetSugg.getHostList()); 	
     }
 
     private void setDataSuggAuth(AssetSuggCommand assetSugg) {
