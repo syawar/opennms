@@ -34,11 +34,14 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Arrays;
 
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ParameterMap;
+import org.opennms.core.utils.BeanUtils;
 import org.opennms.core.utils.PropertiesUtils;
 import org.opennms.netmgt.config.SnmpPeerFactory;
+import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.PollStatus;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
@@ -50,6 +53,7 @@ import org.opennms.netmgt.snmp.SnmpUtils;
 import org.opennms.netmgt.snmp.SnmpValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opennms.netmgt.dao.api.NodeDao;
 
 /**
  * <P>
@@ -68,6 +72,11 @@ import org.slf4j.LoggerFactory;
  */
 @Distributable(DistributionContext.DAEMON)
 public class SnmpMonitor extends SnmpMonitorStrategy {
+
+	/**
+     * the node dao object for retrieving assets
+     */
+    private NodeDao m_nodeDao = null; 
     
     public static final Logger LOG = LoggerFactory.getLogger(SnmpMonitor.class);
     
@@ -111,6 +120,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
     public void initialize(Map<String, Object> parameters) {
         // Initialize the SnmpPeerFactory
         //
+    	m_nodeDao = BeanUtils.getBean("daoContext", "nodeDao", NodeDao.class);
         try {
             SnmpPeerFactory.init();
         } catch (IOException ex) {
@@ -151,8 +161,11 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
      */
     @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+    	OnmsNode onmsNode = m_nodeDao.get(svc.getNodeId());
+    	//OnmsAssetRecord theAssets = onmsNode.getAssetRecord();
+    	LOG.debug(this+"::syawar::Loaded NODE");
         NetworkInterface<InetAddress> iface = svc.getNetInterface();
-
+        LOG.debug(this+"::syawar::Loaded iface ipaddress to be::"+iface.toString());
         PollStatus status = PollStatus.unavailable();
         InetAddress ipaddr = iface.getAddress();
 
@@ -168,13 +181,73 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         String oid = ParameterMap.getKeyedString(parameters, "oid", DEFAULT_OBJECT_IDENTIFIER);
         String operator = ParameterMap.getKeyedString(parameters, "operator", null);
         String operand = ParameterMap.getKeyedString(parameters, "operand", null);
+        //get passive snmp poller stats
+        boolean isPassive = ParameterMap.getKeyedBoolean(parameters, "isPassive", false);
+        String hostList = ParameterMap.getKeyedString(parameters, "hostList", null);
+        
+        // check if asset fields need to be used
+        oid = getStringAsset(oid, onmsNode.getAssetRecord().getSnmpMib() );
+        operator = getStringAsset(operator,onmsNode.getAssetRecord().getSnmpComparator());
+        operand = getStringAsset(operand,onmsNode.getAssetRecord().getCompareValue());
+        hostList = getStringAsset(hostList, onmsNode.getAssetRecord().getHostList());
+      
+        //TODO support mac2oid conversion and mib aggregation
+        boolean mac2oid = ParameterMap.getKeyedBoolean(parameters, "mac2oid", false);
+        boolean aggregation = ParameterMap.getKeyedBoolean(parameters, "aggregation", false);
+      
+       
+        
+        if(isPassive){
+        	LOG.debug(this+"::syawar::is Passive is true");
+            List<String> theHostList;
+            if(hostList != null){
+            	LOG.debug(this+"::syawar::Passive polling hostlist is not empty::");
+            	theHostList=Arrays.asList(hostList.split("\\s*,\\s*"));
+            	for(String host : theHostList){
+            		LOG.debug(this+"::syawar::Passive polling host::"+host);
+            		InetAddress passiveHost = InetAddressUtils.addr(host);
+            		SnmpAgentConfig passiveAgentConfig = SnmpPeerFactory.getInstance().getAgentConfig(passiveHost);
+                    if (passiveAgentConfig == null) {
+                    	
+                    	if (agentConfig == null) throw new RuntimeException("Reverting to local config failed::SnmpAgentConfig object not available for interface " + ipaddr );
+                    	
+                    	status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),agentConfig);
+
+                    }
+                    else{
+                    	status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),passiveAgentConfig);
+                    }  
+                    if(status.isUp()){
+                    	return status;
+                    }
+                    LOG.debug(this+"::syawar::Passive poll on host::"+host+"::result::"+status.toString());
+            	}
+            	return status;
+            }
+            else{
+            	LOG.error(this+"::syawar::Passive poller found no host list::value recieved::"+hostList);
+            	return PollStatus.down();
+            }
+        }
+        else{
+        	LOG.debug(this+"::syawar::doing normal polling::");
+        	status =  doPolling(operator,operand,oid,parameters,status,hostAddress,agentConfig);
+        }
+        
+        LOG.debug(this+"::syawar::SNMP poll result for nodeid::"+svc.getNodeId()+"::result::"+status.toString());
+        return status;
+       
+    }
+    
+    public PollStatus doPolling(String operator, String operand, String oid, Map<String, Object> parameters ,PollStatus status, String hostAddress , SnmpAgentConfig agentConfig){
+    	LOG.debug(this+"::syawar::SNMP dopolling for oid::"+oid+"::operand::"+operand+"::operator::"+operator+"::with address::"+hostAddress);
+    	 //get other config params
         String walkstr = ParameterMap.getKeyedString(parameters, "walk", "false");
         String matchstr = ParameterMap.getKeyedString(parameters, "match-all", "true");
         int countMin = ParameterMap.getKeyedInteger(parameters, "minimum", 0);
         int countMax = ParameterMap.getKeyedInteger(parameters, "maximum", 0);
         String reasonTemplate = ParameterMap.getKeyedString(parameters, "reason-template", DEFAULT_REASON_TEMPLATE);
         String hexstr = ParameterMap.getKeyedString(parameters, "hex", "false");
-
         hex = "true".equalsIgnoreCase(hexstr);
         // set timeout and retries on SNMP peer object
         //
@@ -197,108 +270,109 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         svcParams.setProperty("ipaddr", hostAddress);
         svcParams.setProperty("port", String.valueOf(agentConfig.getPort()));
         svcParams.setProperty("hex", hexstr);
+    	 LOG.debug("poll: service= SNMP address= {}", agentConfig);
 
-        LOG.debug("poll: service= SNMP address= {}", agentConfig);
+         // Establish SNMP session with interface
+         //
+         try {
+             LOG.debug("SnmpMonitor.poll: SnmpAgentConfig address: {}", agentConfig);
+             SnmpObjId snmpObjectId = SnmpObjId.get(oid);
 
-        // Establish SNMP session with interface
-        //
-        try {
-            LOG.debug("SnmpMonitor.poll: SnmpAgentConfig address: {}", agentConfig);
-            SnmpObjId snmpObjectId = SnmpObjId.get(oid);
+             // This if block will count the number of matches within a walk and mark the service
+             // as up if it is between the minimum and maximum number, down if otherwise. Setting
+             // the parameter "matchall" to "count" will act as if "walk" has been set to "true".
+             if ("count".equals(matchstr)) {
+                 if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
+                     reasonTemplate = "Value: ${matchCount} outside of range Min: ${minimum} to Max: ${maximum}";
+                 }
+                 int matchCount = 0;
+                 List<SnmpValue> results = SnmpUtils.getColumns(agentConfig, "snmpPoller", snmpObjectId);
+                 for(SnmpValue result : results) {
 
-            // This if block will count the number of matches within a walk and mark the service
-            // as up if it is between the minimum and maximum number, down if otherwise. Setting
-            // the parameter "matchall" to "count" will act as if "walk" has been set to "true".
-            if ("count".equals(matchstr)) {
-                if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
-                    reasonTemplate = "Value: ${matchCount} outside of range Min: ${minimum} to Max: ${maximum}";
-                }
-                int matchCount = 0;
-                List<SnmpValue> results = SnmpUtils.getColumns(agentConfig, "snmpPoller", snmpObjectId);
-                for(SnmpValue result : results) {
+                     if (result != null) {
+                         LOG.debug("poll: SNMPwalk poll succeeded, addr={} oid={} value={}", hostAddress, oid, result);
+                         if (meetsCriteria(result, operator, operand)) {
+                             matchCount++;
+                         }
+                     }
+                 }
+                 svcParams.setProperty("matchCount", String.valueOf(matchCount));
+                 LOG.debug("poll: SNMPwalk count succeeded, total={} min={} max={}", matchCount, countMin, countMax);
+                 if ((countMin <= matchCount) && (matchCount <= countMax)) {
+                     status = PollStatus.available();
+                 } else {
+                     String reason = PropertiesUtils.substitute(reasonTemplate, svcParams);
+                     LOG.debug(reason);
+                     status = PollStatus.unavailable(reason);
+                     return status;
+                 }
+             } else if ("true".equals(walkstr)) {
+                 if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
+                     reasonTemplate = "SNMP poll failed, addr=${ipaddr} oid=${oid}";
+                 }
+                 List<SnmpValue> results = SnmpUtils.getColumns(agentConfig, "snmpPoller", snmpObjectId);
+                 for(SnmpValue result : results) {
+                     if (result != null) {
+                         svcParams.setProperty("observedValue", getStringValue(result));
+                         LOG.debug("poll: SNMPwalk poll succeeded, addr={} oid={} value={}", hostAddress, oid, result);
+                         if (meetsCriteria(result, operator, operand)) {
+                             status = PollStatus.available();
+                             if ("false".equals(matchstr)) {
+                                 return status;
+                             }
+                         } else if ("true".equals(matchstr)) {
+                             String reason = PropertiesUtils.substitute(reasonTemplate, svcParams);
+                             LOG.debug(reason);
+                             status = PollStatus.unavailable(reason);
+                             return status;
+                         }
+                     }
+                 }
 
-                    if (result != null) {
-                        LOG.debug("poll: SNMPwalk poll succeeded, addr={} oid={} value={}", hostAddress, oid, result);
-                        if (meetsCriteria(result, operator, operand)) {
-                            matchCount++;
-                        }
-                    }
-                }
-                svcParams.setProperty("matchCount", String.valueOf(matchCount));
-                LOG.debug("poll: SNMPwalk count succeeded, total={} min={} max={}", matchCount, countMin, countMax);
-                if ((countMin <= matchCount) && (matchCount <= countMax)) {
-                    status = PollStatus.available();
-                } else {
-                    String reason = PropertiesUtils.substitute(reasonTemplate, svcParams);
-                    LOG.debug(reason);
-                    status = PollStatus.unavailable(reason);
-                    return status;
-                }
-            } else if ("true".equals(walkstr)) {
-                if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
-                    reasonTemplate = "SNMP poll failed, addr=${ipaddr} oid=${oid}";
-                }
-                List<SnmpValue> results = SnmpUtils.getColumns(agentConfig, "snmpPoller", snmpObjectId);
-                for(SnmpValue result : results) {
-                    if (result != null) {
-                        svcParams.setProperty("observedValue", getStringValue(result));
-                        LOG.debug("poll: SNMPwalk poll succeeded, addr={} oid={} value={}", hostAddress, oid, result);
-                        if (meetsCriteria(result, operator, operand)) {
-                            status = PollStatus.available();
-                            if ("false".equals(matchstr)) {
-                                return status;
-                            }
-                        } else if ("true".equals(matchstr)) {
-                            String reason = PropertiesUtils.substitute(reasonTemplate, svcParams);
-                            LOG.debug(reason);
-                            status = PollStatus.unavailable(reason);
-                            return status;
-                        }
-                    }
-                }
+             } else {
+                 if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
+                     if (operator != null) {
+                         reasonTemplate = "Observed value '${observedValue}' does not meet criteria '${operator} ${operand}'";
+                     } else {
+                         reasonTemplate = "Observed value '${observedValue}' was null";
+                     }
+                 }
 
-            } else {
-                if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
-                    if (operator != null) {
-                        reasonTemplate = "Observed value '${observedValue}' does not meet criteria '${operator} ${operand}'";
-                    } else {
-                        reasonTemplate = "Observed value '${observedValue}' was null";
-                    }
-                }
+                 SnmpValue result = SnmpUtils.get(agentConfig, snmpObjectId);
 
-                SnmpValue result = SnmpUtils.get(agentConfig, snmpObjectId);
+                 if (result != null) {
+                     svcParams.setProperty("observedValue", getStringValue(result));
+                     LOG.debug("poll: SNMP poll succeeded, addr={} oid={} value={}", hostAddress, oid, result);
+                     
+                     if (meetsCriteria(result, operator, operand)) {
+                         status = PollStatus.available();
+                     } else {
+                         status = PollStatus.unavailable(PropertiesUtils.substitute(reasonTemplate, svcParams));
+                     }
+                 } else {
+                     String reason = "SNMP poll failed, addr=" + hostAddress + " oid=" + oid;
+                     LOG.debug(reason);
+                     status = PollStatus.unavailable(reason);
+                 }
+             }
 
-                if (result != null) {
-                    svcParams.setProperty("observedValue", getStringValue(result));
-                    LOG.debug("poll: SNMP poll succeeded, addr={} oid={} value={}", hostAddress, oid, result);
-                    
-                    if (meetsCriteria(result, operator, operand)) {
-                        status = PollStatus.available();
-                    } else {
-                        status = PollStatus.unavailable(PropertiesUtils.substitute(reasonTemplate, svcParams));
-                    }
-                } else {
-                    String reason = "SNMP poll failed, addr=" + hostAddress + " oid=" + oid;
-                    LOG.debug(reason);
-                    status = PollStatus.unavailable(reason);
-                }
-            }
+         } catch (NumberFormatException e) {
+             String reason = "Number operator used on a non-number " + e.getMessage();
+             LOG.debug(reason);
+             status = PollStatus.unavailable(reason);
+         } catch (IllegalArgumentException e) {
+             String reason = "Invalid SNMP Criteria: " + e.getMessage();
+             LOG.debug(reason);
+             status = PollStatus.unavailable(reason);
+         } catch (Throwable t) {
+             String reason = "Unexpected exception during SNMP poll of interface " + hostAddress;
+             LOG.debug(reason, t);
+             status = PollStatus.unavailable(reason);
+         }
 
-        } catch (NumberFormatException e) {
-            String reason = "Number operator used on a non-number " + e.getMessage();
-            LOG.debug(reason);
-            status = PollStatus.unavailable(reason);
-        } catch (IllegalArgumentException e) {
-            String reason = "Invalid SNMP Criteria: " + e.getMessage();
-            LOG.debug(reason);
-            status = PollStatus.unavailable(reason);
-        } catch (Throwable t) {
-            String reason = "Unexpected exception during SNMP poll of interface " + hostAddress;
-            LOG.debug(reason, t);
-            status = PollStatus.unavailable(reason);
-        }
-
-        return status;
+         return status;
+    			
     }
+   
 
 }

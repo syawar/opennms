@@ -46,7 +46,8 @@ import org.slf4j.LoggerFactory;
  */
 abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
     
-    
+	protected static final String ASSET_PATTERN="USE_ASSET";
+	
     private static final Logger LOG = LoggerFactory.getLogger(SnmpMonitorStrategy.class);
 
     /**
@@ -173,6 +174,62 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * check to see if the string is to be taken from the assets
+     * @param theValue
+     * @return true if config matches asset pattern
+     */
+    private boolean checkAssetMatch(String theValue){
+    	if (theValue == null){
+    		return false;
+    	}
+    	if(theValue.equalsIgnoreCase(ASSET_PATTERN)){
+    		LOG.debug("Using Asset for value...");
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
+    	
+    }
+    
+    /**
+     * check and assign asset value
+     * @param currentValue the value from the config
+     * @param assetValue the value from the assets
+     * @return the resolved value
+     */
+    public String getStringAsset(String currentValue, String assetValue){
+    	LOG.debug("Checking asset value...");
+    	if(checkAssetMatch(currentValue) && !"".equals(currentValue) && !currentValue.isEmpty()){
+    		currentValue = assetValue.trim();
+    		return assetValue;
+    	}
+    	return currentValue;
+    }
+    
+    //TODO mac2oid and additive mib
+    /**
+     * convert given hex mac address to mib oid
+     * @param macAddress hex mac address
+     * @return a {java.lang.String} object
+     */
+    public String convertMacToOid(String macAddress){
+    	String oid = "";
+    	if(macAddress != null && !"".equals(macAddress) && !macAddress.isEmpty()){
+    		LOG.debug("Converting macAddress::"+macAddress+"to OID");
+    		for(String hex: macAddress.split(":")){
+    			int dec = Integer.parseInt(hex,16);
+    			oid = oid +"."+ Integer.toString(dec);
+    		}
+    	}else{
+    		LOG.debug("No Mac Address provided for conversion to oid...");
+    	}
+    	
+    	
+    	return oid;
     }
 
 }

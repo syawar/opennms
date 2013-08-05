@@ -2071,6 +2071,16 @@ public class OnmsAssetRecord implements Serializable {
             }
         }
     }
+    /**
+     * 
+     * @param assetName
+     * @return the asset record by name
+     */
+    
+    public Object getAssetRecord(String assetName){
+    	BeanWrapper currentBean = PropertyAccessorFactory.forBeanPropertyAccess(this);
+    	return currentBean.getPropertyValue(assetName);
+    }
 
 	
 }
