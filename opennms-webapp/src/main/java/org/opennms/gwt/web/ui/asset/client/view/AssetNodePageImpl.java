@@ -245,6 +245,21 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 
 	@UiField
 	Label lastModified;
+	
+	@UiField
+	FieldSetSuggestBox sSnmpMib;
+
+	@UiField
+	FieldSetSuggestBox sMacAddress;
+
+	@UiField
+	FieldSetSuggestBox sSnmpComparator;
+
+	@UiField
+	FieldSetSuggestBox sCompareValue;
+
+	@UiField
+	FieldSetTextArea sHostList;
 
 	private ArrayList<FieldSet> fieldSetList = new ArrayList<FieldSet>();
 
@@ -285,7 +300,7 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 		saveDataAuthentication();
 		saveDataHardware();
 		saveDataComments();
-
+		saveDataPassiveSnmp();
 		return m_asset;
 	}
 
@@ -374,6 +389,12 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 		fieldSetList.add(sHdd6);
 
 		fieldSetList.add(sComment);
+		
+		fieldSetList.add(sSnmpMib);
+		fieldSetList.add(sMacAddress);
+		fieldSetList.add(sSnmpComparator);
+		fieldSetList.add(sCompareValue);
+		fieldSetList.add(sHostList);
 	}
 
 	@Override
@@ -398,6 +419,14 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 	private void saveDataComments() {
 		m_asset.setComment(sComment.getValue());
 	}
+	
+	private void saveDataPassiveSnmp(){
+		m_asset.setHostList(sHostList.getValue());
+		m_asset.setSnmpMib(sSnmpMib.getValue());
+		m_asset.setSnmpComparator(sSnmpComparator.getValue());
+		m_asset.setCompareValue(sCompareValue.getValue());
+		m_asset.setMacAddress(sMacAddress.getValue());
+	 }
 
 	private void saveDataConfigCategories() {
 		m_asset.setDisplayCategory(sDisplayCat.getValue());
@@ -480,10 +509,18 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 		setDataAuthentication(m_asset);
 		setDataHardware(m_asset);
 		setDataComments(m_asset);
+		setDataPassiveSnmp(m_asset);
 		DateTimeFormat m_formater = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM);
 		lastModified.setText(con.lastModified() + " " + m_formater.format(asset.getLastModifiedDate()) + " | "
 				+ asset.getLastModifiedBy());
 	}
+	private void setDataPassiveSnmp(AssetCommand asset){
+		sSnmpMib.setValue(asset.getSnmpMib());
+		sSnmpComparator.setValue(asset.getSnmpComparator());
+		sMacAddress.setValue(asset.getMacAddress());
+		sCompareValue.setValue(asset.getCompareValue());
+		sHostList.setValue(asset.getHostList());
+		}
 
 	private void setDataAuthentication(AssetCommand asset) {
 		sUserName.setValue(asset.getUsername());
@@ -575,6 +612,15 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 		setDataSuggVendor(assetSugg);
 		setDataSuggAuth(assetSugg);
 		setDataSuggHardware(assetSugg);
+		setDataSuggPassiveSnmp(assetSugg);
+	}
+	
+	private void setDataSuggPassiveSnmp(AssetSuggCommand assetSugg){
+		sSnmpMib.setSuggestions(assetSugg.getSnmpMib());
+		sMacAddress.setSuggestions(assetSugg.getMacAddress());
+		sSnmpComparator.setSuggestions(assetSugg.getSnmpComparator());
+		sCompareValue.setSuggestions(assetSugg.getCompareValue());
+		//sHostList.setSuggestions(assetSugg.getHostList());   
 	}
 
 	private void setDataSuggAuth(AssetSuggCommand assetSugg) {

@@ -178,6 +178,12 @@ public class AssetRecordDaoHibernate extends AbstractDaoHibernate<OnmsAssetRecor
 		projList.add(Projections.alias(Projections.property("vendorPhone"),
 				"vendorPhone"));
 		projList.add(Projections.alias(Projections.property("zip"), "zip"));
+		
+		projList.add(Projections.alias(Projections.property("hostList"), "hostList"));
+		projList.add(Projections.alias(Projections.property("snmpMib"), "snmpMib"));
+		projList.add(Projections.alias(Projections.property("snmpComparator"), "snmpComparator"));
+		projList.add(Projections.alias(Projections.property("compareValue"), "compareValue"));
+		projList.add(Projections.alias(Projections.property("macAddress"), "macAddress"));
 
 		criteria.setProjection(Projections.distinct(projList));
 		criteria.setResultTransformer(Transformers

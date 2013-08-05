@@ -262,6 +262,13 @@ public class AssetServiceImpl extends RemoteServiceServlet implements
 			suggestion.addVendorFax(asset.getVendorFax());
 			suggestion.addVendorPhone(asset.getVendorPhone());
 			suggestion.addZip(asset.getZip());
+			
+			//passive snmp poller assets
+            suggestion.AddSnmpMib(asset.getSnmpMib());
+            suggestion.AddSnmpComparator(asset.getSnmpComparator());
+            suggestion.AddHostList(asset.getHostList());
+            suggestion.AddMacAddress(asset.getMacAddress());
+            suggestion.AddCompareValue(asset.getCompareValue());
 		}
 		return suggestion;
 	}

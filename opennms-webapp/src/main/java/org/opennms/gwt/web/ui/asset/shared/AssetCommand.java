@@ -185,6 +185,16 @@ public class AssetCommand implements IsSerializable {
 	private String m_vendorPhone;
 
 	private String m_zip;
+	
+	private String m_hostList;
+	
+	private String m_snmpMib;
+	
+	private String m_snmpComparator;
+	
+	private String m_compareValue;
+	
+	private String m_macAddress;
 
 	public AssetCommand() {
 		m_autoenableOptions = new ArrayList<String>();
@@ -483,6 +493,42 @@ public class AssetCommand implements IsSerializable {
 	public String getZip() {
 		return m_zip;
 	}
+	
+	 
+	  /**
+	 * @return the m_hostList
+	 */
+	public String getHostList() {
+	  return m_hostList;
+	}
+
+	/**
+	 * @return the m_snmpMib
+	 */
+	public String getSnmpMib() {
+	  return m_snmpMib;
+	}
+
+	/**
+	 * @return the m_snmpComparator
+	 */
+	public String getSnmpComparator() {
+	  return m_snmpComparator;
+	}
+
+	/**
+	 * @return the m_compareValue
+	 */
+	public String getCompareValue() {
+	  return m_compareValue;
+	}
+
+	/**
+	 * @return the m_macAddress
+	 */
+	public String getMacAddress() {
+	  return m_macAddress;
+	}
 
 	public void setAdditionalhardware(String additionalhardware) {
 		m_additionalhardware = additionalhardware;
@@ -775,6 +821,42 @@ public class AssetCommand implements IsSerializable {
 	public void setZip(String zip) {
 		m_zip = zip;
 	}
+	
+
+	/**
+	 * @param m_macAddress the m_macAddress to set
+	 */
+	public void setMacAddress(String m_macAddress) {
+	  this.m_macAddress = m_macAddress;
+	}
+	
+	/**
+	 * @param m_hostList the m_hostList to set
+	 */
+	public void setHostList(String m_hostList) {
+	  this.m_hostList = m_hostList;
+	}
+	
+	/**
+	 * @param m_compareValue the m_compareValue to set
+	 */
+	public void setCompareValue(String m_compareValue) {
+	  this.m_compareValue = m_compareValue;
+	}
+
+	/**
+	 * @param m_snmpComparator the m_snmpComparator to set
+	 */
+	public void setSnmpComparator(String m_snmpComparator) {
+	  this.m_snmpComparator = m_snmpComparator;
+	}
+	
+	/**
+	 * @param m_snmpMib the m_snmpMib to set
+	 */
+	public void setSnmpMib(String m_snmpMib) {
+	  this.m_snmpMib = m_snmpMib;
+	}
 
 	@Override
 	public String toString() {
@@ -804,6 +886,7 @@ public class AssetCommand implements IsSerializable {
 				+ ", m_state=" + m_state + ", m_storagectrl=" + m_storagectrl + ", m_supportPhone=" + m_supportPhone
 				+ ", m_thresholdCategory=" + m_thresholdCategory + ", m_username=" + m_username + ", m_vendor="
 				+ m_vendor + ", m_vendorAssetNumber=" + m_vendorAssetNumber + ", m_vendorFax=" + m_vendorFax
-				+ ", m_vendorPhone=" + m_vendorPhone + ", m_zip=" + m_zip + "]";
+				+ ", m_vendorPhone=" + m_vendorPhone + ", m_zip=" + m_zip + ",m_snmpMib="+ m_snmpMib+",m_macAddress="+m_macAddress
+				+",m_snmpComparator="+m_snmpComparator+",m_compareValue="+m_compareValue+",m_hostList="+m_hostList+"]";
 	}
 }

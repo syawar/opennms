@@ -128,6 +128,32 @@ public class AssetSuggCommand implements IsSerializable {
 
 	private Set<String> m_zip;
 
+	/**
+	 *  the Snmp mib
+	 */
+	private Set<String> m_snmpMib;
+	
+	/**
+	 * the Mac Address for this node
+	 */
+	private Set<String> m_macAddress;
+	
+	/**
+	 *  the comparator for snmp
+	 */
+	private Set<String> m_snmpComparator;
+
+	/**
+	 * the value to compare for passive snmp
+	 */
+	private Set<String> m_compareValue;
+	
+
+	/**
+	 * the host list for passive snmp polling
+	 */
+	private Set<String> m_hostList;
+	
 	public AssetSuggCommand() {
 		m_additionalhardware = new TreeSet<String>();
 		m_address1 = new TreeSet<String>();
@@ -171,7 +197,41 @@ public class AssetSuggCommand implements IsSerializable {
 		m_vendorFax = new TreeSet<String>();
 		m_vendorPhone = new TreeSet<String>();
 		m_zip = new TreeSet<String>();
+		m_snmpMib = new TreeSet<String>();
+		m_macAddress = new TreeSet<String>();
+		m_snmpComparator = new TreeSet<String>();
+		m_compareValue = new TreeSet<String>();
+		m_hostList = new TreeSet<String>();
 		initUnchangedEntry();
+	}
+	 public void AddHostList(String hostList){
+		 if((hostList != null) && !"".equals(hostList)){
+		   m_hostList.add(hostList);
+		 }
+	}
+	
+	public void AddCompareValue(String compareValue){
+		 if((compareValue != null) && !"".equals(compareValue)){
+		   m_compareValue.add(compareValue);
+		 }
+	}
+	
+	public void AddSnmpComparator(String snmpComparator){
+		 if((snmpComparator != null) && !"".equals(snmpComparator)){
+		   m_snmpComparator.add(snmpComparator);
+		 }
+	}
+	
+	public void AddMacAddress(String macAddress){
+		 if((macAddress != null) && !"".equals(macAddress)){
+		   m_macAddress.add(macAddress);
+		 }
+	}
+
+	public void AddSnmpMib(String snmpMib) {
+		 if (( snmpMib != null) && !"".equals(snmpMib)) {
+		   m_snmpMib.add(snmpMib);
+		 }
 	}
 
 	public void addAdditionalhardware(String additionalhardware) {
@@ -593,6 +653,27 @@ public class AssetSuggCommand implements IsSerializable {
 	public Collection<String> getZip() {
 		return m_zip;
 	}
+	
+
+	public Collection<String> getSnmpMib() {
+    return m_snmpMib;
+  }
+  
+  public Collection<String> getMacAddress(){
+    return m_macAddress;
+  }
+  
+  public Collection<String> getSnmpComparator(){
+    return m_snmpComparator;
+  }
+  
+  public Collection<String> getCompareValue(){
+    return m_compareValue;
+  }
+  
+  public Collection<String> getHostList(){
+    return m_hostList;
+  }
 
 	private void initUnchangedEntry() {
 		m_additionalhardware.add("");
@@ -637,5 +718,10 @@ public class AssetSuggCommand implements IsSerializable {
 		m_vendorFax.add("");
 		m_vendorPhone.add("");
 		m_zip.add("");
+		m_snmpMib.add("");
+		m_macAddress.add("");
+		m_snmpComparator.add("");
+		m_compareValue.add("");
+		m_hostList.add("");
 	}
 }
