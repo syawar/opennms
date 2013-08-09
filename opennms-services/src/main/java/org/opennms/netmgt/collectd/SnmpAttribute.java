@@ -172,8 +172,8 @@ public class SnmpAttribute extends AbstractCollectionAttribute {
      * @return a {@link java.lang.String} object.
      */
     public String getNumericValue() {
-        if (getValue() == null) {
-            log().debug("No data collected for attribute "+this+". Skipping");
+    	if (getValue() == null) {
+            log().debug("No data collected for attribute {}. Skipping" + this);
             return null;
         } else if (getValue().isNumeric()) {
             return Long.toString(getValue().toLong());
@@ -183,9 +183,16 @@ public class SnmpAttribute extends AbstractCollectionAttribute {
             try {
                 return Double.valueOf(getValue().toString()).toString();
             } catch(NumberFormatException e) {
-                log().trace("Unable to process data received for attribute " + this + " maybe this is not a number? See bug 1473 for more information. Skipping.");
-                return null;
-            }
+                log().trace("Unable to process data received for attribute {} maybe this is not a number? See bug 1473 for more information. Skipping."+this);
+		if (getValue().getType() == SnmpValue.SNMP_OCTET_STRING) {
+		    try {
+			return Long.valueOf(getValue().toHexString(), 16).toString();
+		    } catch(NumberFormatException ex) {
+			log().trace("Unable to process data received for attribute {} maybe this is not a number? See bug 1473 for more information. Skipping."+this);
+		    }
+		}
+	    }
+            return null;
         }
     }
     

@@ -129,6 +129,7 @@ public class SnmpUtils {
         });
         walker.start();
         walker.waitFor();
+        LogUtils.infof(SnmpUtils.class,"Walker::syawar::walk results::"+results.size());
         return results;
     }
     

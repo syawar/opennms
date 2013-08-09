@@ -196,8 +196,14 @@ public class ModifyAssetServlet extends HttpServlet {
         asset.setAdmin(getRequestParameter(request, "admin"));
         asset.setSnmpcommunity(getRequestParameter(request, "snmpcommunity"));
         asset.setRackunitheight(getRequestParameter(request, "rackunitheight"));
-
+        asset.setHostList(getRequestParameter(request,"hostList"));
+        asset.setMacAddress(getRequestParameter(request,"macAddress"));
+        asset.setSnmpMib(getRequestParameter(request,"snmpMib"));
+        asset.setSnmpComparator(getRequestParameter(request,"snmpComparator"));
+        asset.setCompareValue(getRequestParameter(request,"compareValue"));
+        
         asset.setUserLastModified(request.getRemoteUser());
+       
         asset.setLastModifiedDate(new Date());
 
         return (asset);

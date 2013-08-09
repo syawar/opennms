@@ -43,7 +43,13 @@ import org.opennms.netmgt.snmp.SnmpValue;
  * @version $Id: $
  */
 abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
-
+	
+	/**
+	 * This pattern to use assets.Token replaced when polling.
+	 * 
+	 * @see #checkAssetMatch(String)
+	 */
+	protected static final String ASSET_PATTERN="USE_ASSET";
     /**
      * Constant for less-than operand
      */
@@ -73,8 +79,10 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
     
 
     public String getStringValue(SnmpValue result) {
-    	if (hex)
+    	if (hex){
+    		log().debug(this+"::syawar::The result is hex...converting to string::"+result.toHexString());
     		return result.toHexString();
+    	}
     	return result.toString();
     }
     /**
@@ -89,13 +97,14 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
     public boolean meetsCriteria(SnmpValue result, String operator, String operand) {
 
         Boolean retVal = null;
+        log().debug(this+"::syawar::the result::"+getStringValue(result)+"::comparator::"+operator+"::operand::"+operand);
         
         retVal = isCriteriaNull(result, operator, operand);
-        
+        log().debug(this+"::syawar::is criteria null::"+retVal);
         if (retVal == null) {
         	String value = getStringValue(result);
             retVal = checkStringCriteria(operator, operand, value);
-            
+            log().debug(this+"::syawar::the retval::"+retVal);
             if (retVal == null) {
                 
                 BigInteger val = BigInteger.valueOf(result.toLong());
@@ -110,13 +119,14 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
                 } else if (GREATER_THAN_EQUALS.equals(operator)) {
                     return val.compareTo(intOperand) >= 0;
                 } else {
+                	log().debug(this+"::syawar::illegal argument exception");
                     throw new IllegalArgumentException("operator " + operator + " is unknown");
                 }
             }
         } else if (retVal.booleanValue()) {
             return true;
         }
-        
+        log().debug(this+"::syawar::final::"+retVal);
         return retVal.booleanValue();
     }
 
@@ -167,6 +177,75 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * check to see if the string is to be taken from the assets
+     * @param theValue
+     * @return true if config matches asset pattern
+     */
+    private boolean checkAssetMatch(String theValue){
+    	if (theValue == null){
+    		log().debug(this+"::asset value null...");
+    		return false;
+    	}
+    	if(theValue.equalsIgnoreCase(ASSET_PATTERN)){
+    		log().debug(this+"::Using Asset for value...");
+    		return true;
+    	}
+    	else{
+    		return false;
+    	}
+    	
+    }
+    
+    /**
+     * check and assign asset value
+     * @param currentValue the value from the config
+     * @param assetValue the value from the assets
+     * @return the resolved value
+     */
+    public String getStringAsset(String currentValue, String assetValue){
+    	log().debug(this+"::Checking asset value...");
+    	if(currentValue != null && assetValue !=null){
+    		if(checkAssetMatch(currentValue) && !"".equals(assetValue) && !assetValue.isEmpty()){
+        		currentValue = assetValue.trim();
+        		log().debug(this+"::asset value::"+currentValue+"::");
+        		return assetValue;
+        	}
+    	}
+    	else{
+    		//if asset field not declared
+    		if(currentValue != null && checkAssetMatch(currentValue)){
+    			log().debug(this+"::Asset value not defined...will result in improper monitoring");
+    			currentValue = null;
+    		}
+    	}
+    	
+    	log().debug(this+"::asset value::"+currentValue);
+    	return currentValue;
+    }
+    
+    
+    /**
+     * convert given hex mac address to mib oid
+     * @param macAddress hex mac address
+     * @return a {java.lang.String} object
+     */
+    public String convertMacToOid(String macAddress){
+    	String oid = "";
+    	if(macAddress != null && !"".equals(macAddress) && !macAddress.isEmpty()){
+    		log().debug("Converting macAddress::"+macAddress+"to OID");
+    		for(String hex: macAddress.split(":")){
+    			int dec = Integer.parseInt(hex,16);
+    			oid = oid +"."+ Integer.toString(dec);
+    		}
+    	}else{
+    		log().debug(this+"::No Mac Address provided for conversion to oid...");
+    	}
+    	
+    	
+    	return oid;
     }
 
 }

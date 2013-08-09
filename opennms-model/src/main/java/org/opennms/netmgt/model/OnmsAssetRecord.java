@@ -302,7 +302,7 @@ public class OnmsAssetRecord implements Serializable {
         * Get the SNMP passive monitor host list
       * @return a {@link java.lang.String} object
       */
-       @Column(name = "hostList", length = 1023)
+       @Column(name = "hostList", length = 1024)
      public String getHostList() {
        return m_hostList;
      }

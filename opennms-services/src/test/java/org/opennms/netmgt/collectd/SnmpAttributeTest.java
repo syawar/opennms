@@ -153,6 +153,12 @@ public class SnmpAttributeTest extends TestCase {
         
         persister.commitBuilder();
     }
+    
+    public void testNumericAttributeHexStringValueInString() throws Exception {
+    	String stringValue = "769";
+    	byte[] bytes = new byte[] { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x01 };
+    	testPersisting(stringValue, new Snmp4JValueFactory().getOctetString(bytes));
+     }
 
     @SuppressWarnings("unchecked")
     private <T> List<T> isAList(Class<T> clazz) {

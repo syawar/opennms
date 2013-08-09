@@ -203,8 +203,114 @@ public class Asset extends Object {
     protected String snmpcommunity ="";
 
     protected String rackunitheight ="";
+    
+    protected String hostList ="";
+    
+    protected String snmpComparator="";
+    
+    protected String compareValue="";
+    
+    protected String snmpMib="";
+    
+    protected String macAddress="";
+    
 
     /**
+	 * @return the hostList
+	 */
+	public String getHostList() {
+		return hostList;
+	}
+
+	/**
+	 * @param hostList the hostList to set
+	 */
+	public void setHostList(String hostList) {
+		if ( hostList != null) {
+			this.hostList = hostList;
+        } else {
+            this.hostList = "";
+        }    
+		
+	}
+
+	/**
+	 * @return the snmpComparator
+	 */
+	public String getSnmpComparator() {
+		return snmpComparator;
+	}
+
+	/**
+	 * @param snmpComparator the snmpComparator to set
+	 */
+	public void setSnmpComparator(String snmpComparator) {
+		if ( snmpComparator != null) {
+			this.snmpComparator = snmpComparator;
+        } else {
+            this.snmpComparator = "";
+        }
+		
+	}
+
+	/**
+	 * @return the compareValue
+	 */
+	public String getCompareValue() {
+		return compareValue;
+	}
+
+	/**
+	 * @param compareValue the compareValue to set
+	 */
+	public void setCompareValue(String compareValue) {
+		if ( compareValue != null) {
+			this.compareValue = compareValue;
+        } else {
+            this.compareValue = "";
+        }
+		
+	}
+
+	/**
+	 * @return the snmpMib
+	 */
+	public String getSnmpMib() {
+		return snmpMib;
+	}
+
+	/**
+	 * @param snmpMib the snmpMib to set
+	 */
+	public void setSnmpMib(String snmpMib) {
+		if ( snmpMib != null) {
+			this.snmpMib = snmpMib;
+        } else {
+            this.snmpMib = "";
+        }
+		
+	}
+
+	/**
+	 * @return the macAddress
+	 */
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	/**
+	 * @param macAddress the macAddress to set
+	 */
+	public void setMacAddress(String macAddress) {
+		if ( macAddress != null) {
+			this.macAddress = macAddress;
+        } else {
+            this.macAddress = "";
+        }
+		
+	}
+
+	/**
      * <p>Getter for the field <code>rackunitheight</code>.</p>
      *
      * @return a {@link java.lang.String} object.

@@ -119,7 +119,7 @@ public class AssetModel {
             Connection conn = Vault.getDbConnection();
             d.watch(conn);
 
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO ASSETS (nodeID,category,manufacturer,vendor,modelNumber,serialNumber,description,circuitId,assetNumber,operatingSystem,rack,slot,port,region,division,department,address1,address2,city,state,zip,building,floor,room,vendorPhone,vendorFax,userLastModified,lastModifiedDate,dateInstalled,lease,leaseExpires,supportPhone,maintContract,vendorAssetNumber,maintContractExpires,displayCategory,notifyCategory,pollerCategory,thresholdCategory,comment,username,password,enable,connection,autoenable,cpu,ram,storagectrl,hdd1,hdd2,hdd3,hdd4,hdd5,hdd6,numpowersupplies,inputpower,additionalhardware,admin,snmpcommunity,rackunitheight) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO ASSETS (nodeID,category,manufacturer,vendor,modelNumber,serialNumber,description,circuitId,assetNumber,operatingSystem,rack,slot,port,region,division,department,address1,address2,city,state,zip,building,floor,room,vendorPhone,vendorFax,userLastModified,lastModifiedDate,dateInstalled,lease,leaseExpires,supportPhone,maintContract,vendorAssetNumber,maintContractExpires,displayCategory,notifyCategory,pollerCategory,thresholdCategory,comment,username,password,enable,connection,autoenable,cpu,ram,storagectrl,hdd1,hdd2,hdd3,hdd4,hdd5,hdd6,numpowersupplies,inputpower,additionalhardware,admin,snmpcommunity,rackunitheight,hostList,macAddress,snmpMib,snmpComparator,compareValue) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             d.watch(stmt);
             stmt.setInt(1, asset.nodeId);
             stmt.setString(2, asset.category);
@@ -181,7 +181,11 @@ public class AssetModel {
             stmt.setString(58, asset.admin);
             stmt.setString(59, asset.snmpcommunity);
             stmt.setString(60, asset.rackunitheight);
-
+            stmt.setString(61, asset.hostList);
+            stmt.setString(62, asset.macAddress);
+            stmt.setString(63, asset.snmpMib);
+            stmt.setString(64, asset.snmpComparator);
+            stmt.setString(65, asset.compareValue);
             stmt.execute();
         } finally {
             d.cleanUp();
@@ -202,7 +206,7 @@ public class AssetModel {
             Connection conn = Vault.getDbConnection();
             d.watch(conn);
 
-            PreparedStatement stmt = conn.prepareStatement("UPDATE ASSETS SET category=?,manufacturer=?,vendor=?,modelNumber=?,serialNumber=?,description=?,circuitId=?,assetNumber=?,operatingSystem=?,rack=?,slot=?,port=?,region=?,division=?,department=?,address1=?,address2=?,city=?,state=?,zip=?,building=?,floor=?,room=?,vendorPhone=?,vendorFax=?,userLastModified=?,lastModifiedDate=?,dateInstalled=?,lease=?,leaseExpires=?,supportPhone=?,maintContract=?,vendorAssetNumber=?,maintContractExpires=?,displayCategory=?,notifyCategory=?,pollerCategory=?,thresholdCategory=?,comment=?, username=?, password=?,enable=?,connection=?,autoenable=?,cpu=?,ram=?,storagectrl=?,hdd1=?,hdd2=?,hdd3=?,hdd4=?,hdd5=?,hdd6=?,numpowersupplies=?,inputpower=?,additionalhardware=?,admin=?,snmpcommunity=?,rackunitheight=? WHERE nodeid=?");
+            PreparedStatement stmt = conn.prepareStatement("UPDATE ASSETS SET category=?,manufacturer=?,vendor=?,modelNumber=?,serialNumber=?,description=?,circuitId=?,assetNumber=?,operatingSystem=?,rack=?,slot=?,port=?,region=?,division=?,department=?,address1=?,address2=?,city=?,state=?,zip=?,building=?,floor=?,room=?,vendorPhone=?,vendorFax=?,userLastModified=?,lastModifiedDate=?,dateInstalled=?,lease=?,leaseExpires=?,supportPhone=?,maintContract=?,vendorAssetNumber=?,maintContractExpires=?,displayCategory=?,notifyCategory=?,pollerCategory=?,thresholdCategory=?,comment=?, username=?, password=?,enable=?,connection=?,autoenable=?,cpu=?,ram=?,storagectrl=?,hdd1=?,hdd2=?,hdd3=?,hdd4=?,hdd5=?,hdd6=?,numpowersupplies=?,inputpower=?,additionalhardware=?,admin=?,snmpcommunity=?,rackunitheight=?,hostList=?,macAddress=?,snmpMib=?,snmpComparator=?,compareValue=? WHERE nodeid=?");
             d.watch(stmt);
             stmt.setString(1, asset.category);
             stmt.setString(2, asset.manufacturer);
@@ -263,6 +267,11 @@ public class AssetModel {
             stmt.setString(57, asset.admin);
             stmt.setString(58, asset.snmpcommunity);
             stmt.setString(59, asset.rackunitheight);
+            stmt.setString(61, asset.hostList);
+            stmt.setString(62, asset.macAddress);
+            stmt.setString(63, asset.snmpMib);
+            stmt.setString(64, asset.snmpComparator);
+            stmt.setString(65, asset.compareValue);
             stmt.setInt(60, asset.nodeId);
 
             stmt.execute();
@@ -339,7 +348,8 @@ public class AssetModel {
         try {
             Connection conn = Vault.getDbConnection();
             d.watch(conn);
-            PreparedStatement stmt = conn.prepareStatement("select nodeid, nodelabel from node where nodeid in (select nodeid from assets where coalesce(manufacturer,'') != '' or coalesce(vendor,'') != '' or coalesce(modelNumber,'') != '' or coalesce(serialNumber,'') != '' or coalesce(description,'') != '' or coalesce(circuitId,'') != '' or coalesce(assetNumber,'') != '' or coalesce(operatingSystem,'') != '' or coalesce(rack,'') != '' or coalesce(slot,'') != '' or coalesce(port,'') != '' or coalesce(region,'') != '' or coalesce(division,'') != '' or coalesce(department,'') != '' or coalesce(address1,'') != '' or coalesce(address2,'') != '' or coalesce(city,'') != '' or coalesce(state,'') != '' or coalesce(zip,'') != '' or coalesce(building,'') != '' or coalesce(floor,'') != '' or coalesce(room,'') != '' or coalesce(vendorPhone,'') != '' or coalesce(vendorFax,'') != '' or coalesce(dateInstalled,'') != '' or coalesce(lease,'') != '' or coalesce(leaseExpires,'') != '' or coalesce(supportPhone,'') != '' or coalesce(maintContract,'') != '' or coalesce(vendorAssetNumber,'') != '' or coalesce(maintContractExpires,'') != '' or coalesce(displayCategory,'') != '' or coalesce(notifyCategory,'') != '' or coalesce(pollerCategory,'') != '' or coalesce(thresholdCategory,'') != '' or coalesce(comment,'') != '' or coalesce(username,'') != '' or coalesce(password,'') != '' or coalesce(enable,'') != '' or coalesce(connection,'') != '' or coalesce(autoenable,'') != '' or coalesce(cpu,'') != '' or coalesce(ram,'') != '' or coalesce(storagectrl,'') != '' or coalesce(hdd1,'') != '' or coalesce(hdd2,'') != '' or coalesce(hdd3,'') != '' or coalesce(hdd4,'') != '' or coalesce(hdd5,'') != '' or coalesce(hdd6,'') != '' or coalesce(numpowersupplies,'') != '' or coalesce(inputpower,'') != '' or coalesce(additionalhardware,'') != '' or coalesce(admin,'') != '' or coalesce(snmpcommunity,'') != '' or coalesce(rackunitheight,'') != '')");
+            PreparedStatement stmt = conn.prepareStatement("select nodeid, nodelabel from node where nodeid in (select nodeid from assets where coalesce(manufacturer,'') != '' or coalesce(vendor,'') != '' or coalesce(modelNumber,'') != '' or coalesce(serialNumber,'') != '' or coalesce(description,'') != '' or coalesce(circuitId,'') != '' or coalesce(assetNumber,'') != '' or coalesce(operatingSystem,'') != '' or coalesce(rack,'') != '' or coalesce(slot,'') != '' or coalesce(port,'') != '' or coalesce(region,'') != '' or coalesce(division,'') != '' or coalesce(department,'') != '' or coalesce(address1,'') != '' or coalesce(address2,'') != '' or coalesce(city,'') != '' or coalesce(state,'') != '' or coalesce(zip,'') != '' or coalesce(building,'') != '' or coalesce(floor,'') != '' or coalesce(room,'') != '' or coalesce(vendorPhone,'') != '' or coalesce(vendorFax,'') != '' or coalesce(dateInstalled,'') != '' or coalesce(lease,'') != '' or coalesce(leaseExpires,'') != '' or coalesce(supportPhone,'') != '' or coalesce(maintContract,'') != '' or coalesce(vendorAssetNumber,'') != '' or coalesce(maintContractExpires,'') != '' or coalesce(displayCategory,'') != '' or coalesce(notifyCategory,'') != '' or coalesce(pollerCategory,'') != '' or coalesce(thresholdCategory,'') != '' or coalesce(comment,'') != '' or coalesce(username,'') != '' or coalesce(password,'') != '' or coalesce(enable,'') != '' or coalesce(connection,'') != '' or coalesce(autoenable,'') != '' or coalesce(cpu,'') != '' or coalesce(ram,'') != '' or coalesce(storagectrl,'') != '' or coalesce(hdd1,'') != '' or coalesce(hdd2,'') != '' or coalesce(hdd3,'') != '' or coalesce(hdd4,'') != '' or coalesce(hdd5,'') != '' or coalesce(hdd6,'') != '' or coalesce(numpowersupplies,'') != '' or coalesce(inputpower,'') != '' or coalesce(additionalhardware,'') != '' or coalesce(admin,'') != '' or coalesce(snmpcommunity,'') != ''" +
+            		" or coalesce(rackunitheight,'') != '' or coalesce(hostList,'') != '' or coalesce(macAddress,'') != '' or coalesce(snmpMib,'') != '' or coalesce(snmpComparator,'') != '' or coalesce(compareValue,'') != '')");
             d.watch(stmt);
 
             ResultSet rs = stmt.executeQuery();
@@ -435,6 +445,11 @@ public class AssetModel {
             asset.setAdmin(rs.getString("admin"));
             asset.setSnmpcommunity(rs.getString("snmpcommunity"));
             asset.setRackunitheight(rs.getString("rackunitheight"));
+            asset.setHostList(rs.getString("hostList"));
+            asset.setHostList(rs.getString("macAddress"));
+            asset.setHostList(rs.getString("snmpMib"));
+            asset.setHostList(rs.getString("snmpComparator"));
+            asset.setHostList(rs.getString("compareValue"));
 
             // Convert from java.sql.Timestamp to java.util.Date, since it looks more pretty or something
             asset.lastModifiedDate = new Date(rs.getTimestamp("lastModifiedDate").getTime());
@@ -529,6 +544,11 @@ public class AssetModel {
         new String[] { "Additional hardware", "additionalhardware" },
         new String[] { "Admin", "admin" },
         new String[] { "SNMP community", "snmpcommunity" },
-	new String[] { "Rack unit height", "rackunitheight" }
+	new String[] { "Rack unit height", "rackunitheight" },
+	new String[]{"Host List","hostList"},
+	new String[]{"Mac Address","macAddress"},
+	new String[]{"Snmp Mib","snmpMib"},
+	new String[]{"Snmp Comparator","snmpComparator"},
+	new String[]{"Compare Value","compareValue"}
     };
 }

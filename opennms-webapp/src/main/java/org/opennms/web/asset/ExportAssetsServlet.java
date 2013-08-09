@@ -144,7 +144,12 @@ public class ExportAssetsServlet extends HttpServlet {
 		"Additional hardware",
 		"Admin",
 		"SNMP Community",
-		"Rack unit height"
+		"Rack unit height",
+		"Host List",
+		"Mac Address",
+		"SNMP Mib",
+		"SNMP Comparator",
+		"Compare Value"
         };
         
         out.writeNext(header);
@@ -213,6 +218,11 @@ public class ExportAssetsServlet extends HttpServlet {
             entries.add(asset.getAdmin());
             entries.add(asset.getSnmpcommunity());
             entries.add(asset.getRackunitheight());
+            entries.add(asset.getHostList());
+            entries.add(asset.getMacAddress());
+            entries.add(asset.getSnmpMib());
+            entries.add(asset.getSnmpComparator());
+            entries.add(asset.getCompareValue());
             
             out.writeNext(entries.toArray(new String[0]));
         }

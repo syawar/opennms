@@ -34,6 +34,7 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Arrays;
 
 import org.apache.log4j.Level;
 import org.opennms.core.utils.InetAddressUtils;
@@ -49,7 +50,9 @@ import org.opennms.netmgt.snmp.SnmpAgentConfig;
 import org.opennms.netmgt.snmp.SnmpObjId;
 import org.opennms.netmgt.snmp.SnmpUtils;
 import org.opennms.netmgt.snmp.SnmpValue;
-
+import org.opennms.netmgt.model.OnmsNode;
+import org.opennms.netmgt.dao.NodeDao;
+import org.opennms.core.utils.BeanUtils;
 /**
  * <P>
  * This class is designed to be used by the service poller framework to test the
@@ -71,6 +74,12 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
      * Name of monitored service.
      */
     private static final String SERVICE_NAME = "SNMP";
+    
+    /**
+     * the node dao object for retrieving assets
+     */
+    private NodeDao m_nodeDao = null; 
+    
 
     /**
      * Default object to collect if "oid" property not available.
@@ -106,6 +115,12 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
     public void initialize(Map<String, Object> parameters) {
         // Initialize the SnmpPeerFactory
         //
+    	 m_nodeDao = BeanUtils.getBean("daoContext", "nodeDao", NodeDao.class);
+
+         if (m_nodeDao == null) {
+         	log().debug(this+"::Node dao should be a non-null value.");
+         }
+         
         try {
             SnmpPeerFactory.init();
         } catch (IOException ex) {
@@ -144,6 +159,9 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
      *                Thrown for any unrecoverable errors.
      */
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+    	//the onms node
+    	OnmsNode onmsNode = m_nodeDao.get(svc.getNodeId());
+    	
         NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
         PollStatus status = PollStatus.unavailable();
@@ -161,7 +179,72 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         String oid = ParameterMap.getKeyedString(parameters, "oid", DEFAULT_OBJECT_IDENTIFIER);
         String operator = ParameterMap.getKeyedString(parameters, "operator", null);
         String operand = ParameterMap.getKeyedString(parameters, "operand", null);
-        String walkstr = ParameterMap.getKeyedString(parameters, "walk", "false");
+        
+        //get passive snmp poller stats
+        boolean isPassive = ParameterMap.getKeyedBoolean(parameters, "isPassive", false);
+        String hostList = ParameterMap.getKeyedString(parameters, "hostList", null);
+        
+        //TODO support mac2oid conversion and mib aggregation
+        boolean mac2oid = ParameterMap.getKeyedBoolean(parameters, "mac2oid", false);
+        boolean aggregation = ParameterMap.getKeyedBoolean(parameters, "aggregation", false);
+        
+        // check if asset fields need to be used
+        oid = getStringAsset(oid, onmsNode.getAssetRecord().getSnmpMib() );
+        operator = getStringAsset(operator,onmsNode.getAssetRecord().getSnmpComparator());
+        log().debug(this+"::syawar::the operator::" + operator);
+        operand = getStringAsset(operand,onmsNode.getAssetRecord().getCompareValue());
+        log().debug(this+"::syawar::the operand::" + operand);
+        hostList = getStringAsset(hostList, onmsNode.getAssetRecord().getHostList());
+        
+        // check if asset fields need to be used
+        oid = getStringAsset(oid, onmsNode.getAssetRecord().getSnmpMib() );
+        operator = getStringAsset(operator,onmsNode.getAssetRecord().getSnmpComparator());
+        operand = getStringAsset(operand,onmsNode.getAssetRecord().getCompareValue());
+        hostList = getStringAsset(hostList, onmsNode.getAssetRecord().getHostList());
+        
+        log().debug(this+"::syawar::The value of isPassive::"+isPassive);
+        if(isPassive){
+        	log().debug(this+"::syawar::is Passive is true");
+            List<String> theHostList;
+            if(hostList != null){
+            	log().debug(this+"::syawar::Passive polling hostlist is not empty::");
+            	theHostList=Arrays.asList(hostList.split("\\s*,\\s*"));
+            	for(String host : theHostList){
+            		log().debug(this+"::syawar::Passive polling host::"+host);
+            		InetAddress passiveHost = InetAddressUtils.addr(host);
+            		SnmpAgentConfig passiveAgentConfig = SnmpPeerFactory.getInstance().getAgentConfig(passiveHost);
+                   // if (passiveAgentConfig == null) {
+            		agentConfig.setAddress(passiveHost);
+                   if (agentConfig == null) throw new RuntimeException("Reverting to local config failed::SnmpAgentConfig object not available for interface " + ipaddr );
+                    status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),agentConfig);
+
+                    //}
+                    //else{
+                    	//status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),passiveAgentConfig);
+                    //}  
+                    if(status.isUp()){
+                    	return status;
+                    }
+                    log().debug(this+"::syawar::Passive poll on host::"+host+"::result::"+status.toString());
+            	}
+            	if(!status.isUp()){
+            		status= PollStatus.down();
+            	}
+            }
+            else{
+            	log().error(this+"::syawar::Passive poller found no host list::value recieved::"+hostList);
+            }
+            return status;
+        }
+        else{
+        	log().debug(this+"::syawar::doing normal polling::");
+        	return doPolling(operator,operand,oid,parameters,status,hostAddress,agentConfig);
+        }
+        
+    }
+    
+    public PollStatus doPolling(String operator, String operand, String oid, Map<String, Object> parameters ,PollStatus status, String hostAddress , SnmpAgentConfig agentConfig){
+    	String walkstr = ParameterMap.getKeyedString(parameters, "walk", "false");
         String matchstr = ParameterMap.getKeyedString(parameters, "match-all", "true");
         int countMin = ParameterMap.getKeyedInteger(parameters, "minimum", 0);
         int countMax = ParameterMap.getKeyedInteger(parameters, "maximum", 0);
@@ -200,11 +283,12 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
                 log().debug("SnmpMonitor.poll: SnmpAgentConfig address: " +agentConfig);
             }
             SnmpObjId snmpObjectId = SnmpObjId.get(oid);
-
+            log().debug(this+"::syawar::snmp object for oid::"+oid+"::is::"+snmpObjectId);
             // This if block will count the number of matches within a walk and mark the service
             // as up if it is between the minimum and maximum number, down if otherwise. Setting
             // the parameter "matchall" to "count" will act as if "walk" has been set to "true".
             if ("count".equals(matchstr)) {
+            	log().debug(this+"::SNMP::level 1::Count Match");
                 if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
                     reasonTemplate = "Value: ${matchCount} outside of range Min: ${minimum} to Max: ${maximum}";
                 }
@@ -228,14 +312,20 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
                     return status;
                 }
             } else if ("true".equals(walkstr)) {
+            	log().debug(this+"::SNMP::level 2::WALK");
                 if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
                     reasonTemplate = "SNMP poll failed, addr=${ipaddr} oid=${oid}";
+                    log().debug(this+"::syawar::reason template failure");
                 }
+                
                 List<SnmpValue> results = SnmpUtils.getColumns(agentConfig, "snmpPoller", snmpObjectId);
+                log().debug(this+"::syawar::the snmp walk resultsed in list of size::"+results.size());
                 for(SnmpValue result : results) {
+                	log().debug(this+"::syawar::iterative snmp walk result::"+result.toHexString());
                     if (result != null) {
+                    	log().debug(this+"::syawar::results are NOT null");
                         svcParams.setProperty("observedValue", getStringValue(result));
-                        log().debug("poll: SNMPwalk poll succeeded, addr=" + hostAddress + " oid=" + oid + " value=" + result);
+                        log().debug("poll: SNMPwalk poll succeeded, addr=" + hostAddress + " oid=" + oid + " value=" + getStringValue(result));
                         if (meetsCriteria(result, operator, operand)) {
                             status = PollStatus.available();
                             if ("false".equals(matchstr)) {
@@ -246,9 +336,13 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
                             return status;
                         }
                     }
+                    else{
+                    	log().debug(this+"::syawar::results are null");
+                    }
                 }
 
             } else {
+            	log().debug(this+"::SNMP::level 3::DEFAULT");
                 if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
                     if (operator != null) {
                         reasonTemplate = "Observed value '${observedValue}' does not meet criteria '${operator} ${operand}'";

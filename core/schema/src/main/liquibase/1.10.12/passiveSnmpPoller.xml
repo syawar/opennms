@@ -9,15 +9,15 @@
 
 	<changeSet id="1.11.3-add-passive-SNMP-poller-asset-fields" author="syawar">
 		<addColumn tableName="assets">
-			<column name="hostlist" type="character(1023)">
+			<column name="hostlist" type="character varying(1023)">
 			</column>
-			<column name="snmpmib" type="character(200)">
+			<column name="snmpmib" type="character varying(200)">
 			</column>
-			<column name="macaddress" type="character(200)">
+			<column name="macaddress" type="character varying(200)">
 			</column>
-			<column name="snmpcomparator" type="character(20)">
+			<column name="snmpcomparator" type="character varying(20)">
 			</column>
-			<column name="comparevalue" type="character(20)">
+			<column name="comparevalue" type="character varying(20)">
 			</column>
 		</addColumn>
 		<rollback>
