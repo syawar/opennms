@@ -87,7 +87,11 @@ public class AssetRecordDaoHibernate extends AbstractDaoHibernate<OnmsAssetRecor
 		}
 		return assetNumberMap;
 	}
-
+	
+	public void updateAssetRecord(Integer id, String assetName, String value){
+		getHibernateTemplate().bulkUpdate("update OnmsAssetRecord set " + assetName +"='"+value+"' where nodeid ="+id);
+	}
+	
 	@Override
 	public List<OnmsAssetRecord> getDistinctProperties() {
 		DetachedCriteria criteria = DetachedCriteria
@@ -179,6 +183,8 @@ public class AssetRecordDaoHibernate extends AbstractDaoHibernate<OnmsAssetRecor
 				"vendorPhone"));
 		projList.add(Projections.alias(Projections.property("zip"), "zip"));
 		
+		projList.add(Projections.alias(Projections.property("snmpCheckDate"), "snmpCheckDate"));
+		projList.add(Projections.alias(Projections.property("lastParentController"), "lastParentController"));
 		projList.add(Projections.alias(Projections.property("hostList"), "hostList"));
 		projList.add(Projections.alias(Projections.property("snmpMib"), "snmpMib"));
 		projList.add(Projections.alias(Projections.property("snmpComparator"), "snmpComparator"));

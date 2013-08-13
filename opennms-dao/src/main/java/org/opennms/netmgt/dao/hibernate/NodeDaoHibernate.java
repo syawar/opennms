@@ -368,4 +368,5 @@ public class NodeDaoHibernate extends AbstractDaoHibernate<OnmsNode, Integer> im
     	nextNodeId = findObjects(Integer.class, "select n.id from OnmsNode as n where n.id < ? and n.type != 'D' order by n.id desc limit 1", nodeId).get(0);
     	return nextNodeId;
     }
+    
 }

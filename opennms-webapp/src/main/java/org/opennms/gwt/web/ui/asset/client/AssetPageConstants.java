@@ -28,6 +28,7 @@
 
 package org.opennms.gwt.web.ui.asset.client;
 
+
 /**
  * @author <a href="mailto:MarkusNeumannMarkus@gmail.com">Markus Neumann</a>
  *         Basic static string i18n mechanism by GWT. Just add:
@@ -747,5 +748,21 @@ public interface AssetPageConstants extends com.google.gwt.i18n.client.Constants
 	@DefaultStringValue("The compared operand")
 	@Key("compareValueHelp")
 	String compareValueHelp();
+	
+	@DefaultStringValue("Last Passive Check")
+	@Key("snmpCheckDate")
+	String snmpCheckDate();
+	
+	@DefaultStringValue("The date-time when it when Passive snmp last polled")
+	@Key("snmpCheckDateHelp")
+	String snmpCheckDateHelp();
+	
+	@DefaultStringValue("Last Parent Controller")
+	@Key("lastParentController")
+	String lastParentController();
+	
+	@DefaultStringValue("The controller on which the AP was adopted on the previous scan")
+	@Key("lastParentControllerHelp")
+	String lastParentControllerHelp();
 	
 }

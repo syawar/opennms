@@ -247,6 +247,12 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 	Label lastModified;
 	
 	@UiField
+	FieldSetTextDisplay sSnmpCheckDate;
+	
+	@UiField
+	FieldSetTextDisplay sLastParentController;
+	
+	@UiField
 	FieldSetSuggestBox sSnmpMib;
 
 	@UiField
@@ -390,6 +396,8 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 
 		fieldSetList.add(sComment);
 		
+		fieldSetList.add(sSnmpCheckDate);
+		fieldSetList.add(sLastParentController);
 		fieldSetList.add(sSnmpMib);
 		fieldSetList.add(sMacAddress);
 		fieldSetList.add(sSnmpComparator);
@@ -421,6 +429,8 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 	}
 	
 	private void saveDataPassiveSnmp(){
+		m_asset.setSnmpCheckDate(sSnmpCheckDate.getValue());
+		m_asset.setLastParentController(sLastParentController.getValue());
 		m_asset.setHostList(sHostList.getValue());
 		m_asset.setSnmpMib(sSnmpMib.getValue());
 		m_asset.setSnmpComparator(sSnmpComparator.getValue());
@@ -520,6 +530,8 @@ public class AssetNodePageImpl extends Composite implements AssetPagePresenter.D
 		sMacAddress.setValue(asset.getMacAddress());
 		sCompareValue.setValue(asset.getCompareValue());
 		sHostList.setValue(asset.getHostList());
+		sSnmpCheckDate.setValue(asset.getSnmpCheckDate());
+		sLastParentController.setValue(asset.getLastParentController());
 		}
 
 	private void setDataAuthentication(AssetCommand asset) {

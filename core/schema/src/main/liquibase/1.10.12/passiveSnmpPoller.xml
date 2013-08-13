@@ -17,7 +17,11 @@
 			</column>
 			<column name="snmpcomparator" type="character varying(20)">
 			</column>
-			<column name="comparevalue" type="character varying(20)">
+			<column name="comparevalue" type="character varying(128)">
+			</column>
+			<column name="snmpcheckdate" type="character varying(128)">
+			</column>
+			<column name="lastparentcontroller" type="character varying(200)">
 			</column>
 		</addColumn>
 		<rollback>
@@ -25,7 +29,9 @@
 			<dropColumn tableName="assets" columnName="snmpmib"/>
 			<dropColumn tableName="assets" columnName="macaddress"/>
 			<dropColumn tableName="assets" columnName="snmpcomparator"/>
-			<dropColumn tableName="assets" columnName="comparevalue"/>		
+			<dropColumn tableName="assets" columnName="comparevalue"/>
+			<dropColumn tableName="assets" columnName="snmpcheckdate"/>
+			<dropColumn tableName="assets" columnName="lastparentcontroller"/>		
 		</rollback>
 	</changeSet>
 

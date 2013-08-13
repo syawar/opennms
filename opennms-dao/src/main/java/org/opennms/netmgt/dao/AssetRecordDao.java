@@ -43,4 +43,6 @@ public interface AssetRecordDao extends OnmsDao<OnmsAssetRecord, Integer> {
     public Map<String, Integer> findImportedAssetNumbersToNodeIds(String foreignSource);
     
     public List<OnmsAssetRecord> getDistinctProperties();
+    
+    public void updateAssetRecord(Integer id, String assetName, String value);
 }

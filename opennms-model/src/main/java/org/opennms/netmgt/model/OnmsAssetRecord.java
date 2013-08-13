@@ -289,6 +289,16 @@ public class OnmsAssetRecord implements Serializable {
     * SNMP compare to value
     */
     private String m_compareValue;
+    
+    /**
+     * Last SNMP check Date Time
+     */
+    private String m_snmpCheckDate;
+    
+    /**
+     * Last Parent Controller
+     */
+    private String m_lastParentController;
 
     /**
      * default constructor
@@ -399,6 +409,19 @@ public class OnmsAssetRecord implements Serializable {
      }
 
     /**
+	 * @return the m_lastParentController
+	 */
+     @Column(name = "lastParentController", length = 200)
+	public String getLastParentController() {
+		return m_lastParentController;
+	}
+	/**
+	 * @param m_lastParentController the m_lastParentController to set
+	 */
+	public void setLastParentController(String m_lastParentController) {
+		this.m_lastParentController = m_lastParentController;
+	}
+	/**
      * <p>getId</p>
      *
      * @return a {@link java.lang.Integer} object.
@@ -978,6 +1001,19 @@ public class OnmsAssetRecord implements Serializable {
     }
 
     /**
+	 * @return a {@link java.util.Date} object.
+	 */
+    @Column(name="snmpCheckDate", length = 128)
+	public String getSnmpCheckDate() {
+		return m_snmpCheckDate;
+	}
+	/**
+	 * @param m_snmpCheckDate a {@link java.util.Date} object.
+	 */
+	public void setSnmpCheckDate(String m_snmpCheckDate) {
+		this.m_snmpCheckDate = m_snmpCheckDate;
+	}
+	/**
      *--# dateInstalled    : The date the asset was installed.
      *
      * @return a {@link java.lang.String} object.
