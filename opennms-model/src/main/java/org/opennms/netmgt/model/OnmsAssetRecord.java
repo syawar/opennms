@@ -299,7 +299,12 @@ public class OnmsAssetRecord implements Serializable {
      * Last Parent Controller
      */
     private String m_lastParentController;
-
+    
+    /**
+     * Last polled MIB
+     */
+    private String m_lastPolledMib;
+    
     /**
      * default constructor
      */
@@ -421,6 +426,25 @@ public class OnmsAssetRecord implements Serializable {
 	public void setLastParentController(String m_lastParentController) {
 		this.m_lastParentController = m_lastParentController;
 	}
+	
+	/**
+	 * 
+	 * @return the m_lastPolledMib
+	 */
+	@Column(name = "lastPolledMib", length = 256)
+	public String getLastPolledMib(){
+		return m_lastPolledMib;
+	}
+	
+	/**
+	 * 
+	 * @param m_lastPolledMib the m_lastPolledMib to set
+	 */
+	public void setLastPolledMib(String m_lastPolledMib){
+		this.m_lastPolledMib = m_lastPolledMib;
+	}
+	
+	
 	/**
      * <p>getId</p>
      *
@@ -1743,6 +1767,9 @@ public class OnmsAssetRecord implements Serializable {
             .append("snmpComparator", getSnmpComparator())
             .append("compareValue", getCompareValue())
             .append("hostList", getHostList())
+            .append("lastParentController", getLastParentController())
+            .append("snmpCheckDate", getSnmpCheckDate())
+            .append("", getLastPolledMib())
             .toString();
     }
 

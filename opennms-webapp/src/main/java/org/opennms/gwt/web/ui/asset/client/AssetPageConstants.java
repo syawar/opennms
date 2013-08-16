@@ -765,4 +765,12 @@ public interface AssetPageConstants extends com.google.gwt.i18n.client.Constants
 	@Key("lastParentControllerHelp")
 	String lastParentControllerHelp();
 	
+	@DefaultStringValue("Last Polled Mib Oid")
+	@Key("lastPolledMib")
+	String lastPolledMib();
+	
+	@DefaultStringValue("The last mib oid that was polled")
+	@Key("lastPolledMibHelp")
+	String lastPolledMibHelp();
+	
 }

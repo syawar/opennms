@@ -176,6 +176,16 @@ public class SnmpMonitorStrategyTest {
         ta.verifyAnticipated();
     }
     
+    @Test
+    public void testMacToOidConversion(){
+    	assertTrue(".0.36.106.27.231.17".equals(monitor.convertMacToOid("00:24:6A:1B:E7:11")));
+    }
+    
+    @Test
+    public void testAddMibObject(){
+    	assertTrue(".1.1.2.3.4.5".equals(monitor.addMibObject(".1.1.2.", ".3.4.5")));
+    }
+    
     private void testSyntaxEquals(SnmpValue result, String eqString, String neString) {
         assertTrue(monitor.meetsCriteria(result, null, null));
 

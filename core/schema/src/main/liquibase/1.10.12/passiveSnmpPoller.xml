@@ -23,6 +23,8 @@
 			</column>
 			<column name="lastparentcontroller" type="character varying(200)">
 			</column>
+			<column name="lastpolledmib" type="character varying(256)">
+			</column>
 		</addColumn>
 		<rollback>
 			<dropColumn tableName="assets" columnName="hostlist"/>	
@@ -31,7 +33,8 @@
 			<dropColumn tableName="assets" columnName="snmpcomparator"/>
 			<dropColumn tableName="assets" columnName="comparevalue"/>
 			<dropColumn tableName="assets" columnName="snmpcheckdate"/>
-			<dropColumn tableName="assets" columnName="lastparentcontroller"/>		
+			<dropColumn tableName="assets" columnName="lastparentcontroller"/>	
+			<dropColumn tableName="assets" columnName="lastpolledmib"/>		
 		</rollback>
 	</changeSet>
 

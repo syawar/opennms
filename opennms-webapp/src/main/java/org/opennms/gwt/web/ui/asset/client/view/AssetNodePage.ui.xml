@@ -314,6 +314,8 @@
 						name="{con.snmpCheckDate}" value="" helpText="{con.snmpCheckDateHelp}" />
 					<onms_fs:FieldSetTextDisplay ui:field="sLastParentController"
 						name="{con.lastParentController}" value="" helpText="{con.lastParentControllerHelp}" />
+						<onms_fs:FieldSetTextDisplay ui:field="sLastPolledMib"
+						name="{con.lastPolledMib}" value="" helpText="{con.lastPolledMibHelp}" />
                                <onms_fs:FieldSetSuggestBox ui:field="sSnmpMib"
                                                name="{con.snmpMib}" value="" helpText="{con.snmpMibHelp}"
                                                maxLength="200" />

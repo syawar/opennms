@@ -199,6 +199,8 @@ public class AssetCommand implements IsSerializable {
 	private String m_snmpCheckDate;
 	
 	private String m_lastParentController;
+	
+	private String m_lastPolledMib;
 
 	public AssetCommand() {
 		m_autoenableOptions = new ArrayList<String>();
@@ -549,6 +551,14 @@ public class AssetCommand implements IsSerializable {
 	public String getLastParentController(){
 		return m_lastParentController;
 	}
+	
+	/**
+	 * 
+	 * @return m_lastPolledMib
+	 */
+	public String getLastPolledMib(){
+		return m_lastPolledMib;
+	}
 
 	public void setAdditionalhardware(String additionalhardware) {
 		m_additionalhardware = additionalhardware;
@@ -891,6 +901,13 @@ public class AssetCommand implements IsSerializable {
 	public void setLastParentController(String m_lastParentController){
 		this.m_lastParentController = m_lastParentController;
 	}
+	/**
+	 * 
+	 * @param m_lastPolledMib
+	 */
+	public void setLastPolledMib(String m_lastPolledMib){
+		this.m_lastPolledMib = m_lastPolledMib;
+	}
 
 	@Override
 	public String toString() {
@@ -921,6 +938,7 @@ public class AssetCommand implements IsSerializable {
 				+ ", m_thresholdCategory=" + m_thresholdCategory + ", m_username=" + m_username + ", m_vendor="
 				+ m_vendor + ", m_vendorAssetNumber=" + m_vendorAssetNumber + ", m_vendorFax=" + m_vendorFax
 				+ ", m_vendorPhone=" + m_vendorPhone + ", m_zip=" + m_zip + ",m_snmpMib="+ m_snmpMib+",m_macAddress="+m_macAddress
-				+",m_snmpComparator="+m_snmpComparator+",m_compareValue="+m_compareValue+",m_hostList="+m_hostList+",m_snmpCheckDate="+m_snmpCheckDate+",m_lastParentController="+m_lastParentController+"]";
+				+",m_snmpComparator="+m_snmpComparator+",m_compareValue="+m_compareValue+",m_hostList="+m_hostList
+				+",m_snmpCheckDate="+m_snmpCheckDate+",m_lastParentController="+m_lastParentController+",m_lastPolledMib="+m_lastPolledMib+"]";
 	}
 }

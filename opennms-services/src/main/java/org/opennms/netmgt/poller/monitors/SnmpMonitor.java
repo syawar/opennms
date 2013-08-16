@@ -49,6 +49,7 @@ import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.snmp.SnmpAgentConfig;
+import org.opennms.netmgt.snmp.SnmpInstId;
 import org.opennms.netmgt.snmp.SnmpObjId;
 import org.opennms.netmgt.snmp.SnmpUtils;
 import org.opennms.netmgt.snmp.SnmpValue;
@@ -181,7 +182,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         if (agentConfig == null) throw new RuntimeException("SnmpAgentConfig object not available for interface " + ipaddr);
         final String hostAddress = InetAddressUtils.str(ipaddr);
 		log().debug("poll: setting SNMP peer attribute for interface " + hostAddress);
-
+		
         // Get configuration parameters
         //
         String oid = ParameterMap.getKeyedString(parameters, "oid", DEFAULT_OBJECT_IDENTIFIER);
@@ -195,6 +196,8 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         //TODO support mac2oid conversion and mib aggregation
         boolean mac2oid = ParameterMap.getKeyedBoolean(parameters, "mac2oid", false);
         boolean aggregation = ParameterMap.getKeyedBoolean(parameters, "aggregation", false);
+        int strategy = ParameterMap.getKeyedInteger(parameters,"strategy", 0);
+        boolean reverse = ParameterMap.getKeyedBoolean(parameters, "reverse", false);
         
         //mac to oid
         String assetMacToOid =onmsNode.getAssetRecord().getMacAddress();
@@ -204,17 +207,13 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         	}      	
         }
         //aggregation
-        oid = getStringAsset(oid, onmsNode.getAssetRecord().getSnmpMib() );
+        String assetOid = getStringAsset(oid, onmsNode.getAssetRecord().getSnmpMib() );
         if(aggregation){
-        	if(assetMacToOid!=null  && !"".equals(assetMacToOid)){
-        		if(oid != null && !"".equals(oid)){
-        			 log().debug("adding mib + mac2oid...");
-        			 //TODO mib proper format of new additive mib
-        		}
-        		else{
-        			 log().debug("only using mac2oid since oid in config/asset is null");
-        		}
-        	}
+        	oid = OidAggregation(strategy, reverse, assetMacToOid, assetOid, oid);
+        }
+        else{
+        	// check if asset fields need to be used
+            oid = getStringAsset(oid, onmsNode.getAssetRecord().getSnmpMib() );
         }
         
         // check if asset fields need to be used
@@ -224,32 +223,39 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         log().debug("the operand::" + operand);
         hostList = getStringAsset(hostList, onmsNode.getAssetRecord().getHostList());
         
-        // check if asset fields need to be used
-        oid = getStringAsset(oid, onmsNode.getAssetRecord().getSnmpMib() );
+        
         operator = getStringAsset(operator,onmsNode.getAssetRecord().getSnmpComparator());
         operand = getStringAsset(operand,onmsNode.getAssetRecord().getCompareValue());
         hostList = getStringAsset(hostList, onmsNode.getAssetRecord().getHostList());
         
         log().debug("The value of isPassive::"+isPassive);
+        //Check if passive SNMP polling
         if(isPassive){
-        	boolean lastParentPresent = false;
         	String lastParentController = onmsNode.getAssetRecord().getLastParentController();
-        	if(lastParentController != null && !"".equals(lastParentController) ){
-        		lastParentPresent = true;
-        		lastParentController= lastParentController.trim();
-        		log().debug("Passive polling last Parent Controller::"+lastParentController);
-        		InetAddress passiveHost = InetAddressUtils.addr(lastParentController);
-        		SnmpAgentConfig passiveAgentConfig = SnmpPeerFactory.getInstance().getAgentConfig(passiveHost);
-                agentConfig.setAddress(passiveHost);
-                if (agentConfig == null) throw new RuntimeException("Reverting to local config failed::SnmpAgentConfig object not available for interface " + ipaddr );
-                status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),agentConfig);
-                if(status.isUp()){
-                	Date theCurrentTime = new Date();
-                	log().debug("updating asset records..1..");
-                	m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
-                	m_assetDao.updateAssetRecord(svc.getNodeId(),"lastParentController",lastParentController);
-                	return status;
-                }
+        	String lastPolledMib = onmsNode.getAssetRecord().getLastPolledMib();
+        	//check if asset field has changed and/or matches the last polling record
+        	if(lastParentController != null && !"".equals(lastParentController) && lastPolledMib != null && !"".equals(lastPolledMib) && (lastPolledMib.equals(oid) || lastPolledMib.contains(oid))){
+        		//check if hostlist still contains the selected IP from the previous poll
+        		if(hostList != null && hostList.contains(lastParentController)){
+        			boolean previousCheck = true;
+            		lastParentController= lastParentController.trim();
+            		log().debug("Passive polling last Parent Controller::"+lastParentController);
+            		InetAddress passiveHost = InetAddressUtils.addr(lastParentController);
+            		SnmpAgentConfig passiveAgentConfig = SnmpPeerFactory.getInstance().getAgentConfig(passiveHost);
+                    agentConfig.setAddress(passiveHost);
+                    if (agentConfig == null) throw new RuntimeException("Reverting to local config failed::SnmpAgentConfig object not available for interface " + ipaddr );
+                    status =  doPolling(operator,operand,lastPolledMib,parameters,status,InetAddressUtils.str(passiveHost),agentConfig, previousCheck,svc.getNodeId());
+                    if(status.isUp()){
+                    	Date theCurrentTime = new Date();
+                    	log().debug("updating asset records..1..");
+                    	m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
+                    	return status;
+                    }
+        		}
+        		else{
+        			log().debug("Previous Optimized Value is outdated...Ignoring");
+        		}
+        		
         	}
         	log().debug("is Passive is true");
             List<String> theHostList;
@@ -262,17 +268,8 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
             		SnmpAgentConfig passiveAgentConfig = SnmpPeerFactory.getInstance().getAgentConfig(passiveHost);
                     agentConfig.setAddress(passiveHost);
                     if (agentConfig == null) throw new RuntimeException("Reverting to local config failed::SnmpAgentConfig object not available for interface " + ipaddr );
-                    if(lastParentPresent && !lastParentController.trim().equals(host.trim())){
-                    	status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),agentConfig);
-                    }else{
-                    	if(!lastParentPresent){
-                    		status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),agentConfig);
-                    	}
-                    	else{
-
-                        	log().debug("ignoring previous polling parent host::"+host+"::already polled");
-                    	}
-                    }
+                    status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),agentConfig,false,svc.getNodeId());
+                    //if the status is up change the required asset fields for optimization steps
                     if(status.isUp()){
                     	Date theCurrentTime = new Date();
                     	log().debug("updating asset records..2..");
@@ -305,16 +302,44 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         }
         else{
         	log().debug("doing normal polling::");
-        	status = doPolling(operator,operand,oid,parameters,status,hostAddress,agentConfig);
+        	status = doPolling(operator,operand,oid,parameters,status,hostAddress,agentConfig,false,svc.getNodeId());
         }
         
         
         return status;
         
     }
-    
-    public PollStatus doPolling(String operator, String operand, String oid, Map<String, Object> parameters ,PollStatus status, String hostAddress , SnmpAgentConfig agentConfig){
-    	String walkstr = ParameterMap.getKeyedString(parameters, "walk", "false");
+    /**
+     * {@inheritDoc}
+     *
+     * <P>
+     * The doPoll() method is responsible for polling the specified address for
+     * SNMP service availability based on the configuration passed from the poll() method
+     * </P>
+     * @param operator
+     * @param operand
+     * @param oid
+     * @param parameters
+     * @param status
+     * @param hostAddress
+     * @param agentConfig 
+     * @param prevCheck 
+     * @param nodeId 
+     * @return PollStatus from the current poll
+     * 
+     * @author <A HREF="mailto:syawar@datavalet.com">Saqib Yawar </A>
+     */
+    public PollStatus doPolling(String operator, String operand, String oid, Map<String, Object> parameters ,PollStatus status, String hostAddress , SnmpAgentConfig agentConfig, boolean prevCheck, Integer nodeId){
+    	
+    	//to compensate for previous mib checks
+    	String walkstr = "";
+    	if(prevCheck){
+    		walkstr = "false";
+    	}
+    	else{
+    		walkstr = ParameterMap.getKeyedString(parameters, "walk", "false");
+    	}
+    	
         String matchstr = ParameterMap.getKeyedString(parameters, "match-all", "true");
         int countMin = ParameterMap.getKeyedInteger(parameters, "minimum", 0);
         int countMax = ParameterMap.getKeyedInteger(parameters, "maximum", 0);
@@ -323,7 +348,6 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
 
         hex = "true".equalsIgnoreCase(hexstr);
         // set timeout and retries on SNMP peer object
-        //
         agentConfig.setTimeout(ParameterMap.getKeyedInteger(parameters, "timeout", agentConfig.getTimeout()));
         agentConfig.setRetries(ParameterMap.getKeyedInteger(parameters, "retry", ParameterMap.getKeyedInteger(parameters, "retries", agentConfig.getRetries())));
         agentConfig.setPort(ParameterMap.getKeyedInteger(parameters, "port", agentConfig.getPort()));
@@ -385,12 +409,13 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
             	log().debug("::SNMP::level 2::WALK");
                 if (DEFAULT_REASON_TEMPLATE.equals(reasonTemplate)) {
                     reasonTemplate = "SNMP poll failed, addr=${ipaddr} oid=${oid}";
-                    log().debug("reason template failure");
                 }
                 
-                List<SnmpValue> results = SnmpUtils.getColumns(agentConfig, "snmpPoller", snmpObjectId);
+                //List<SnmpValue> results = SnmpUtils.getColumns(agentConfig, "snmpPoller", snmpObjectId);
+                Map<SnmpInstId, SnmpValue> results = SnmpUtils.getOidValues(agentConfig, "snmpPoller", snmpObjectId);
                 log().debug("the snmp walk resultsed in list of size::"+results.size());
-                for(SnmpValue result : results) {
+                for(Map.Entry<SnmpInstId, SnmpValue> entry : results.entrySet()) {
+                	SnmpValue result= entry.getValue();
                 	log().debug("iterative snmp walk result::"+result.toHexString());
                     if (result != null) {
                     	log().debug("results are NOT null");
@@ -398,6 +423,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
                         log().debug("poll: SNMPwalk poll succeeded, addr=" + hostAddress + " oid=" + oid + " value=" + getStringValue(result));
                         if (meetsCriteria(result, operator, operand)) {
                             status = PollStatus.available();
+                        	m_assetDao.updateAssetRecord(nodeId,"lastPolledMib", addMibObject(oid,entry.getKey().toString()));
                             if ("false".equals(matchstr)) {
                                 return status;
                             }
@@ -429,6 +455,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
                     
                     if (meetsCriteria(result, operator, operand)) {
                         status = PollStatus.available();
+                        m_assetDao.updateAssetRecord(nodeId,"lastPolledMib", oid);
                     } else {
                         status = PollStatus.unavailable(PropertiesUtils.substitute(reasonTemplate, svcParams));
                     }

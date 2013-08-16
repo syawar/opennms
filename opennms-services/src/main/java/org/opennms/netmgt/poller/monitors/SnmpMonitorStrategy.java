@@ -80,7 +80,7 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
 
     public String getStringValue(SnmpValue result) {
     	if (hex){
-    		log().debug(this+"::syawar::The result is hex...converting to string::"+result.toHexString());
+    		log().debug("::The result is hex...converting to string::"+result.toHexString());
     		return result.toHexString();
     	}
     	return result.toString();
@@ -97,14 +97,14 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
     public boolean meetsCriteria(SnmpValue result, String operator, String operand) {
 
         Boolean retVal = null;
-        log().debug(this+"::syawar::the result::"+getStringValue(result)+"::comparator::"+operator+"::operand::"+operand);
+        log().debug("::the result::"+getStringValue(result)+"::comparator::"+operator+"::operand::"+operand);
         
         retVal = isCriteriaNull(result, operator, operand);
-        log().debug(this+"::syawar::is criteria null::"+retVal);
+        log().debug("::is criteria null::"+retVal);
         if (retVal == null) {
         	String value = getStringValue(result);
             retVal = checkStringCriteria(operator, operand, value);
-            log().debug(this+"::syawar::the retval::"+retVal);
+            log().debug("::the retval::"+retVal);
             if (retVal == null) {
                 
                 BigInteger val = BigInteger.valueOf(result.toLong());
@@ -119,16 +119,150 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
                 } else if (GREATER_THAN_EQUALS.equals(operator)) {
                     return val.compareTo(intOperand) >= 0;
                 } else {
-                	log().debug(this+"::syawar::illegal argument exception");
+                	log().debug("::illegal argument exception");
                     throw new IllegalArgumentException("operator " + operator + " is unknown");
                 }
             }
         } else if (retVal.booleanValue()) {
             return true;
         }
-        log().debug(this+"::syawar::final::"+retVal);
+        log().debug("::final::"+retVal);
         return retVal.booleanValue();
     }
+
+    
+    /**
+     * check and assign asset value
+     * @param currentValue the value from the config
+     * @param assetValue the value from the assets
+     * @return the resolved value
+     */
+    public String getStringAsset(String currentValue, String assetValue){
+    	log().debug("Checking asset value...");
+    	if(currentValue != null && assetValue !=null){
+    		if(checkAssetMatch(currentValue) && !"".equals(assetValue) && !assetValue.isEmpty()){
+        		currentValue = assetValue.trim();
+        		log().debug("asset value::"+currentValue+"::");
+        		return assetValue;
+        	}
+    	}
+    	else{
+    		//if asset field not declared
+    		if(currentValue != null && checkAssetMatch(currentValue)){
+    			log().debug("Asset value not defined...will result in improper monitoring");
+    			currentValue = null;
+    		}
+    	}
+    	
+    	log().debug("asset value::"+currentValue);
+    	return currentValue;
+    }
+    
+    
+    /**
+     * convert given hex mac address to mib oid
+     * @param macAddress hex mac address
+     * @return a {java.lang.String} object
+     */
+    public String convertMacToOid(String macAddress){
+    	String oid = "";
+    	if(macAddress != null && !"".equals(macAddress) && !macAddress.isEmpty()){
+    		log().debug("Converting macAddress::"+macAddress+"to OID");
+    		for(String hex: macAddress.split(":")){
+    			int dec = Integer.parseInt(hex,16);
+    			oid = oid +"."+ Integer.toString(dec);
+    		}
+    	}else{
+    		log().debug("No Mac Address provided for conversion to oid...");
+    	}
+    	
+    	
+    	return oid;
+    }
+    
+    /**
+     * add two mibs together based on a strategy
+     * Strtegies for generating oid:
+    	 * 1) assetMacToOid + assetOid
+    	 * 2) assetMacToOid + confOid
+    	 * 3) confOid + assetOid 
+     * @param strategy
+     * @param reverse
+     * @param assetMacToOid
+     * @param assetOid
+     * @param confOid
+     * @return the added mibs
+     */
+    public String OidAggregation(int strategy, boolean reverse, String assetMacToOid, String assetOid, String confOid){
+    	String theOid = "";
+    	switch(strategy){
+    	case 1:
+    		theOid = addMibObject(assetOid, assetMacToOid);
+    		break;
+    	case 2:
+    		theOid = addMibObject(confOid, assetMacToOid);
+    		break;
+    	case 3:
+    		theOid = addMibObject(confOid , assetOid);
+    		break;
+    	} 	
+    	return theOid;
+    }
+    
+    /**
+     * Add two mib strings together and ensure proper format
+     * @param a
+     * @param b
+     * @return a+b
+     */
+    public String addMibObject(String a, String b){
+    	String tempMib = "";
+    	if(a != null){
+    		a = manageMibFormat(a,true);
+    		if(b != null){
+    			b = manageMibFormat(b,false);
+    			tempMib = a +"."+b;
+    		}
+    		else{
+    			tempMib = a;
+    		}
+    	}
+    	else{
+    		
+    		if(b != null){
+    			b = manageMibFormat(b,false);
+    			tempMib = b;
+    		}
+    	}
+    	
+    	//if incorect dot addition
+    	tempMib.replaceAll("..", ".");
+    	if(tempMib.lastIndexOf(".") == (tempMib.length()-1)){
+    		tempMib = tempMib.substring(0, tempMib.lastIndexOf("."));
+    	}
+    	return tempMib;
+    }
+    
+    /**
+     * returns the properly formated mib for aggregation:
+     * @param mib
+     * @return a java.lang.String object
+     */
+    private String manageMibFormat(String mib, boolean front){
+    	if (front){
+    		if(mib != null && mib.length() > 0 && mib.charAt(mib.length()-1)=='.'){
+       		 mib = mib.substring(0, mib.length()-1);
+    		}	
+    	}
+    	else{
+    		if(mib != null && mib.length() > 0 && mib.charAt(0)=='.'){
+    			mib=mib.substring(1);
+    		}
+    	}
+    	
+    	return mib;	
+    }
+    
 
     /**
      * @param operator
@@ -186,66 +320,17 @@ abstract public class SnmpMonitorStrategy extends AbstractServiceMonitor {
      */
     private boolean checkAssetMatch(String theValue){
     	if (theValue == null){
-    		log().debug(this+"::asset value null...");
+    		log().debug("asset value null...");
     		return false;
     	}
     	if(theValue.equalsIgnoreCase(ASSET_PATTERN)){
-    		log().debug(this+"::Using Asset for value...");
+    		log().debug("Using Asset for value...");
     		return true;
     	}
     	else{
     		return false;
     	}
     	
-    }
-    
-    /**
-     * check and assign asset value
-     * @param currentValue the value from the config
-     * @param assetValue the value from the assets
-     * @return the resolved value
-     */
-    public String getStringAsset(String currentValue, String assetValue){
-    	log().debug(this+"::Checking asset value...");
-    	if(currentValue != null && assetValue !=null){
-    		if(checkAssetMatch(currentValue) && !"".equals(assetValue) && !assetValue.isEmpty()){
-        		currentValue = assetValue.trim();
-        		log().debug(this+"::asset value::"+currentValue+"::");
-        		return assetValue;
-        	}
-    	}
-    	else{
-    		//if asset field not declared
-    		if(currentValue != null && checkAssetMatch(currentValue)){
-    			log().debug(this+"::Asset value not defined...will result in improper monitoring");
-    			currentValue = null;
-    		}
-    	}
-    	
-    	log().debug(this+"::asset value::"+currentValue);
-    	return currentValue;
-    }
-    
-    
-    /**
-     * convert given hex mac address to mib oid
-     * @param macAddress hex mac address
-     * @return a {java.lang.String} object
-     */
-    public String convertMacToOid(String macAddress){
-    	String oid = "";
-    	if(macAddress != null && !"".equals(macAddress) && !macAddress.isEmpty()){
-    		log().debug("Converting macAddress::"+macAddress+"to OID");
-    		for(String hex: macAddress.split(":")){
-    			int dec = Integer.parseInt(hex,16);
-    			oid = oid +"."+ Integer.toString(dec);
-    		}
-    	}else{
-    		log().debug(this+"::No Mac Address provided for conversion to oid...");
-    	}
-    	
-    	
-    	return oid;
     }
 
 }
