@@ -162,6 +162,9 @@ public class DefaultTicketerServiceLayer implements TicketerServiceLayer, Initia
 	public void createTicketForAlarm(int alarmId) {
 	    
 		OnmsAlarm alarm = m_alarmDao.get(alarmId);
+		if (alarm == null) {
+			throw new ObjectRetrievalFailureException("Unable to locate Alarm with ID: "+alarmId, null);
+		}
         
         Ticket ticket = createTicketFromAlarm(alarm);
         
@@ -188,7 +191,7 @@ public class DefaultTicketerServiceLayer implements TicketerServiceLayer, Initia
 	 * TODO: Add alarmid to Ticket class for ability to reference back to Alarm (waffling on this
 	 * since ticket isn't a persisted object and other reasons)
 	 */
-    private Ticket createTicketFromAlarm(OnmsAlarm alarm) {
+    protected Ticket createTicketFromAlarm(OnmsAlarm alarm) {
         Ticket ticket = new Ticket();
         ticket.setSummary(alarm.getLogMsg());
         ticket.setDetails(alarm.getDescription());
@@ -234,6 +237,15 @@ public class DefaultTicketerServiceLayer implements TicketerServiceLayer, Initia
         
 		m_alarmDao.saveOrUpdate(alarm);
 	}
+
+    /*
+     * (non-Javadoc)
+     * @see org.opennms.netmgt.ticketd.TicketerServiceLayer#reloadTicketer()
+     */
+	/** {@inheritDoc} */
+    public void reloadTicketer() {
+	// Do nothing
+    }
     
     // TODO what if the alarm doesn't exist?
 	
