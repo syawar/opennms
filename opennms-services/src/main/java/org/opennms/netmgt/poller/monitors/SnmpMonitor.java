@@ -247,7 +247,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
                     status =  doPolling(operator,operand,lastPolledMib,parameters,status,InetAddressUtils.str(passiveHost),agentConfig, previousCheck,svc.getNodeId());
                     if(status.isUp()){
                     	Date theCurrentTime = new Date();
-                    	log().debug("updating asset records..1..");
+                    	log().debug("updating asset records..status up from last polled mib..");
                     	m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
                     	return status;
                     }
@@ -272,7 +272,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
                     //if the status is up change the required asset fields for optimization steps
                     if(status.isUp()){
                     	Date theCurrentTime = new Date();
-                    	log().debug("updating asset records..2..");
+                    	log().debug("updating asset records..for node up..");
                     	m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
                     	m_assetDao.updateAssetRecord(svc.getNodeId(),"lastParentController",host.trim());
                     	return status;
@@ -280,22 +280,22 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
                     log().debug("Passive poll on host::"+host+"::result::"+status.toString());
             	}
             	if(!status.isUp()){
-            		Date theCurrentTime = new Date();
-            		log().debug("updating asset records..3..");
-            		m_nodeDao.get(svc.getNodeId()).getAssetRecord().setSnmpCheckDate(theCurrentTime.toString());
+            		//Date theCurrentTime = new Date();
+            		log().debug("updating asset records..for down or unavailable node..");
+            		//m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
             		status= PollStatus.down();
             	}
             }
             else{
-            	Date theCurrentTime = new Date();
-            	log().debug("updating asset records..4..");
-            	m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
+            	//Date theCurrentTime = new Date();
+            	log().debug("updating asset records..no host list found..");
+            	//m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
             	log().error("Passive poller found no host list::value recieved::"+hostList+"::setting state to down");
             	status = PollStatus.down();
             }
-            Date theCurrentTime = new Date();
-            log().debug("updating asset records..5..");
-            m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
+            //Date theCurrentTime = new Date();
+            log().debug("updating asset records..normal update..");
+            //m_assetDao.updateAssetRecord(svc.getNodeId(),"snmpCheckDate",theCurrentTime.toString());
     		
         	log().debug("::The status to return::"+status.toString());
             return status;
