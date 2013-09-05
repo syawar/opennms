@@ -29,6 +29,7 @@
 package org.opennms.netmgt.poller;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -166,7 +167,7 @@ public interface QueryManager {
      * @param nodeId a int.
      * @return an array of {@link java.lang.String} objects.
      */
-    public String[] getCriticalPath(int nodeId);
+    public ArrayList<String[]> getCriticalPath(int nodeId);
     
     public List<String[]> getNodeServices(int nodeId);
     

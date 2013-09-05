@@ -30,6 +30,7 @@ package org.opennms.netmgt.poller;
 
 import java.net.InetAddress;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -238,25 +239,37 @@ public class DefaultPollContext implements PollContext, EventListener {
         
         if (uei.equals(EventConstants.NODE_DOWN_EVENT_UEI)
                 && this.getPollerConfig().isPathOutageEnabled()) {
-            String[] criticalPath = this.getQueryManager().getCriticalPath(nodeId);
+        	ArrayList<String[]> criticalPaths = this.getQueryManager().getCriticalPath(nodeId);
+        	boolean critPathUp = false;
+        	String critPathIps = "";
+        	String critPathSvcs = "";
+        	boolean pathExist = false;
+        	for(String[] criticalPath: criticalPaths){
+        		 if (criticalPath[0] != null && !criticalPath[0].equals("")) {
+        			 critPathUp=this.testCriticalPath(criticalPath);
+        			 critPathIps=critPathIps+criticalPath[0]+",";
+        			 critPathSvcs=critPathSvcs+criticalPath[1]+",";
+        			 pathExist = true;
+        		 }
+        		 else {
+        			 log.debug("No Critical path to test for node " + nodeId);
+        		 }
+        	}
             
-            if (criticalPath[0] != null && !criticalPath[0].equals("")) {
-                if (!this.testCriticalPath(criticalPath)) {
+                if (pathExist && !critPathUp) {
                     log.debug("Critical path test failed for node " + nodeId);
                     
                     // add eventReason, criticalPathIp, criticalPathService
                     // parms
                     
                     bldr.addParam(EventConstants.PARM_LOSTSERVICE_REASON, EventConstants.PARM_VALUE_PATHOUTAGE);
-                    bldr.addParam(EventConstants.PARM_CRITICAL_PATH_IP, criticalPath[0]);
-                    bldr.addParam(EventConstants.PARM_CRITICAL_PATH_SVC, criticalPath[1]);
+                    bldr.addParam(EventConstants.PARM_CRITICAL_PATH_IP, critPathIps);
+                    bldr.addParam(EventConstants.PARM_CRITICAL_PATH_SVC, critPathSvcs);
                     
                 } else {
                     log.debug("Critical path test passed for node " + nodeId);
                 }
-            } else {
-                log.debug("No Critical path to test for node " + nodeId);
-            }
+            
         }
         
         else if (uei.equals(EventConstants.NODE_LOST_SERVICE_EVENT_UEI)) {
