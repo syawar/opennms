@@ -516,27 +516,36 @@ public class DefaultQueryManager implements QueryManager {
     }
 
     /** {@inheritDoc} */
-    public String[] getCriticalPath(int nodeId) {
+    public ArrayList<String[]> getCriticalPath(int nodeId) {
+    	final ArrayList<String[]> critPaths = new ArrayList<String[]>();
         final String[] cpath = new String[2];
         Querier querier = new Querier(getDataSource(), "SELECT criticalpathip, criticalpathservicename FROM pathoutage where nodeid=?") {
     
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                cpath[0] = rs.getString(1);
-                cpath[1] = rs.getString(2);
+            	while(rs.next()){
+            		cpath[0] = rs.getString(1);
+                    cpath[1] = rs.getString(2);
+                    critPaths.add(cpath);
+            	}
+                
             }
     
         };
         querier.execute(Integer.valueOf(nodeId));
-    
-        if (cpath[0] == null || cpath[0].equals("")) {
-            cpath[0] = OpennmsServerConfigFactory.getInstance().getDefaultCriticalPathIp();
-            cpath[1] = "ICMP";
+        
+        for(String[] paths : critPaths){
+        	if (paths[0] == null || paths[0].equals("")) {
+        		paths[0] = OpennmsServerConfigFactory.getInstance().getDefaultCriticalPathIp();
+        		paths[1] = "ICMP";
+            }
+            if (paths[1] == null || paths[1].equals("")) {
+            	paths[1] = "ICMP";
+            }
         }
-        if (cpath[1] == null || cpath[1].equals("")) {
-            cpath[1] = "ICMP";
-        }
-        return cpath;
+        
+        
+        return critPaths;
     }
 
     public List<String[]> getNodeServices(int nodeId){
