@@ -30,6 +30,7 @@ package org.opennms.netmgt.poller;
 
 import java.net.InetAddress;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,13 +38,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.exolab.castor.xml.ValidationException;
+import org.opennms.core.utils.BeanUtils;
+import org.opennms.core.utils.ConfigFileConstants;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ThreadCategory;
 import org.opennms.netmgt.EventConstants;
 import org.opennms.netmgt.capsd.plugins.IcmpPlugin;
 import org.opennms.netmgt.config.OpennmsServerConfigFactory;
 import org.opennms.netmgt.config.PollerConfig;
+import org.opennms.netmgt.dao.AssetRecordDao;
+import org.opennms.netmgt.dao.NodeDao;
 import org.opennms.netmgt.eventd.EventIpcManager;
+import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.opennms.netmgt.model.events.EventListener;
 import org.opennms.netmgt.poller.pollables.PendingPollEvent;
@@ -68,6 +75,16 @@ public class DefaultPollContext implements PollContext, EventListener {
     private volatile boolean m_listenerAdded = false;
     private final List<PendingPollEvent> m_pendingPollEvents = new LinkedList<PendingPollEvent>();
 
+    /**
+     * the node dao object for retrieving assets
+     */
+    private NodeDao m_nodeDao = null; 
+    
+    /**
+     * the asset records
+     */
+    private AssetRecordDao m_assetDao = null;
+    
     /**
      * <p>getEventManager</p>
      *
@@ -222,6 +239,23 @@ public class DefaultPollContext implements PollContext, EventListener {
     /** {@inheritDoc} */
     public Event createEvent(String uei, int nodeId, InetAddress address, String svcName, Date date, String reason) {
         ThreadCategory log = ThreadCategory.getInstance(this.getClass());
+        m_nodeDao = BeanUtils.getBean("daoContext", "nodeDao", NodeDao.class);
+   	 	m_assetDao = BeanUtils.getBean("daoContext", "assetRecordDao", AssetRecordDao.class);
+   	 	OnmsNode onmsNode = m_nodeDao.get(nodeId);
+   	    String critHosts = onmsNode.getAssetRecord().getHostList();
+   	    List<String> theHostList = null;
+   	    boolean isPassive = false;
+   	    if(critHosts != null && !critHosts.isEmpty()){
+   	    	theHostList = Arrays.asList(critHosts.split("\\s*,\\s*"));
+   	    	isPassive = true;
+   	    }
+   	    
+   	    log.debug("Event hostList::"+theHostList);
+        
+        //TODO make passive service monitor variable
+        String PassiveServiceMonitor = "SNMP";
+        
+        log.debug("Event on node"+nodeId+" ::is passive::"+isPassive);
         
         if (log.isDebugEnabled())
             log.debug("createEvent: uei = " + uei + " nodeid = " + nodeId);
@@ -238,24 +272,81 @@ public class DefaultPollContext implements PollContext, EventListener {
         
         if (uei.equals(EventConstants.NODE_DOWN_EVENT_UEI)
                 && this.getPollerConfig().isPathOutageEnabled()) {
-            String[] criticalPath = this.getQueryManager().getCriticalPath(nodeId);
-            
-            if (criticalPath[0] != null && !criticalPath[0].equals("")) {
-                if (!this.testCriticalPath(criticalPath)) {
-                    log.debug("Critical path test failed for node " + nodeId);
-                    
-                    // add eventReason, criticalPathIp, criticalPathService
-                    // parms
-                    
-                    bldr.addParam(EventConstants.PARM_LOSTSERVICE_REASON, EventConstants.PARM_VALUE_PATHOUTAGE);
-                    bldr.addParam(EventConstants.PARM_CRITICAL_PATH_IP, criticalPath[0]);
-                    bldr.addParam(EventConstants.PARM_CRITICAL_PATH_SVC, criticalPath[1]);
-                    
+            if(isPassive){
+            	log.debug("Is Passive true...Checking all crit paths...");
+            	boolean critIsUp = false;
+            	if(theHostList != null){
+            		log.debug("Host list not null...the host list::"+theHostList);
+            		for(String critHost: theHostList){
+            			String [] criticalPath = new String[2];
+            			criticalPath[0] = critHost.trim();
+            			criticalPath[1] = PassiveServiceMonitor;
+            			log.debug("Checking crit path on ip::"+criticalPath[0]);
+            			if (criticalPath[0] != null && !criticalPath[0].equals("")) {
+            				 if (this.testCriticalPath(criticalPath)) {
+                                critIsUp = true;
+                                 
+                             } else {
+                                 log.debug("Passive Critical path test passed for node " + nodeId);
+                             }
+                        } else {
+                            log.debug("No Passive Critical path to test for node " + nodeId);
+                        }
+            		}
+            		//check if normal crit path exists and is up iff the other crit path is up
+            		if(critIsUp){
+            			String[] criticalPath = this.getQueryManager().getCriticalPath(nodeId);
+                        
+                        if (criticalPath[0] != null && !criticalPath[0].equals("")) {
+                            if (!this.testCriticalPath(criticalPath)) {
+                                log.debug("Critical path test failed for node " + nodeId);
+                                critIsUp = false;	
+                                critHosts = criticalPath[0];
+                                PassiveServiceMonitor = criticalPath[1];
+                                
+                            } else {
+                                log.debug("Normal Passive Critical path test passed for node " + nodeId);
+                            }
+                        } else {
+                            log.debug("No Normal Passive Critical path to test for node " + nodeId);
+                        }
+            		}
+            		if(!critIsUp){
+            			 log.debug("Passive Critical path test failed for node " + nodeId);
+                         
+                         // add eventReason, criticalPathIp, criticalPathService
+                         // parms
+                         
+                         bldr.addParam(EventConstants.PARM_LOSTSERVICE_REASON, EventConstants.PARM_VALUE_PATHOUTAGE);
+                         bldr.addParam(EventConstants.PARM_CRITICAL_PATH_IP, critHosts);
+                         bldr.addParam(EventConstants.PARM_CRITICAL_PATH_SVC, PassiveServiceMonitor);
+            		}
+           	    }
+            	else{
+
+           	    	log.error("Service Passive but no host list defined...");
+            	}
+            }
+            else{
+            	String[] criticalPath = this.getQueryManager().getCriticalPath(nodeId);
+                
+                if (criticalPath[0] != null && !criticalPath[0].equals("")) {
+                    if (!this.testCriticalPath(criticalPath)) {
+                        log.debug("Critical path test failed for node " + nodeId);
+                        
+                        // add eventReason, criticalPathIp, criticalPathService
+                        // parms
+                        
+                        bldr.addParam(EventConstants.PARM_LOSTSERVICE_REASON, EventConstants.PARM_VALUE_PATHOUTAGE);
+                        bldr.addParam(EventConstants.PARM_CRITICAL_PATH_IP, criticalPath[0]);
+                        bldr.addParam(EventConstants.PARM_CRITICAL_PATH_SVC, criticalPath[1]);
+                        
+                    } else {
+                        log.debug("Critical path test passed for node " + nodeId);
+                    }
                 } else {
-                    log.debug("Critical path test passed for node " + nodeId);
+                    log.debug("No Critical path to test for node " + nodeId);
                 }
-            } else {
-                log.debug("No Critical path to test for node " + nodeId);
             }
         }
         
