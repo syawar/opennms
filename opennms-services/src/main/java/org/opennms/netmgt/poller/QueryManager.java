@@ -167,7 +167,7 @@ public interface QueryManager {
      * @param nodeId a int.
      * @return an array of {@link java.lang.String} objects.
      */
-    public ArrayList<String[]> getCriticalPath(int nodeId);
+    public String[] getCriticalPath(int nodeId);
     
     public List<String[]> getNodeServices(int nodeId);
     
