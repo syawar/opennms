@@ -35,6 +35,8 @@ import org.opennms.netmgt.config.collector.Persister;
 import org.opennms.netmgt.config.collector.ServiceParameters;
 import org.opennms.netmgt.snmp.SnmpUtils;
 import org.opennms.netmgt.snmp.SnmpValue;
+import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.Variable;
 
 /**
  * <p>SnmpAttribute class.</p>
@@ -202,7 +204,11 @@ public class SnmpAttribute extends AbstractCollectionAttribute {
      * @return a {@link java.lang.String} object.
      */
     public String getStringValue() {
+    	if(m_type.getType().toLowerCase().startsWith("hexstring")){
+    		Variable value = new OctetString(getValue().getBytes());
+    		return value.toString();
+    	}
         SnmpValue value=getValue();
-        return (value == null ? null : value.toString());
+        return (value == null ? null : value.toString());  
     }
 }

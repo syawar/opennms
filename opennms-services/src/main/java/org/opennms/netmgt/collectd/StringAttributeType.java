@@ -32,6 +32,7 @@ import org.opennms.netmgt.config.MibObject;
 import org.opennms.netmgt.config.collector.AttributeGroupType;
 import org.opennms.netmgt.config.collector.CollectionAttribute;
 import org.opennms.netmgt.config.collector.Persister;
+import org.opennms.netmgt.snmp.SnmpValue;
 
 /**
  * <p>StringAttributeType class.</p>
@@ -40,6 +41,8 @@ import org.opennms.netmgt.config.collector.Persister;
  * @version $Id: $
  */
 public class StringAttributeType extends SnmpAttributeType {
+	
+	private boolean isHex = false;
     
     /**
      * <p>supportsType</p>
@@ -48,7 +51,14 @@ public class StringAttributeType extends SnmpAttributeType {
      * @return a boolean.
      */
     public static boolean supportsType(String rawType) {
-        return rawType.toLowerCase().startsWith("string");
+    	if (rawType.toLowerCase().startsWith("string")){
+    		return true;
+    	}
+    	if (rawType.toLowerCase().startsWith("hexstring")){
+    		return true;
+    	}
+    	return false;
+        //return rawType.toLowerCase().startsWith("string");
     }
     
     /**
@@ -61,11 +71,28 @@ public class StringAttributeType extends SnmpAttributeType {
      */
     public StringAttributeType(ResourceType resourceType, String collectionName, MibObject mibObj, AttributeGroupType groupType) {
         super(resourceType, collectionName, mibObj, groupType);
+        if(mibObj.getType().toLowerCase().startsWith("hexstring")){
+            setHex(true);
+        }
     }
 
     /** {@inheritDoc} */
     public void storeAttribute(CollectionAttribute attribute, Persister persister) {
         persister.persistStringAttribute(attribute);
     }
+
+	/**
+	 * @return the isHex
+	 */
+	public boolean isHex() {
+		return isHex;
+	}
+
+	/**
+	 * @param isHex the isHex to set
+	 */
+	public void setHex(boolean isHex) {
+		this.isHex = isHex;
+	}
 
 }
