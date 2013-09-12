@@ -30,8 +30,8 @@
 --%>
 
 <%@page language="java" contentType="text/html" session="true"
-	import="java.util.Iterator,
-		java.util.List,
+        import="java.util.Iterator,
+                java.util.List,
                 org.opennms.netmgt.config.OpennmsServerConfigFactory,
                 org.opennms.web.pathOutage.*" %>
 
@@ -50,36 +50,37 @@
 <%
         List<String[]> testPaths = PathOutageFactory.getAllCriticalPaths();
         String dcpip = OpennmsServerConfigFactory.getInstance().getDefaultCriticalPathIp();
-        String[] pthData = PathOutageFactory.getCriticalPathData(dcpip, "ICMP");
+        String criticalSvc = OpennmsServerConfigFactory.getInstance().getDefaultCriticalPathService();
+        String[] pthData = PathOutageFactory.getCriticalPathData(dcpip, criticalSvc);
 %>
 <% if (dcpip != null && !dcpip.equals("")) { %>
-	<p>Default Critical Path = <%= dcpip %> ICMP</p>
+        <p>Default Critical Path = <%= dcpip %> Service=<%= criticalSvc %></p>
 <% } %>
-	<h3>All path outages</h3>
-	<table>
-		<tr>
-			<th>Critical Path Node</th>
-			<th><%= "Critical Path IP" %></th>
-			<th><%= "Critical Path Service" %></th>
-			<th># of Nodes</th>
-		</tr>
-		<%          Iterator<String[]> iter2 = testPaths.iterator();
-		while( iter2.hasNext() ) {
-			String[] pth = iter2.next();
-			pthData = PathOutageFactory.getCriticalPathData(pth[0], pth[1]); %>
-			<tr class="CellStatus">
-				<% if((pthData[0] == null) || (pthData[0].equals(""))) { %>
-					<td>(interface not in DB)</td>
-					<% } else if (pthData[0].indexOf("nodes have this IP") > -1) { %>
-						<td><a href="element/nodeList.htm?iplike=<%= pth[0] %>"><%= pthData[0] %></a></td>
-						<% } else { %>
-							<td><a href="element/node.jsp?node=<%= pthData[1] %>"><%= pthData[0] %></a></td>
-							<% } %>
-							<td><%= pth[0] %></td>
-							<td class="<%= pthData[3] %>" align="center"><%= pth[1] %></td>
-							<td><a href="pathOutage/showNodes.jsp?critIp=<%= pth[0] %>&critSvc=<%= pth[1] %>"><%= pthData[2] %></a></td>
-						</tr>
-						<% } %>
+        <h3>All path outages</h3>
+        <table>
+                <tr>
+                        <th>Critical Path Node</th>
+                        <th><%= "Critical Path IP" %></th>
+                        <th><%= "Critical Path Service" %></th>
+                        <th># of Nodes</th>
+                </tr>
+                <%          Iterator<String[]> iter2 = testPaths.iterator();
+                while( iter2.hasNext() ) {
+                        String[] pth = iter2.next();
+                        pthData = PathOutageFactory.getCriticalPathData(pth[0], pth[1]); %>
+                        <tr class="CellStatus">
+                                <% if((pthData[0] == null) || (pthData[0].equals(""))) { %>
+                                        <td>(interface not in DB)</td>
+                                        <% } else if (pthData[0].indexOf("nodes have this IP") > -1) { %>
+                                                <td><a href="element/nodeList.htm?iplike=<%= pth[0] %>"><%= pthData[0] %></a></td>
+                                                <% } else { %>
+                                                        <td><a href="element/node.jsp?node=<%= pthData[1] %>"><%= pthData[0] %></a></td>
+                                                        <% } %>
+                                                        <td><%= pth[0] %></td>
+                                                        <td class="<%= pthData[3] %>" align="center"><%= pth[1] %></td>
+                                                        <td><a href="pathOutage/showNodes.jsp?critIp=<%= pth[0] %>&critSvc=<%= pth[1] %>"><%= pthData[2] %></a></td>
+                                                </tr>
+                                                <% } %>
 </table>
 
 

@@ -29,11 +29,42 @@
 
 --%>
 
+
 <%@page language="java"
-	contentType="text/html"
-	session="true"
-	import="org.opennms.web.admin.notification.noticeWizard.*"
+        contentType="text/html"
+        session="true"
+        import="
+                java.io.*,
+                java.util.*,
+                org.opennms.web.admin.notification.noticeWizard.*,
+                org.opennms.netmgt.config.*,
+                org.opennms.netmgt.config.notifications.*,
+                org.opennms.core.utils.BundleLists,
+                org.opennms.core.utils.ConfigFileConstants,
+                org.springframework.core.io.FileSystemResource,
+                org.opennms.netmgt.poller.ServiceMonitor
+        "
 %>
+
+<%!
+        private DefaultPollerConfigDao m_pollerConfDao;
+
+        public void init() throws ServletException {
+                
+                try {
+                        OpennmsServerConfigFactory.init();
+                OpennmsServerConfigFactory onmsSvrConfig = OpennmsServerConfigFactory.getInstance();
+                        m_pollerConfDao = new DefaultPollerConfigDao();
+                        m_pollerConfDao.setConfigResource(new FileSystemResource(ConfigFileConstants.getFile(ConfigFileConstants.POLLER_CONFIG_FILE_NAME)));
+                        m_pollerConfDao.setLocalServer(onmsSvrConfig.getServerName());
+                        m_pollerConfDao.setVerifyServer(onmsSvrConfig.verifyServer());
+                        m_pollerConfDao.afterPropertiesSet();
+                } catch (Throwable e) {
+                        throw new ServletException("Cannot load configuration file", e);
+                }
+        }
+%>
+
 
 <%
     String newRule = request.getParameter("newRule");
@@ -87,8 +118,8 @@
 
     <br/><br/>
 
-    <select name="criticalSvc" value="ICMP" size="1">
-        <option value="ICMP">ICMP</option>
+    <select name="criticalSvc" size="1">
+        <%=getAllPollerList()%>
     </select>
       <input type="hidden" name="sourcePage" value="<%=NotificationWizardServlet.SOURCE_PAGE_PATH_OUTAGE%>"/>
       <input type="hidden" name="nextPage" value=""/>
@@ -101,22 +132,22 @@
                commas are used for list demarcation.
             </p>
             <p>The following examples are all valid and yield the set of addresses from
-	       192.168.0.0 through 192.168.3.255.</p>
+               192.168.0.0 through 192.168.3.255.</p>
                <ul>
                   <li>192.168.0-3.*
                   <li>192.168.0-3.0-255
                   <li>192.168.0,1,2,3.*
                </ul>
-	    <p>To Use a rule based on TCP/IP addresses as described above, enter<br/><br/>
-	       IPADDR IPLIKE *.*.*.*<br/><br/>in the Current Rule box below, substituting your
-	       desired address fields for *.*.*.*.
-	       <br/>Otherwise, you may enter any valid rule.
-	    </p>
-	    Current Rule:<br/>
-	    <input type="text" size=100 name="newRule" value="<%=newRule%>"/>
+            <p>To Use a rule based on TCP/IP addresses as described above, enter<br/><br/>
+               IPADDR IPLIKE *.*.*.*<br/><br/>in the Current Rule box below, substituting your
+               desired address fields for *.*.*.*.
+               <br/>Otherwise, you may enter any valid rule.
+            </p>
+            Current Rule:<br/>
+            <input type="text" size=100 name="newRule" value="<%=newRule%>"/>
            <br/><br/>
 
-	    Show matching node list:
+            Show matching node list:
             <% if (showNodes == null) { %>
             <input type="checkbox" name="showNodes" checked="true" >
             <% } else { %>
@@ -132,3 +163,21 @@
 
 <jsp:include page="/includes/footer.jsp" flush="false" />
 
+<%!
+        public String getAllPollerList() throws IOException, FileNotFoundException{
+                
+                PollerConfig m_pollerConfig = m_pollerConfDao.getPollerConfig();
+                
+                Map<String, ServiceMonitor> serviceMonitors = m_pollerConfig.getServiceMonitors();
+                
+                StringBuffer buffer = new StringBuffer();
+                
+                for (Map.Entry<String, ServiceMonitor> entry : serviceMonitors.entrySet()) {
+                        buffer.append("<option selected VALUE=" + entry.getKey() + ">" + entry.getKey() + "</option>");
+                }
+
+        return buffer.toString();
+    }  
+    
+    
+%>

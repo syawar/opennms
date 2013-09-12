@@ -35,10 +35,39 @@
 	import="org.opennms.web.WebSecurityUtils,
 		org.opennms.web.element.*,
 		org.opennms.netmgt.model.OnmsNode,
-		org.opennms.web.MissingParameterException
+		org.opennms.web.MissingParameterException,
+		java.io.*,
+		java.util.*,
+		org.opennms.web.admin.notification.noticeWizard.*,
+		org.opennms.netmgt.config.*,
+		org.opennms.netmgt.config.notifications.*,
+		org.opennms.core.utils.BundleLists,
+		org.opennms.core.utils.ConfigFileConstants,
+		org.springframework.core.io.FileSystemResource,
+		org.opennms.netmgt.poller.ServiceMonitor
 	"
 %>
 
+<%!
+private DefaultPollerConfigDao m_pollerConfDao;
+
+public void init() throws ServletException {
+	
+	try {
+		OpennmsServerConfigFactory.init();
+   		OpennmsServerConfigFactory onmsSvrConfig = OpennmsServerConfigFactory.getInstance();
+		m_pollerConfDao = new DefaultPollerConfigDao();
+		m_pollerConfDao.setConfigResource(new FileSystemResource(ConfigFileConstants.getFile(ConfigFileConstants.POLLER_CONFIG_FILE_NAME)));
+		m_pollerConfDao.setLocalServer(onmsSvrConfig.getServerName());
+		m_pollerConfDao.setVerifyServer(onmsSvrConfig.verifyServer());
+		m_pollerConfDao.afterPropertiesSet();
+	} catch (Throwable e) {
+		throw new ServletException("Cannot load configuration file", e);
+	}
+	
+}
+   
+%>
 <%
     int nodeId = -1;
     String nodeIdString = request.getParameter("node");
@@ -153,9 +182,10 @@ LABEL
 <p>
 <label for="criticalSvc">Critical path service:</label><br/>
 
-  <select id="criticalSvc" name="criticalSvc" value="ICMP" size="1">
-        <option value="ICMP">ICMP</option>
-  </select>
+  
+  <select name="criticalSvc" size="1">
+    	<%=getAllPollerList()%>
+    </select>
 </p>
 
 <p>
@@ -173,5 +203,23 @@ LABEL
 </p>
 
 </form>
+<%!
+	public String getAllPollerList() throws IOException, FileNotFoundException{
+		
+		PollerConfig m_pollerConfig = m_pollerConfDao.getPollerConfig();
+		
+		Map<String, ServiceMonitor> serviceMonitors = m_pollerConfig.getServiceMonitors();
+		
+		StringBuffer buffer = new StringBuffer();
+		
+		for (Map.Entry<String, ServiceMonitor> entry : serviceMonitors.entrySet()) {
+    			buffer.append("<option selected VALUE=" + entry.getKey() + ">" + entry.getKey() + "</option>");
+		}
+
+        return buffer.toString();
+    }  
+    
+    
+%>
 
 <jsp:include page="/includes/footer.jsp" flush="true"/>
