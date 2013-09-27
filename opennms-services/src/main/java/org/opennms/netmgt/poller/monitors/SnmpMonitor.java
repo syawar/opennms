@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.log4j.Level;
+import org.jfree.util.Log;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.core.utils.PropertiesUtils;
@@ -237,14 +238,27 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         	if(lastParentController != null && !"".equals(lastParentController) && lastPolledMib != null && !"".equals(lastPolledMib) && (lastPolledMib.equals(oid) || lastPolledMib.contains(oid))){
         		//check if hostlist still contains the selected IP from the previous poll
         		if(hostList != null && hostList.contains(lastParentController)){
+        			List<String> theHostList=Arrays.asList(hostList.split("\\s*:\\s*"));
+        			Integer theDynamicPort = null;
         			boolean previousCheck = true;
+        			for(String host : theHostList){
+        				if(host.contains(":")){
+                			List<String> hostDiv=Arrays.asList(host.split("\\s*:\\s*"));
+                			if(hostDiv.size() == 2){
+                				if(hostDiv.get(0).trim().contains(lastParentController)){
+                        			theDynamicPort = Integer.parseInt(hostDiv.get(1).trim());
+                				}
+                			}
+                		}
+        			}
+        			
             		lastParentController= lastParentController.trim();
             		log().debug("Passive polling last Parent Controller::"+lastParentController);
             		InetAddress passiveHost = InetAddressUtils.addr(lastParentController);
             		SnmpAgentConfig passiveAgentConfig = SnmpPeerFactory.getInstance().getAgentConfig(passiveHost);
                     agentConfig.setAddress(passiveHost);
                     if (agentConfig == null) throw new RuntimeException("Reverting to local config failed::SnmpAgentConfig object not available for interface " + ipaddr );
-                    status =  doPolling(operator,operand,lastPolledMib,parameters,status,InetAddressUtils.str(passiveHost),agentConfig, previousCheck,svc.getNodeId());
+                    status =  doPolling(operator,operand,lastPolledMib,parameters,status,InetAddressUtils.str(passiveHost),agentConfig, previousCheck,svc.getNodeId(),theDynamicPort);
                     if(status.isUp()){
                     	Date theCurrentTime = new Date();
                     	log().debug("updating asset records..status up from last polled mib..");
@@ -259,16 +273,30 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         	}
         	log().debug("is Passive is true");
             List<String> theHostList;
+            Integer theDynamicPort = null;
             if(hostList != null){
             	log().debug("Passive polling hostlist is not empty::");
             	theHostList=Arrays.asList(hostList.split("\\s*,\\s*"));
             	for(String host : theHostList){
+            		
+            		if(host.contains(":")){
+            			List<String> hostDiv=Arrays.asList(host.split("\\s*:\\s*"));
+            			if(hostDiv.size() == 2){
+            				host=hostDiv.get(0).trim();
+                			theDynamicPort = Integer.parseInt(hostDiv.get(1).trim());
+            			}
+            			else{
+            				log().error("Improper fomat of host::"+host+"::compensating and using default port");
+            				host = host.replace(":", "");
+            				host = host.trim();
+            			}
+            		}
             		log().debug("Passive polling host::"+host);
             		InetAddress passiveHost = InetAddressUtils.addr(host);
             		SnmpAgentConfig passiveAgentConfig = SnmpPeerFactory.getInstance().getAgentConfig(passiveHost);
                     agentConfig.setAddress(passiveHost);
                     if (agentConfig == null) throw new RuntimeException("Reverting to local config failed::SnmpAgentConfig object not available for interface " + ipaddr );
-                    status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),agentConfig,false,svc.getNodeId());
+                    status =  doPolling(operator,operand,oid,parameters,status,InetAddressUtils.str(passiveHost),agentConfig,false,svc.getNodeId(),theDynamicPort);
                     //if the status is up change the required asset fields for optimization steps
                     if(status.isUp()){
                     	Date theCurrentTime = new Date();
@@ -302,7 +330,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         }
         else{
         	log().debug("doing normal polling::");
-        	status = doPolling(operator,operand,oid,parameters,status,hostAddress,agentConfig,false,svc.getNodeId());
+        	status = doPolling(operator,operand,oid,parameters,status,hostAddress,agentConfig,false,svc.getNodeId(),null);
         }
         
         
@@ -329,7 +357,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
      * 
      * @author <A HREF="mailto:syawar@datavalet.com">Saqib Yawar </A>
      */
-    public PollStatus doPolling(String operator, String operand, String oid, Map<String, Object> parameters ,PollStatus status, String hostAddress , SnmpAgentConfig agentConfig, boolean prevCheck, Integer nodeId){
+    public PollStatus doPolling(String operator, String operand, String oid, Map<String, Object> parameters ,PollStatus status, String hostAddress , SnmpAgentConfig agentConfig, boolean prevCheck, Integer nodeId, Integer dynamicPort){
     	
     	//to compensate for previous mib checks
     	String walkstr = "";
@@ -350,7 +378,12 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
         // set timeout and retries on SNMP peer object
         agentConfig.setTimeout(ParameterMap.getKeyedInteger(parameters, "timeout", agentConfig.getTimeout()));
         agentConfig.setRetries(ParameterMap.getKeyedInteger(parameters, "retry", ParameterMap.getKeyedInteger(parameters, "retries", agentConfig.getRetries())));
-        agentConfig.setPort(ParameterMap.getKeyedInteger(parameters, "port", agentConfig.getPort()));
+        if(dynamicPort != null){
+        	agentConfig.setPort(dynamicPort);
+        }
+        else{
+        	agentConfig.setPort(ParameterMap.getKeyedInteger(parameters, "port", agentConfig.getPort()));
+        }
 
         // Squirrel the configuration parameters away in a Properties for later expansion if service is down
         Properties svcParams = new Properties();
