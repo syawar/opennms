@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<datacollection-group name="mongostats">
+    <!-- Mongo  locks -->
+    <group name="mongo-lock-stats" ifType="ignore">
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="3" alias="localReadTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="4" alias="globalACRead" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="5" alias="globalACTotal" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="26" alias="serverStatusReadTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="27" alias="globaltotalTime" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="38" alias="testWriteTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="43" alias="dbReadTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="46" alias="globalReadersCQ" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="48" alias="dvdnsReadTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="52" alias="test__WriteTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="55" alias="admin__ReadTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="57" alias="testReadTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="58" alias="dvdns__ReadTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="59" alias="admin__WriteTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="61" alias="adminReadTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="68" alias="db__WriteTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="76" alias="globalACwriters" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="77" alias="globallockTime" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="78" alias="db__WriteTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="80" alias="dot_ReadTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="82" alias="dvdns__WriteTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="83" alias="db__ReadTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="85" alias="dot_WriteTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="86" alias="test__ReadTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="87" alias="localaccessesNotInMemory" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="88" alias="serverStatus__ReadTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="91" alias="dot_WriteTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="98" alias="dot_ReadTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="109" alias="local__WriteTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="110" alias="serverStatus__WriteTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="122" alias="globalCQwriters" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="127" alias="admin__WriteTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="133" alias="serverStatusWriteTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="134" alias="dvdns__WriteTAM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="138" alias="local__ReadTLM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="146" alias="local__WriteTAM" type="gauge" />
+    </group>
+    <!-- Mongo OPCounters -->
+    <group name="mongo-opc-stats" ifType="ignore">
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="2" alias="OPCupdate" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="11" alias="OPCReplcommand" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="20" alias="OPCdelete" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="37" alias="OPCRepldelete" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="69" alias="OPCReplgetmore" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="70" alias="OPCReplupdate" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="90" alias="OPCReplinsert" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="95" alias="OPCquery" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="97" alias="OPCReplquery" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="124" alias="OPCinsert" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="135" alias="OPCcommand" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="142" alias="OPCgetmore" type="gauge" />
+    </group>
+    <!-- Mongo Network Stats -->
+    <group name="mongo-network-stats" ifType="ignore">
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="19" alias="metricsReplNetGMnum" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="22" alias="metricsReplNetops" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="44" alias="metricsReplNetbytes" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="49" alias="metricsReplNetreadersCreated" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="62" alias="NetnumRequests" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="100" alias="NetbytesIn" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="115" alias="NetbytesOut" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="129" alias="metricsReplNetGMtotal" type="gauge" />
+    </group>
+    <!-- Mongo Document Stats -->
+    <group name="mongo-document-stats" ifType="ignore">
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="36" alias="docupdated" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="51" alias="docdeleted" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="71" alias="docreturned" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="132" alias="docinserted" type="gauge" />
+    </group>
+    <!-- Mongo Memory Stats -->
+    <group name="mongo-memory-stats" ifType="ignore">
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="1" alias="Memresident" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="30" alias="Memvirtual" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="31" alias="Membits" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="50" alias="Memmapped" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="120" alias="Memsupported" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="144" alias="MemmappedWithJournal" type="gauge" />
+    </group>
+    <!-- Mongo Record Stats -->
+    <group name="mongo-recordStats-stats" ifType="ignore">
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="6" alias="serverStatANM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="13" alias="dbPFEThrown" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="41" alias="localPFEThrown" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="60" alias="testPFEThrown" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="64" alias="adminPFEThrown" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="67" alias="testANM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="87" alias="localANM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="104" alias="adminANM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="108" alias="ANM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="117" alias="serverStatusPFEThrown" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="118" alias="dvdnsANM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="123" alias="pageFaultExceptionsThrown" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="139" alias="dbANM" type="gauge" />
+        <mibObj oid=".1.2.3.2.2.5.666.777.1" instance="143" alias="dvdnsPFEThrown" type="gauge" />
+    </group>
+    <systemDef name="mongostats">
+        <sysoid>.1.3.6.1.4.1.8072.3.2.10.1</sysoid>
+        <collect>
+            <includeGroup>mongo-lock-stats</includeGroup>
+            <includeGroup>mongo-opc-stats</includeGroup>
+            <includeGroup>mongo-network-stats</includeGroup>
+            <includeGroup>mongo-document-stats</includeGroup>
+            <includeGroup>mongo-memory-stats</includeGroup>
+            <includeGroup>mongo-recordStats-stats</includeGroup>
+        </collect>
+    </systemDef>
+</datacollection-group>

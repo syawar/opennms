@@ -37,5 +37,6 @@
 			<dropColumn tableName="assets" columnName="lastpolledmib"/>		
 		</rollback>
 	</changeSet>
+	
 
 </databaseChangeLog>

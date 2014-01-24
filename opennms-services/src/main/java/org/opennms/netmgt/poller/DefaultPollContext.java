@@ -490,7 +490,8 @@ public class DefaultPollContext implements PollContext, EventListener {
 		log().debug("syawar::"+this+"::initiating checking");
 		ThreadCategory log = log();
 		log.debug("Test critical path IP " + criticalPath[0]);
-		addr = InetAddressUtils.addr(criticalPath[0]);
+		String [] theHosts = criticalPath[0].split(":");
+		addr = InetAddressUtils.addr(theHosts[0]);
 		if (addr == null) {
 			log.error("failed to convert string address to InetAddress " + criticalPath[0]);
 			return true;
@@ -519,10 +520,17 @@ public class DefaultPollContext implements PollContext, EventListener {
 		log().debug("syawar::"+this+"::here3--"+str);
 		log().debug("syawar::"+this+"::Instatiation of new plugin");
 		Plugin theRequiredPlugin;
+		Map<String, Object> qualifiers = new HashMap<String, Object>();
+		qualifiers.put("port", theHosts[1]);
 		try {
 			theRequiredPlugin = (Plugin) Class.forName(str).newInstance();
 			log().debug("syawar::"+this+"instantiation successfull...get poll");
-			result = theRequiredPlugin.isProtocolSupported(addr);
+			if(theHosts[1] != null){
+				result = theRequiredPlugin.isProtocolSupported(addr, qualifiers);
+			}
+			else{
+				result = theRequiredPlugin.isProtocolSupported(addr);
+			}		
 			log().debug("syawar::"+this+"poll result===>"+result);
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block

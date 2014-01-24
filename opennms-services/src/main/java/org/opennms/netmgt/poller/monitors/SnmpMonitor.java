@@ -358,7 +358,7 @@ public class SnmpMonitor extends SnmpMonitorStrategy {
      * @author <A HREF="mailto:syawar@datavalet.com">Saqib Yawar </A>
      */
     public PollStatus doPolling(String operator, String operand, String oid, Map<String, Object> parameters ,PollStatus status, String hostAddress , SnmpAgentConfig agentConfig, boolean prevCheck, Integer nodeId, Integer dynamicPort){
-    	
+    	//TODO:CLEANUP THE FUNCTION TO USE MAP STRING INSTEAD OF SO MANY VARIABLES
     	//to compensate for previous mib checks
     	String walkstr = "";
     	if(prevCheck){
